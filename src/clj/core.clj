@@ -1890,18 +1890,18 @@
 ; (= (__ 4 #{[1 2 3] :a "abc" "efg"}) #{#{[1 2 3] :a "abc" "efg"}})
 ; (= (__ 2 #{[1 2 3] :a "abc" "efg"}) #{#{[1 2 3] :a} #{[1 2 3] "abc"} #{[1 2 3] "efg"}
 ;                                     #{:a "abc"} #{:a "efg"} #{"abc" "efg"}})
-; (defn p103 [n s]
-;   (if (zero? n)
-;     []
-;     (map
-;       (fn [a]
-;         (cons a (p103 (dec n) (clojure.set/difference s (hash-set a))))) s)))
-; (def x '(0 (1) (2)))
-; (def y '((0 (1) (2)) (1 (0) (2)) (2 (0) (1))))
-; (defn fnx [tr]
-;   (if-not (seq tr)
-;     []
-;     (map #(vector [(first tr)] [%])  (fnx (rest tr)))))
+ (defn p103 [n s]
+   (if (zero? n)
+     []
+     (map
+       (fn [a]
+         (cons a (p103 (dec n) (clojure.set/difference s (hash-set a))))) s)))
+ (def x '(0 (1) (2)))
+ (def y '((0 (1) (2)) (1 (0) (2)) (2 (0) (1))))
+ (defn fnx [tr]
+   (if-not (seq tr)
+     []
+     (map #(vector [(first tr)] [%])  (fnx (rest tr)))))
 (defn rotate [coll]
   (let [n (count coll)]
     (map #(concat (drop % coll) (take % coll)) (range 0 n))))
