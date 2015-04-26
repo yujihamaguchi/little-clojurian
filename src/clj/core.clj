@@ -1890,35 +1890,22 @@
 ; (= (__ 4 #{[1 2 3] :a "abc" "efg"}) #{#{[1 2 3] :a "abc" "efg"}})
 ; (= (__ 2 #{[1 2 3] :a "abc" "efg"}) #{#{[1 2 3] :a} #{[1 2 3] "abc"} #{[1 2 3] "efg"}
 ;                                     #{:a "abc"} #{:a "efg"} #{"abc" "efg"}})
- (defn p103 [n s]
-   (if (zero? n)
-     []
-     (map
-       (fn [a]
-         (cons a (p103 (dec n) (clojure.set/difference s (hash-set a))))) s)))
- (def x '(0 (1) (2)))
- (def y '((0 (1) (2)) (1 (0) (2)) (2 (0) (1))))
- (defn fnx [tr]
-   (if-not (seq tr)
-     []
-     (map #(vector [(first tr)] [%])  (fnx (rest tr)))))
-(defn rotate [coll]
-  (let [n (count coll)]
-    (map #(concat (drop % coll) (take % coll)) (range 0 n))))
-
-(defn cons-tr [n coll]
-  (when-not (or (zero? n) (not (seq coll)))
-    (let [x (first coll)
-          coll' (rotate (rest coll))]
-      (concat [x] (filter #(not (nil? %)) (map (partial cons-tr (dec n)) coll'))))))
-
-; (walk-tr '(1 (2 (3)) (4 (5))))
-;-> ((1 2 3) (1 4 5))
-
-(defn walk-tr [tr]
-  (if-not (next (seq tr))
-    tr
-    (mapcat (comp (partial cons (first tr)) walk-tr) (rest tr))))
+(defn p103 [n s]
+  (letfn [(gen-tree [n s]
+            (if (zero? n)
+              []
+              (map
+              (fn [a]
+                (cons a (gen-tree (dec n) (clojure.set/difference s (hash-set a))))) s)))
+          (walk-tr-in-depth [tr acc n]
+            (if (zero? n)
+              [acc]
+              (mapcat (fn [cn] (walk-tr-in-depth
+                                 (when (seq? cn) (rest cn))
+                                 (conj acc (if (seq? cn) (first cn) cn))
+                                 (dec n)))
+                      tr)))]
+    (set (map set (walk-tr-in-depth (gen-tree n s) [] n)))))
 
 ; テスト無し(REPLで直接書くこと)
 ; Q: 2つの文字列から文字を取り出して交互にはさみこめ。またそれを元に戻せ。
