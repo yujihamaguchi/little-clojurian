@@ -1907,6 +1907,27 @@
                       tr)))]
     (set (map set (walk-tr-in-depth (gen-tree n s) [] n)))))
 
+; Q: A balanced prime is a prime number which is also the mean of the primes directly before and after it in the sequence of valid primes.
+;    Create a function which takes an integer n, and returns true iff it is a balanced prime.(p116)
+; (= false (__ 4))
+; (= true (__ 563))
+; (= 1103 (nth (filter __ (range)) 15))
+(defn factors [n] (for [n' (range 1 (inc n)) :when (zero? (mod n n'))] n'))
+(def factors' (memoize factors))
+(defn prime? [n] (= [1, n] (factors' n)))
+(def prime?' (memoize prime?))
+(defn pre-prime [n] (if (or (<= n 0) (prime?' n)) n (pre-prime (dec n))))
+(def pre-prime' (memoize pre-prime))
+(defn post-prime [n] (if (prime? n) n (post-prime (inc n))))
+(def post-prime' (memoize post-prime))
+(defn p116 [n]
+;  (let [factors (memoize (fn [n] (for [n' (range 1 (inc n)) :when (zero? (mod n n'))] n')))
+;        prime? (memoize (fn [n] (= [1, n] (factors n))))]
+    (and (prime?' n)
+;      (let [pre-prime (memoize (fn [n] (if (or (<= n 0) (prime? n)) n (pre-prime (dec n)))))
+;            post-prime (memoize (fn [n] (if (prime? n) n (post-prime (inc n)))))]
+        (= n (/ (+ (pre-prime' (dec n)) (post-prime' (inc n))) 2))))
+
 ; テスト無し(REPLで直接書くこと)
 ; Q: 2つの文字列から文字を取り出して交互にはさみこめ。またそれを元に戻せ。
 ; A:

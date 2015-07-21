@@ -1315,3 +1315,12 @@
 	(is (= (p103 2 #{[1 2 3] :a "abc" "efg"}) #{#{[1 2 3] :a} #{[1 2 3] "abc"} #{[1 2 3] "efg"}
                                     #{:a "abc"} #{:a "efg"} #{"abc" "efg"}}))
 )
+
+(deftest ut-p116
+  (is (= false (p116 4)))
+  (is (= true (p116 5)))
+  (is (= true (p116 53)))
+  (is (= true (p116 563)))
+  (is (= true (p116 1103)))
+  (is (= 1103 (nth (filter p116 (range)) 15)))
+)

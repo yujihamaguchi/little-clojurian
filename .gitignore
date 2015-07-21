@@ -1,3 +1,5 @@
 .lein-repl-history
 *.swp
+*.swo
+*.swn
 target/repl-port
