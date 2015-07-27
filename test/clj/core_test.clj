@@ -8,9 +8,9 @@
     (is　(= (zip [1 2] "x") '((1 \x)) ))
     (is　(= (zip [1] "xy") '((1 \x)) ))
     (is　(= (zip) nil ))
-    (is　(= (zip "") nil ))
-    (is　(= (zip "" [1]) nil ))
-    (is　(= (zip [1] "") nil ))
+    (is　(or (= (zip "") nil) (= (zip "") '())))
+    (is　(or (= (zip "" [1]) nil ) (= (zip "" [1]) '())))
+    (is　(or (zip [1] "") nil ) (= (zip [1] "") '()))
   )
 )
 

@@ -6,10 +6,13 @@
 ; Q: haskellのzipと同様の機能の関数を書け
 ; zip :: [a] -> [b] -> [(a, b)]
 (defn zip [& colls]
-  (when (and (not (nil? colls))
-             (every? seq colls))
-    (cons (map first colls)
-          (apply zip (map rest colls)))))
+  (when (seq colls)
+    (apply (partial map (fn [& xs] (vec xs))) colls)))
+;(defn zip [& colls]
+;  (when (and (not (nil? colls))
+;             (every? seq colls))
+;    (cons (map first colls)
+;          (apply zip (map rest colls)))))
 
 ; Q: haskellのsumと同様の機能の関数を書け。(reduceを用いるパターン、applyを用いるパターン、再帰を用いるパターン)
 ; sum :: (Num a) => [a] -> a
@@ -18,14 +21,17 @@
 ;     see also: product, foldl
 ;         sum [1, 2, 3]  = 6
 ;         sum []         = 0
-; (defn sum [ns]
-;   (reduce + ns))
+; A: Using reduce.
+(defn sum [ns]
+  (reduce + ns))
+; A: Using apply.
 ; (defn sum [ns]
 ;   (apply + ns))
-(defn sum [ns]
-  (if-not (seq ns)
-    0
-    (+ (first ns) (sum (rest ns)))))
+; A: Using recursion.
+;(defn sum [ns]
+;  (if-not (seq ns)
+;    0
+;    (+ (first ns) (sum (rest ns)))))
 
 ; Q: クイックソート関数qsort01を書け
 (defn qsort01 [xs]
@@ -44,10 +50,13 @@
 ;         product [2, 3, 4]   = 24
 ;         product [4, 5, 0]   = 0
 ;         product []          = 1
+; A: Using reduce.
 ; (defn product [ns]
 ;   (reduce * ns))
+; A: Using apply.
 ; (defn product [ns]
 ;   (apply * ns))
+; A: Using recursion.
 (defn product [ns]
   (if-not (seq ns)
     1
