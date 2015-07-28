@@ -60,11 +60,11 @@
   )
 )
 
-(deftest ut-init01
+(deftest ut-my-init
   (testing
-    (is　(= (init01 [1 2 3]) [1 2]))
-    (is　(= (init01 [1 2]) [1]))
-    (is　(= (init01 [1]) []))
+    (is　(= (my-init [1 2 3]) [1 2]))
+    (is　(= (my-init [1 2]) [1]))
+    (is　(= (my-init [1]) []))
   )
 )
 

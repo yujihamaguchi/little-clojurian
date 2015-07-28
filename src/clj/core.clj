@@ -67,20 +67,23 @@
   (if-not (seq xs)
     []
     (let [x (first xs)
-          lt (filter #(< (int %) (int x)) (rest xs))
-          ge (filter #(>= (int %) (int x)) (rest xs))]
+          xs' (rest xs)
+          lt (for [x' xs' :when (< (int x') (int x))] x') 
+          ge (for [x' xs' :when (>= (int x') (int x))] x')]
       (concat (rqsort ge) [x] (rqsort lt)))))
 
-; Q: haskellのinitと同様の機能の関数init01を書け
+; Q: haskellのinitと同様の機能の関数my-initを書け
 ; init :: [a] -> [a]
 ; リスト xs の最後の要素を除いたリストを返す。
 ;     init [1,2,3]   = [1,2]
 ;     init [1]       = []
-;     init []        = エラー
-(defn init01 [xs]
-  (if-not (seq (rest xs))
-    []
-    (cons (first xs) (init01 (rest xs)))))
+(defn my-init [xs]
+  ((comp reverse rest reverse) xs))
+; A: Using recursion.
+;(defn my-init [xs]
+;  (if-not (seq (rest xs))
+;    []
+;    (cons (first xs) (my-init (rest xs)))))
 
 ; Q: haskellのlastと同様の機能の関数を書け
 ; last :: [a] -> a
