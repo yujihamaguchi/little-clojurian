@@ -91,14 +91,18 @@
 ;         last [1,2,3]   = 3
 ;         last []        = エラー
 (defn my-last [xs]
-  (if-not (seq (rest xs))
-    (first xs)
-    (my-last (rest xs))))
+  ((comp first reverse) xs))
+; A: Using recursion.
+;(defn my-last [xs]
+;  (if-not (seq (rest xs))
+;    (first xs)
+;    (my-last (rest xs))))
 
 ; Q: 偶数の長さを持つリストを半分ずつに分割する関数halveを書け。
 (defn halve [xs]
-  (let [n (quot (count xs) 2)]
-    (vector (take n xs) (drop n xs))))
+  (when (seq xs)
+    (let [n (quot (count xs) 2)]
+      [(take n xs) (drop n xs)])))
 
 ; Q: concatをリスト内包表記で実装したmy-concatを書け。
 ; concat :: [[a]] -> [a]
@@ -108,14 +112,12 @@
 ;         concat ["ab", "cd", "ef"]       = "abcdef"
 ;         concat [[]]                     = []
 ;         concat []                       = []
-; (defn my-concat [& xss]
-;   (for [xs xss x xs] x))
 (defn my-concat [& xss]
   (for [xs xss x xs] x))
 
 ; Q: 正の整数に対し、すべての約数を計算する関数factorsを書け
 (defn factors [n]
-  (for [n' (range 1 (+ n 1)) :when (= 0 (rem n n'))] n'))
+  (for [n' (range 1 (inc n)) :when (zero? (mod n n'))] n'))
 
 ; Q: 対(pair)のリストを探索し、検索キーと等しいキーを持つ対全てを探し出し、対応する値を取り出してリストにする関数my-findを書け。
 (defn my-find [k ps]
@@ -133,8 +135,6 @@
 ;         length "abcde"   = 5
 ;         length []        = 0
 ;         length ""        = 0
-; (defn length [xs]
-;   (sum (for [_ xs] 1)))
 (defn length [coll]
   (sum (for [_ coll] 1)))
 
@@ -162,8 +162,10 @@
 ; Q: 目的とする値がリストのどの位置にあるかを調べて、その位置全てをリストとして返す関数positionsを書け。
 ; (defn positions [x xs]
 ;   (next (find (apply (partial merge-with list) (map (partial apply hash-map)  (map vector xs (iterate inc 0)))) x)))
+;(defn positions [x xs]
+;  (map first (filter #(= x (second %)) (zipmap (iterate inc 0) xs))))
 (defn positions [x xs]
-  (map first (filter #(= x (second %)) (zipmap (iterate inc 0) xs))))
+  (for [[idx x'] (zipmap (iterate inc 0) xs) :when (= x x')] idx))
 
 ; Q: 指定した特定の文字がいくつ含まれているか数える関数char-countを書け。
 ; (defn char-count [c cs]
@@ -200,8 +202,10 @@
 ; Q: 与えられたシフト数で文字列を暗号化する関数my-encodeを書け。
 ; (defn my-encode [n cs]
 ;   (apply str (for [c cs] (shift n c))))
-(defn my-encode [n s]
-  (apply str (map #(shift n %) s)))
+;(defn my-encode [n s]
+;  (apply str (map #(shift n %) s)))
+(defn my-encode [n cs]
+  (apply str (map (partial shift n) cs)))
 
 ; Q: 百分率を計算し、浮動小数点数として返す関数percentを書け。
 (defn percent [n m]
@@ -211,10 +215,14 @@
 ; (defn freqs [cs]
 ;   (let [alph-cs (map char (range (int \a) (inc (int \z))))]
 ;     (for [c alph-cs] (percent (count (for [c' cs :when (= c c')] c')) (lowers cs)))))
-(defn freqs [s]
-  (let [cs (map char (range (int \a) (inc (int \z))))
-        cnt (lowers s)]
-    (map (fn [c] (percent (count (filter #((hash-set c) %) s)) cnt)) cs)))
+;(defn freqs [s]
+;  (let [cs (map char (range (int \a) (inc (int \z))))
+;        cnt (lowers s)]
+;    (map (fn [c] (percent (count (filter #((hash-set c) %) s)) cnt)) cs)))
+(defn freqs [cs]
+  (let [cs' (map char (range (int \a) (int \z)))
+        cnt (lowers cs)]
+    (map (fn [c] (percent (count (filter #(= c %) cs)) cnt)) cs')))
 
 ; Q: カイ二乗検定を行う関数chisqrを書け。
 (defn chisqr [ob ex]
@@ -231,7 +239,7 @@
 
 ; Q: 1から100までの二乗の和を計算する式をリスト内包表記を用いて書け。
 ; (reduce + (for [n (range 1 101)] (* n n)))
-(reduce + (for [n (range 1 101)] (Math/pow n 2)))
+(reduce + (for [n (range 1 (inc 100))] (Math/pow n 2)))
 
 ; Q: 二つの生成器を持つリスト内包表記[(x,y) | x <- [1,2,3], y <- [4,5,6]]は、
 ;    一つの生成器を持つリスト内包表記二つでも表現出来る事を示せ。
@@ -243,26 +251,33 @@
 (defn perfects [n]
   (for [n' (range 2 (dec n)) :when (= n' (- (reduce + (factors n')) n'))] n'))
 
-; Q: ピタゴラス数のリストを生成する関数pythsをリスト内包表記を使って定義せよ。ただし、ピタゴラス数の要素は与えられた上限n以下であるとする。
+; Q: ピタゴラス数のリスト(組み合わせ)を生成する関数pythsをリスト内包表記を使って定義せよ。ただし、ピタゴラス数の要素は与えられた上限n以下であるとする。
 (defn pyths [n]
-  (for [x (range 1 (inc n))
-        y (range 1 (inc n))
-        z (range 1 (inc n))
-        :when
-          (and
-            (= (Math/pow x 2)
-               (+ (Math/pow y 2)
-                  (Math/pow z 2)))
-            (< y z))]
-    [x y z]))
+  (letfn [(range-closed [n] (range 1 (inc n)))]
+    (for [
+      x (range-closed n)
+      y (range-closed n)
+      z (range-closed n)
+      :when
+        (and
+          (= (Math/pow x 2) (+ (Math/pow y 2) (Math/pow z 2)))
+          (< y z))]
+      [x y z])))
+
 
 ; Q: ある要素のみからなるリストを生成する関数my-replicateを書け。
 ;    ex) >replicate 3 True
 ;        [True, True, True]
+;(defn my-replicate [n x]
+;  (if (zero? n)
+;    []
+;    (cons x (my-replicate (dec n) x))))
 (defn my-replicate [n x]
-  (if (zero? n)
-    []
-    (cons x (my-replicate (dec n) x))))
+  (letfn [(my-replicate' [n acc]
+    (if (zero? n)
+      acc
+      (my-replicate' (dec n) (cons x acc))))]
+    (my-replicate' n [])))
 
 ; Q: 二つの整数のリストの内積を求める関数scalarproductをリスト内包表記を用いて書け。
 ; A
