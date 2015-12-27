@@ -2,19 +2,13 @@
 
 (def table [8.2 1.5 2.8 4.3 12.7 2.2 2.0 6.1 7.0 0.2 0.8 4.0 2.4 6.7 7.5 1.9 0.1 6.0 6.3 9.1 2.8 1.0 2.4 0.2 2.0 0.1])
 
-; Add pre and post assertion!!!
-; Q: haskellのzipと同様の機能の関数を書け
+; Q001: haskellのzipと同様の機能の関数を書け
 ; zip :: [a] -> [b] -> [(a, b)]
 (defn zip [& colls]
   (when (seq colls)
-    (apply (partial map (fn [& xs] (vec xs))) colls)))
-;(defn zip [& colls]
-;  (when (and (not (nil? colls))
-;             (every? seq colls))
-;    (cons (map first colls)
-;          (apply zip (map rest colls)))))
+    (apply (partial map vector) colls)))
 
-; Q: haskellのsumと同様の機能の関数を書け。(reduceを用いるパターン、applyを用いるパターン、再帰を用いるパターン)
+; Q002: haskellのsumと同様の機能の関数を書け。(reduceを用いるパターン、applyを用いるパターン、再帰を用いるパターン)
 ; sum :: (Num a) => [a] -> a
 ; sum ns
 ;     数値のリスト ns の総和を返す。
@@ -33,16 +27,17 @@
 ;    0
 ;    (+ (first ns) (sum (rest ns)))))
 
-; Q: クイックソート関数qsort01を書け
+; Q003: クイックソート関数qsort01を書け
 (defn qsort01 [xs]
   (if-not (seq xs)
     []
     (let [x (first xs)
-          lt (filter #(< (int %) (int x)) (rest xs))
-          ge (filter #(>= (int %) (int x)) (rest xs))]
+          xs' (rest xs)
+          lt (for [x' xs' :when (< (int x') (int x))] x')
+          ge (for [x' xs' :when (>= (int x') (int x))] x')]
       (concat (qsort01 lt) [x] (qsort01 ge)))))
 
-; Q: haskellのproductと同様の機能の関数を書け(reduceを用いるパターン、applyを用いるパターン、再帰を用いるパターン)
+; Q004: haskellのproductと同様の機能の関数を書け(reduceを用いるパターン、applyを用いるパターン、再帰を用いるパターン)
 ; product :: (Num a) => [a] -> a
 ; product ns
 ;     数値のリスト ns の全要素の積を返す。
@@ -62,17 +57,18 @@
     1
     (* (first ns) (product (rest ns)))))
 
-; Q: リストを逆順に整列する関数rqsortを書け
+; Q005: リストを逆順に整列する関数rqsortを書け
 (defn rqsort [xs]
   (if-not (seq xs)
     []
     (let [x (first xs)
           xs' (rest xs)
-          lt (for [x' xs' :when (< (int x') (int x))] x') 
+          lt (for [x' xs' :when (< (int x') (int x))] x')
           ge (for [x' xs' :when (>= (int x') (int x))] x')]
       (concat (rqsort ge) [x] (rqsort lt)))))
 
-; Q: haskellのinitと同様の機能の関数my-initを書け
+
+; Q006: haskellのinitと同様の機能の関数my-initを書け(再帰を用いるバージョンも書くこと)
 ; init :: [a] -> [a]
 ; リスト xs の最後の要素を除いたリストを返す。
 ;     init [1,2,3]   = [1,2]
@@ -85,7 +81,7 @@
 ;    []
 ;    (cons (first xs) (my-init (rest xs)))))
 
-; Q: haskellのlastと同様の機能の関数を書け
+; Q007: haskellのlastと同様の機能の関数を書け(再帰を用いるバージョンも書くこと)
 ; last :: [a] -> a
 ;     リストの最後の要素を返す。
 ;         last [1,2,3]   = 3
@@ -98,13 +94,13 @@
 ;    (first xs)
 ;    (my-last (rest xs))))
 
-; Q: 偶数の長さを持つリストを半分ずつに分割する関数halveを書け。
+; Q008: 偶数の長さを持つリストを半分ずつに分割する関数halveを書け。
 (defn halve [xs]
   (when (seq xs)
     (let [n (quot (count xs) 2)]
       [(take n xs) (drop n xs)])))
 
-; Q: concatをリスト内包表記で実装したmy-concatを書け。
+; Q009: concatをリスト内包表記で実装したmy-concatを書け。
 ; concat :: [[a]] -> [a]
 ; concat xs
 ;     リストのリスト xs を一つのリストに連結する。
@@ -115,19 +111,19 @@
 (defn my-concat [& xss]
   (for [xs xss x xs] x))
 
-; Q: 正の整数に対し、すべての約数を計算する関数factorsを書け
+; Q010: 正の整数に対し、すべての約数を計算する関数factorsを書け
 (defn factors [n]
   (for [n' (range 1 (inc n)) :when (zero? (mod n n'))] n'))
 
-; Q: 対(pair)のリストを探索し、検索キーと等しいキーを持つ対全てを探し出し、対応する値を取り出してリストにする関数my-findを書け。
+; Q011: 対(pair)のリストを探索し、検索キーと等しいキーを持つ対全てを探し出し、対応する値を取り出してリストにする関数my-findを書け。
 (defn my-find [k ps]
   (for [[k' v] ps :when (= k k')] v))
 
-; Q: 対のリストから、対の先頭の要素を取り出してリストを生成するfirstsを書け。
+; Q012: 対のリストから、対の先頭の要素を取り出してリストを生成するfirstsを書け。
 (defn firsts [ps]
   (for [[k _] ps] k))
 
-; Q: haskellのlengthをsumとリスト内包表記で書け。
+; Q013: haskellのlengthをsumとリスト内包表記で書け。
 ; length :: [a] -> Int
 ; length xs
 ;     リスト xs の長さを返す。
@@ -138,15 +134,15 @@
 (defn length [coll]
   (sum (for [_ coll] 1)))
 
-; Q: factorsを用いて、整数が素数か判定する関数primeを書け。
+; Q014: factorsを用いて、整数が素数か判定する関数primeを書け。
 (defn prime [n]
   (= [1, n] (factors n)))
 
-; Q: primeを用いて与えられた上限数までの全ての素数を生成する関数primesを書け。
+; Q015: primeを用いて与えられた上限数までの全ての素数を生成する関数primesを書け。
 (defn primes [n]
   (for [n' (range (inc n)) :when (prime n')] n'))
 
-; Q: リストから隣り合う要素をマップにして返す関数pairsをzipmapを用いて書け。
+; Q016: リストから隣り合う要素をマップにして返す関数pairsをzipmapを用いて書け。
 ; ex)
 ;   [1 2] => {1 2}
 ;   [1 2 3] => {1 2, 2 3}
@@ -154,12 +150,12 @@
 (defn pairs [xs]
   (zipmap xs (rest xs)))
 
-; Q: 順序クラスに属する任意の型の要素を持つリストが、整列されているか調べる関数sortedをpairs関数を用いて書け。
+; Q017: 順序クラスに属する任意の型の要素を持つリストが、整列されているか調べる関数sortedをpairs関数を用いて書け。
 ;    （本来、pairsのような処理を行いたい場合、Clojureではシーケンスライブラリのpartitionを使用する。）
 (defn sorted [xs]
   (every? (fn [[x y]] (<= x y)) (pairs xs)))
 
-; Q: 目的とする値がリストのどの位置にあるかを調べて、その位置全てをリストとして返す関数positionsを書け。
+; Q018: 目的とする値がリストのどの位置にあるかを調べて、その位置全てをリストとして返す関数positionsを書け。
 ; (defn positions [x xs]
 ;   (next (find (apply (partial merge-with list) (map (partial apply hash-map)  (map vector xs (iterate inc 0)))) x)))
 ;(defn positions [x xs]
@@ -167,25 +163,25 @@
 (defn positions [x xs]
   (for [[idx x'] (zipmap (iterate inc 0) xs) :when (= x x')] idx))
 
-; Q: 指定した特定の文字がいくつ含まれているか数える関数char-countを書け。
+; Q019: 指定した特定の文字がいくつ含まれているか数える関数char-countを書け。
 ; (defn char-count [c cs]
 ;   (count (for [c' cs :when (= c c')] c')))
 (defn char-count [c s]
   (count (filter #{c} s)))
 
-; Q: 文字列から小文字を数える関数lowersを書け。
+; Q020: 文字列から小文字を数える関数lowersを書け。
 (defn lowers [s]
   (count (re-seq #"[a-z]" s)))
 
-; Q: Unicodeコードポイント（整数、'a'が0）を文字に変換する関数int2letを書け。
+; Q021: Unicodeコードポイント（整数、'a'が0）を文字に変換する関数int2letを書け。
 (defn int2let [n]
   (char (+ n (int \a))))
 
-; Q: 文字をUnicodeのコードポイント（整数）に変換する関数let2intを書け。（'a'が0番とする）
+; Q022: 文字をUnicodeのコードポイント（整数）に変換する関数let2intを書け。（'a'が0番とする）
 (defn let2int [c]
   (- (int c) (int \a)))
 
-; Q: 小文字をシフト数だけずらすshiftを書け。
+; Q023: 小文字をシフト数だけずらすshiftを書け。
 ;    (循環すること。)
 ;     ex) 'z'に対し、1ならば'a'となる）（小文字のみ対象とすること）
 ; (defn shift [n c]
@@ -199,7 +195,7 @@
   (let [m (inc (- (let2int \z) (let2int \a)))]
     (int2let (rem (+ n (let2int c)) m))))
 
-; Q: 与えられたシフト数で文字列を暗号化する関数my-encodeを書け。
+; Q024: 与えられたシフト数で文字列を暗号化する関数my-encodeを書け。
 ; (defn my-encode [n cs]
 ;   (apply str (for [c cs] (shift n c))))
 ;(defn my-encode [n s]
@@ -207,11 +203,11 @@
 (defn my-encode [n cs]
   (apply str (map (partial shift n) cs)))
 
-; Q: 百分率を計算し、浮動小数点数として返す関数percentを書け。
+; Q025: 百分率を計算し、浮動小数点数として返す関数percentを書け。
 (defn percent [n m]
   (float (* (/ n m) 100)))
 
-; Q: 任意の文字列に対して文字の出現頻度表を返す関数freqsを書け。（lowersとcountとpercentを用いる）
+; Q026: 任意の文字列に対して文字の出現頻度表を返す関数freqsを書け。（lowersとcountとpercentを用いる）
 ; (defn freqs [cs]
 ;   (let [alph-cs (map char (range (int \a) (inc (int \z))))]
 ;     (for [c alph-cs] (percent (count (for [c' cs :when (= c c')] c')) (lowers cs)))))
@@ -224,34 +220,34 @@
         cnt (lowers cs)]
     (map (fn [c] (percent (count (filter #(= c %) cs)) cnt)) cs')))
 
-; Q: カイ二乗検定を行う関数chisqrを書け。
+; Q027: カイ二乗検定を行う関数chisqrを書け。
 (defn chisqr [ob ex]
   (reduce +
           (map (fn [o e] (float (/ (Math/pow (- e o) 2) e)))
                ob
                ex)))
 
-; Q: 文字リストの要素をnだけ左に回転させる関数rotateを書け。（リストの先頭は末尾に接続していると考える）
+; Q028: 文字リストの要素をnだけ左に回転させる関数rotateを書け。（リストの先頭は末尾に接続していると考える）
 ; (defn rotate [n cs]
 ;   (apply str (concat (drop n cs) (take n cs))))
 (defn rotate [n cs]
   (apply str (concat (drop n cs) (take n cs))))
 
-; Q: 1から100までの二乗の和を計算する式をリスト内包表記を用いて書け。
+; Q029: 1から100までの二乗の和を計算する式をリスト内包表記を用いて書け。
 ; (reduce + (for [n (range 1 101)] (* n n)))
 (reduce + (for [n (range 1 (inc 100))] (Math/pow n 2)))
 
-; Q: 二つの生成器を持つリスト内包表記[(x,y) | x <- [1,2,3], y <- [4,5,6]]は、
+; Q030: 二つの生成器を持つリスト内包表記[(x,y) | x <- [1,2,3], y <- [4,5,6]]は、
 ;    一つの生成器を持つリスト内包表記二つでも表現出来る事を示せ。
 ;    ヒント：一方のリスト内包表記を他方の中に入れ、またライブラリ関数concatも使え。
 (apply concat (for [x [1 2 3]] (for [y [4 5 6]] [x y])))
 
-; Q: 与えられた上限までに含まれる完全数全てを算出する関数perfectsをリスト内包表記と関数factorsを使って定義せよ。
+; Q031: 与えられた上限までに含まれる完全数全てを算出する関数perfectsをリスト内包表記と関数factorsを使って定義せよ。
 ;    完全数：自分自身をのぞく約数の和が自分自身と等しい整数
 (defn perfects [n]
   (for [n' (range 2 (dec n)) :when (= n' (- (reduce + (factors n')) n'))] n'))
 
-; Q: ピタゴラス数のリスト(組み合わせ)を生成する関数pythsをリスト内包表記を使って定義せよ。ただし、ピタゴラス数の要素は与えられた上限n以下であるとする。
+; Q032: ピタゴラス数のリスト(組み合わせ)を生成する関数pythsをリスト内包表記を使って定義せよ。ただし、ピタゴラス数の要素は与えられた上限n以下であるとする。
 (defn pyths [n]
   (letfn [(range-closed [n] (range 1 (inc n)))]
     (for [
@@ -265,7 +261,7 @@
       [x y z])))
 
 
-; Q: ある要素のみからなるリストを生成する関数my-replicateを書け。
+; Q033: ある要素のみからなるリストを生成する関数my-replicateを書け。
 ;    ex) >replicate 3 True
 ;        [True, True, True]
 ;(defn my-replicate [n x]
@@ -279,19 +275,19 @@
       (my-replicate' (dec n) (cons x acc))))]
     (my-replicate' n [])))
 
-; Q: 二つの整数のリストの内積を求める関数scalarproductをリスト内包表記を用いて書け。
+; Q034: 二つの整数のリストの内積を求める関数scalarproductをリスト内包表記を用いて書け。
 ; A
 (defn scalarproduct [ns ms]
   (reduce + (for [[n m] (map vector ns ms)] (* n m))))
 
-; Q: 要素を逆転する関数myreverseを書け。
+; Q035: 要素を逆転する関数myreverseを書け。
 ; A
 (defn myreverse [coll]
   (if-not (seq coll)
     []
     (conj (myreverse (rest coll)) (first coll))))
 
-; Q: 整列された要素を持つリストに要素を挿入する関数myinsertを書け。
+; Q036: 整列された要素を持つリストに要素を挿入する関数myinsertを書け。
 ; A
 (defn myinsert [x xs]
   (if-not (seq xs)
@@ -300,21 +296,21 @@
       (cons x xs)
       (cons (first xs) (myinsert x (rest xs))))))
 
-; Q: 関数insertを用いてリストのソートを行う"挿入ソート"を行う関数isortを書け。
+; Q037: 関数insertを用いてリストのソートを行う"挿入ソート"を行う関数isortを書け。
 ; A
 (defn isort [xs]
   (if-not (seq xs)
     []
     (myinsert (first xs) (isort (rest xs)))))
 
-; Q: dropを再帰を用いて自作せよ。
+; Q038: dropを再帰を用いて自作せよ。
 ; A
 (defn mydrop [n coll]
   (if (zero? n)
     coll
     (mydrop (dec n) (rest coll))))
 
-; Q: zipを再帰を用いて自作せよ。
+; Q039: zipを再帰を用いて自作せよ。
 ; A
 ; (defn myzip [xs ys]
 ;   (if (or (empty? xs) (empty? ys))
@@ -325,7 +321,7 @@
     (cons (vector (first xs) (first ys)) (myzip (rest xs) (rest ys)))
     []))
 
-; Q: evenとoddを相互再帰を用いて自作せよ。(declareを自作してそれを用いよ。)
+; Q040: evenとoddを相互再帰を用いて自作せよ。(declareを自作してそれを用いよ。)
 ;    ヒント：0は偶数、-3は奇数
 ; A
 (defmacro mydeclare [& expr]
@@ -339,7 +335,7 @@
        (myeven? (dec (Math/abs n)))))
 
 
-; Q: 0以上の整数nに対し、n番目のフィボナッチ数を求める関数fibonacciを書け。
+; Q041: 0以上の整数nに対し、n番目のフィボナッチ数を求める関数fibonacciを書け。
 ; A
 (defn fibonacci [n]
   (case n
@@ -347,7 +343,7 @@
     1 1
     (+ (fibonacci (- n 1)) (fibonacci (- n 2)))))
 
-; Q: qsortを再帰を用いて書け。
+; Q042: qsortを再帰を用いて書け。
 ; A
 (defn qsort [xs]
   (if-not (seq xs)
@@ -358,7 +354,7 @@
           ge (for [x' xs' :when (>= x' x)] x')]
       (concat lt [x] ge))))
 
-; Q: リストから偶数の位置の要素を取り出す関数evensと、奇数の位置の要素を取り出す関数oddsを相互再帰を用いて書け。
+; Q043: リストから偶数の位置の要素を取り出す関数evensと、奇数の位置の要素を取り出す関数oddsを相互再帰を用いて書け。
 ; A
 (declare evens odds)
 (defn evens [xs]
@@ -370,7 +366,7 @@
     []
     (cons (first xs) (evens (rest xs)))))
 
-; Q: initを自作せよ。
+; Q044: initを自作せよ。
 ; A
 ; (defn init [xs]
 ;   (if (or (empty? xs) (= (count xs) 1))
@@ -381,7 +377,7 @@
     []
     (cons (first coll) (my-init (rest coll)))))
 
-; Q: elemを再帰を用いて自作せよ。（二項演算子"||"を用いよ）
+; Q045: elemを再帰を用いて自作せよ。（二項演算子"||"を用いよ）
 ; A
 (defn elem [x xs]
   (if-not (seq xs)
@@ -389,14 +385,14 @@
     (or (= x (first xs))
         (elem x (rest xs)))))
 
-; Q: !!の前置記法版のindex関数を再帰を用いて自作せよ。(my-index)
+; Q046: !!の前置記法版のindex関数を再帰を用いて自作せよ。(my-index)
 ; A
 (defn my-index [coll n]
   (if (zero? n)
     (first coll)
     (my-index (rest coll) (dec n))))
 
-; Q: 整列されたリストを二つとり、一つの整列されたリストにして返す関数mergeを自作せよ。
+; Q047: 整列されたリストを二つとり、一つの整列されたリストにして返す関数mergeを自作せよ。
 ;    insertやisort等、整列されたリストを処理する関数は用いてはならない。
 ;    ex) merge [2,5,6] [1,3,4] ==> [1,2,3,4,5,6]
 ; A
@@ -410,7 +406,7 @@
                  (cons x (my-merge (rest xs) ys))
                  (cons y (my-merge xs (rest ys)))))))
 
-; Q: 関数my-mergeを用いてマージソートを実行する関数msortを再帰を用いて書け。
+; Q048: 関数my-mergeを用いてマージソートを実行する関数msortを再帰を用いて書け。
 ;    マージソートは、引数のリストを二つに分割し、それぞれを整列した後、再び一つに戻す事で、整列を実現する。
 ;    最初に、リストを半分に分割する関数halveを書け。
 ; A
@@ -422,45 +418,45 @@
       (let [[xs ys] (halve coll)]
         (my-merge (msort xs) (msort ys)))))
 
-; Q: replicateを再帰を用いて自作せよ。(my-replicate-rec [n x])
+; Q049: replicateを再帰を用いて自作せよ。(my-replicate-rec [n x])
 ; A
 (defn my-replicate-rec [n x]
   (if (zero? n)
     []
     (cons x (my-replicate-rec (dec n) x))))
 
-; Q: 負でない整数に対する累乗演算を行うmyを定義せよ。
+; Q050: 負でない整数に対する累乗演算を行うmyを定義せよ。
 ; A
 (defn my [n m]
   (if (zero? m)
     1
     (* n (my n (dec m)))))
 
-; Q: mapをリスト内包表記を用いて自作せよ。
+; Q051: mapをリスト内包表記を用いて自作せよ。
 ; A
 (defn my-map [f coll]
   (for [x coll] (f x)))
 
-; Q: filterをリスト内包表記を用いて自作せよ。
+; Q052: filterをリスト内包表記を用いて自作せよ。
 ; A
 (defn my-filter [f coll]
   (for [x coll :when (f x)] x))
 
-; Q: mapを再帰を用いて自作せよ。(my-map-recur)
+; Q053: mapを再帰を用いて自作せよ。(my-map-recur)
 ; A
 (defn my-map-recur [f coll]
   (if-not (seq coll)
     []
     (cons (f (first coll)) (my-map-recur f (rest coll)))))
 
-; Q: リストの先頭から述語を満たす連続した要素を取り除く関数dropWhileを自作せよ。
+; Q054: リストの先頭から述語を満たす連続した要素を取り除く関数dropWhileを自作せよ。
 ; A:
 (defn my-drop-while [p xs]
   (if (or (empty? xs) (not (p (first xs))))
     xs
     (my-drop-while p (rest xs))))
 
-; Q: filterを再帰を用いて自作せよ。(my-filter-recur)
+; Q055: filterを再帰を用いて自作せよ。(my-filter-recur)
 ; A
 (defn my-filter-recur [p coll]
   (if-not (seq coll)
@@ -471,14 +467,14 @@
         true (cons x (my-filter-recur p xs))
         false (my-filter-recur p xs)))))
 
-; Q: リストの先頭から述語を満たす連続した要素を取り出す関数takeWhileを自作せよ。(my-take-while)
+; Q056: リストの先頭から述語を満たす連続した要素を取り出す関数takeWhileを自作せよ。(my-take-while)
 ; A:
 (defn my-take-while [p coll]
   (if (not (and (seq coll) (p (first coll))))
     []
     (cons (first coll) (my-take-while p (rest coll)))))
 
-; Q: 以下の様に使用できる関数foldrを自作せよ。(my-foldr)
+; Q057: 以下の様に使用できる関数foldrを自作せよ。(my-foldr)
 ; cons = foldr (:) []
 ; sum = foldr (+) 0
 ; product = foldr (*) 1
@@ -494,7 +490,7 @@
     x
     (f (first coll) (my-foldr f x (rest coll)))))
 
-; Q: ビットのリストで表現される二進表記を整数に変換する関数bit2intを書け。
+; Q057: ビットのリストで表現される二進表記を整数に変換する関数bit2intを書け。
 ;    ・iterateを用いること
 ;    ・二進表記は逆順であること
 ; type Bit = Int
@@ -512,7 +508,7 @@
 (defn bit2int [bits]
   (reduce + (map #(* %1 %2) bits (map #(Math/pow 2 %) (range)))))
 
-; Q: 負でない整数を二進表記へ変換する関数int2bitを書け。(0は正の整数ではない)
+; Q058: 負でない整数を二進表記へ変換する関数int2bitを書け。(0は正の整数ではない)
 ; A
 ; (defn int2bit [n]
 ;   (if (zero? n)
@@ -529,7 +525,7 @@
     []
     (cons (mod n 2) (int2bit (quot n 2)))))
 
-; Q: 二進表記が必ず8ビットになるように切り詰めたり適切な数の0を詰め込んだりする関数make8を書け。
+; Q059: 二進表記が必ず8ビットになるように切り詰めたり適切な数の0を詰め込んだりする関数make8を書け。
 ; A
 ; my answer 2014/05/19
 ; (defn make8 [bs]
@@ -539,27 +535,27 @@
 (defn make8 [bs]
   (take 8 (concat bs (repeat 0))))
 
-; Q: ビット列を8ビットの二進表記に分割する関数chop8を書け。
+; Q060: ビット列を8ビットの二進表記に分割する関数chop8を書け。
 ; A
 (defn chop8 [bs]
   (if (empty? bs)
     []
     (lazy-seq (cons (make8 (take 8 bs)) (chop8 (drop 8 bs))))))
 
-; Q: ビットのリストを文字列に復号する関数decodeを書け。
+; Q061: ビットのリストを文字列に復号する関数decodeを書け。
 ;    リストを分割し、二進表記をUnicodeのコードポイント（整数）へ変換し、文字へ直して、全体として文字列にする。
 ;    関数合成を用いて実装せよ。
 ; A
 (defn decode [bs]
   (apply str (map (comp char bit2int) (chop8 bs))))
 
-; Q: 文字列をビット列に符号化する関数encodeを書け。
+; Q062: 文字列をビット列に符号化する関数encodeを書け。
 ;    それぞれの文字列をunicodeのコードポイント（整数）に変換し、さらに8ビットの二進表記に直して、全体を連結することで、ビットのリストを作る。高階関数mapと関数合成を用いて実装せよ。
 ; A
 (defn encode [cs]
   (apply concat (map (comp make8 int2bit int) cs)))
 
-; Q: 関数allを自作せよ。(my-all)
+; Q063: 関数allを自作せよ。(my-all)
 ; Prelude.all
 ; all :: (a -> Bool) -> [a] -> Bool
 ; all f xs
@@ -574,7 +570,7 @@
     true
     (and (p (first coll)) (my-all p (rest coll)))))
 
-; Q: 関数anyを自作せよ。(my-any)
+; Q064: 関数anyを自作せよ。(my-any)
 ; Prelude.any
 ; any :: (a -> Bool) -> [a] -> Bool
 ; any f xs
@@ -590,7 +586,7 @@
     (or (p (first coll)) (my-any p (rest coll)))))
 
 
-; Q: 暗号化された文字列は手に入れたが、シフト数は分からないとしよう。暗号文を解読するためにシフト数を推測したい。
+; Q065: 暗号化された文字列は手に入れたが、シフト数は分からないとしよう。暗号文を解読するためにシフト数を推測したい。
 ;    これは次のように実現できる。すなわち暗号文に対する文字の出現頻度表を作り、この表を左に回転させながら、
 ;    期待される文字の出現頻度表に対するカイ二乗検定の値を計算する。そして、算出されたカイ二乗検定の値のリストの中で、
 ;    最小の値の位置をシフト数とする。
@@ -659,11 +655,11 @@
 
 (defn guess-shift-count [obs ex]
   (min-val-index (indexed (map #(chisqr (freq-table %) ex) obs))))
-  
+
 (defn crack [s]
   (shift-string s (guess-shift-count (round-shift-string s) table)))
 
-; Q: ファイルが過去半時間の間に更新されたかどうか調べる述語recently-modified?を書け。
+; Q066: ファイルが過去半時間の間に更新されたかどうか調べる述語recently-modified?を書け。
 (defn recently-modified? [f]
   (>= (* 1000 60 30) (- (System/currentTimeMillis) (.lastModified f))))
 
@@ -682,38 +678,38 @@
   {:nation "Austria" :language "German"}
   {:nation "Italy" :language "Italian"}})
 
-; Q: compositionsのキーワード:nameの別名として:titleを持つ集合を取得せよ。(set1関数の戻り値として)
+; Q067: compositionsのキーワード:nameの別名として:titleを持つ集合を取得せよ。(set1関数の戻り値として)
 (use 'clojure.set)
 (defn set1 []
   (rename compositions {:name :title}))
 
-; Q: compositionsから:nameが"Requiem"のレコードを抽出せよ（set2関数の戻り値として）
+; Q068: compositionsから:nameが"Requiem"のレコードを抽出せよ（set2関数の戻り値として）
 (defn set2 []
   (select #(= "Requiem" (:name %)) compositions))
 
-; Q: compositionsから:nameキーの値のみを射影せよ。（set3関数の戻り値として）
+; Q069: compositionsから:nameキーの値のみを射影せよ。（set3関数の戻り値として）
 (defn set3 []
   (project compositions [:name]))
 
-; Q: compositionsとcomposersを自然結合せよ。（set4関数の戻り値として）
+; Q070: compositionsとcomposersを自然結合せよ。（set4関数の戻り値として）
 (defn set4 []
   (join compositions composers))
 
-; Q: composersとnationsを:countryと:nationで結合せよ。（set5関数の戻り値として）
+; Q071: composersとnationsを:countryと:nationで結合せよ。（set5関数の戻り値として）
 (defn set5 []
   (join composers nations {:country :nation}))
 
-; Q: compositionsから:nameが"Requiem"のレコードを抽出し、composersと自然結合し、:countryキーで射影せよ。（set6関数の戻り値として）
+; Q072: compositionsから:nameが"Requiem"のレコードを抽出し、composersと自然結合し、:countryキーで射影せよ。（set6関数の戻り値として）
 (defn set6 []
   (project (join (select #(= "Requiem" (:name %)) compositions) composers) [:country]))
 
-; Q: 最底部にbottomというシンボルを持つ、任意のnレベルまでネストしたリストを作るdeeply-nested関数を書け。
+; Q073: 最底部にbottomというシンボルを持つ、任意のnレベルまでネストしたリストを作るdeeply-nested関数を書け。
 (defn deeply-nested [n]
   (if (zero? n)
     'bottom
     (list (deeply-nested (dec n)))))
 
-; Q: 以下のコイントスの結果データ（:h 表、:t 裏）について、 表が2回続けて出たケースをカウントする関数count-heads-pairsをloop/recurを用いて書け。
+; Q074: 以下のコイントスの結果データ（:h 表、:t 裏）について、 表が2回続けて出たケースをカウントする関数count-heads-pairsをloop/recurを用いて書け。
 ; (count-heads-pairs [:h :t :t :h :h :h])
 ; ;= 2
 (defn count-heads-pairs [coll]
@@ -724,7 +720,7 @@
         (recur (inc acc) (rest coll))
         (recur acc (rest coll))))))
 
-; Q: 以下の変換を行う関数by-pairsを、lazy-seqを用いて書け。
+; Q075: 以下の変換を行う関数by-pairsを、lazy-seqを用いて書け。
 ;     変換前：[:h :t :t :h :h :h]
 ;     変換後：((:h :t) (:t :t) (:t :h) (:h :h) (:h :h))
 (defn by-pairs [coll]
@@ -732,7 +728,7 @@
     '()
     (lazy-seq (cons (take 2 coll) (by-pairs (rest coll))))))
 
-; Q: ホフスタッタの男女シーケンスを書け。(f, m)
+; Q076: ホフスタッタの男女シーケンスを書け。(f, m)
 ;
 ; F(0) = 1; M(0) = 0
 ; F(n) = n - M(F(n-1)), n>0
@@ -772,7 +768,7 @@
 (def m-seq (map m (range)))
 
 
-; s-list（シンボルとシンボルのリスト両方を要素に出来るリスト）、oldsym、newsymを引数に取り、s-listの中のoldsymをすべてnewsymに置き換える関数replace-symbolを、
+; Q077: s-list（シンボルとシンボルのリスト両方を要素に出来るリスト）、oldsym、newsymを引数に取り、s-listの中のoldsymをすべてnewsymに置き換える関数replace-symbolを、
 ; シンボル（と見られる要素）の置換を行うreplace-symbol-expression関数との相互再帰で書け。
 ; (replace-symbol '((a b) (((b g r) (f r)) c (d e)) b) 'b 'a)
 ; ;= ((a a) (((a g r) (f r)) c (d e)) a)
@@ -813,7 +809,7 @@
 (defmethod replace-symbol :scalar [sym oldsym newsym]
   (if (= sym oldsym) newsym sym))
 
-; Q: 名前（username）をパラメータとし、"{greeting-prefix}, {username}"の文字列を返す関数を返す、
+; Q078: 名前（username）をパラメータとし、"{greeting-prefix}, {username}"の文字列を返す関数を返す、
 ;    挨拶の種類（greeting-prefix）をパラメータとする関数make-greeterを書け。
 ; ((make-greeter "Hello") "Yuji")
 ; ;= "Hello, Yuji"
@@ -822,7 +818,7 @@
 (defn make-greeter [greeting-prefix]
   (fn [username] (str greeting-prefix ", " username)))
 
-; Q: n番目のフィボナッチ数を返す、recurで明示的な再帰を行う関数recur-fiboを書け。
+; Q079: n番目のフィボナッチ数を返す、recurで明示的な再帰を行う関数recur-fiboを書け。
 ; (recur-fibo 9)
 ; ;= 34N
 ; (recur-fibo 1000000)
@@ -834,7 +830,7 @@
               (recur (dec n) f2 (+' f1 f2))))]
     (recur-fibo- n 0 1)))
 
-; Q: 遅延評価されるフィボナッチ数列を生成する関数lazy-seq-fiboを書け。
+; Q080: 遅延評価されるフィボナッチ数列を生成する関数lazy-seq-fiboを書け。
 ; A:
 ; my answer 2014/11/03
 ; (defn lazy-seq-fibo []
@@ -843,7 +839,7 @@
   ([] (lazy-seq-fibo 1 1))
   ([n m] (lazy-seq (cons m (lazy-seq-fibo m (+' n m))))))
 
-; Q: 以下のように、指定したディレクトリ／ファイル以下のClojureソースファイルの（空行を除いた）行数の合計をカウントする関数clojure-locを書け。
+; Q081: 以下のように、指定したディレクトリ／ファイル以下のClojureソースファイルの（空行を除いた）行数の合計をカウントする関数clojure-locを書け。
 ;
 ; (clojure-loc (java.io.File. "C:/Dropbox/_training/clojure-master/src/clj/clojure"))
 ; ;= 16606
@@ -864,7 +860,7 @@
               (with-open [rdr (reader f')]
                 (count (filter #(re-seq #"\S" %) (line-seq rdr)))))))
 
-; Q: 文字列中の文字で、探すべき文字のセットにマッチするもののインデックスを得る関数index-filterを書け。（indexed関数を用いよ。）
+; Q082: 文字列中の文字で、探すべき文字のセットにマッチするもののインデックスを得る関数index-filterを書け。（indexed関数を用いよ。）
 ; ([pred coll])
 ; ex)
 ; (index-filter #{\a \b} "abcdbbb")
@@ -907,7 +903,7 @@
     `(let [or# ~x]
       (if or# or# (my-or ~@rest)))))
 
-; Q: 相互再帰を使って、my-odd?およびmy-even?を定義せよ。(*utのコメントアウト部分でStackOverflowエラー発生課題残*)
+; Q083: 相互再帰を使って、my-odd?およびmy-even?を定義せよ。(*utのコメントアウト部分でStackOverflowエラー発生課題残*)
 ; A
 (declare my-odd? my-even?)
 
@@ -921,13 +917,13 @@
     true
     (my-odd? (dec n))))
 
-; Q: 任意のディレクトリのファイル、ディレクトリ名をシーケンスとして取得する関数list-filesを書け。
+; Q084: 任意のディレクトリのファイル、ディレクトリ名をシーケンスとして取得する関数list-filesを書け。
 ; A
 (import 'java.io.File)
 (defn list-files [base-dir]
   (map #(.getName %) (.listFiles (File. base-dir))))
 
-; Q: Clojureの..マクロを真似するchainマクロを書け。 
+; Q: Clojureの..マクロを真似するchainマクロを書け。
 ; ヒント: <TBD>引数の個数はマッチング出来る
 ;
 ; | マクロ呼び出し                     | 展開後                         |
@@ -952,7 +948,7 @@
 ;     1 `(. ~obj ~(first methods))
 ;     `(chain (. ~obj ~(first methods)) ~@(rest methods))))
 
-; Q: n番目のフィボナッチ数を返す、末尾再帰を用いたtail-fibo関数を書け。
+; Q085: n番目のフィボナッチ数を返す、末尾再帰を用いたtail-fibo関数を書け。
 ; A
 ; user=> (tail-fibo 1000000)
 ; StackOverflowError   java.math.BigInteger.add (:-1)
@@ -971,7 +967,7 @@
       (recur m (+' n m) (dec l))))]
     (tail-fibo- 0 1 n)))
 
-; Q: *out*を一時的に新たなStringWriterに束縛し、exprsを評価して、評価中に*out*へ出力されたものを文字列にして返すwith-out-strマクロを自作せよ。(my-with-out-str)
+; Q086: *out*を一時的に新たなStringWriterに束縛し、exprsを評価して、評価中に*out*へ出力されたものを文字列にして返すwith-out-strマクロを自作せよ。(my-with-out-str)
 ; (my-with-out-str (print "hello, ") (print "world"))
 ; ;= "hello, world"
 ; refer: [Let vs. Binding in Clojure](http://stackoverflow.com/questions/1523240/let-vs-binding-in-clojure)
@@ -981,14 +977,14 @@
     (do ~@exprs)
     (str *out*)))
 
-; Q: 任意のファイルの空行を除いた行数を表示する関数count-not-empty-lineを書け。
+; Q087: 任意のファイルの空行を除いた行数を表示する関数count-not-empty-lineを書け。
 ; A
 (use '[clojure.java.io :only [reader]])
 (defn count-not-empty-line [f]
   (with-open [rdr (reader f)]
     (count (filter #(re-find #"\w" %) (line-seq rdr)))))
 
-; Q: 以下の動作をする関数count-runsをpartitionを用いて書け。（先立って、filterしてcountするcount-if関数を書け。また、関数合成と部分適用も使用せよ。）
+; Q088: 以下の動作をする関数count-runsをpartitionを用いて書け。（先立って、filterしてcountするcount-if関数を書け。また、関数合成と部分適用も使用せよ。）
 ; (count-runs 2 #(= :h %) [:h :t :t :h :h :h])
 ; ;= 2
 ; (count-runs 2 #(= :t %) [:h :t :t :h :h :h])
@@ -999,7 +995,7 @@
 (defn count-runs [n p coll]
   (count-if #(every? p %) (partition n 1 coll)))
 
-; Q: シーケンスライブラリの関数であるiterateを用いてフィボナッチ数列を生成する関数fiboを書け。
+; Q089: シーケンスライブラリの関数であるiterateを用いてフィボナッチ数列を生成する関数fiboを書け。
 ; この関数は以下のように大きな値に対しても動作する。
 ; (take 10 (fibo))
 ; ;= (0 1 1 2 3 5 8 13 21 34)
@@ -1009,7 +1005,7 @@
 (defn fibo []
   (map first (iterate (fn [[n m]] [m (+' n m)]) [0 1])))
 
-; Q: n番目のフィボナッチ数を返す、単純な再帰を使ったstack-consuming-fibo関数を書け。
+; Q090: n番目のフィボナッチ数を返す、単純な再帰を使ったstack-consuming-fibo関数を書け。
 ; (stack-consuming-fibo 9)
 ; ;= 34
 ; (stack-consuming-fibo 1000000N)
@@ -1027,11 +1023,11 @@
     (+ (stack-consuming-fibo (- n 1))
        (stack-consuming-fibo (- n 2)))))
 
-; Q: 文字列がブランクかどうか調べるblank?関数を書け。
+; Q091: 文字列がブランクかどうか調べるblank?関数を書け。
 (defn blank? [cs]
   (every? #(Character/isWhitespace %) cs))
 
-; Q: timeマクロの変種で、何回もの実行結果を後で集めやすいようにしたbenchというマクロを書け。
+; Q092: timeマクロの変種で、何回もの実行結果を後で集めやすいようにしたbenchというマクロを書け。
 ; ; (bench (str "a" "b"))
 ; {:result "ab", :elapsed 53026}
 ; ; は次のとおり展開される
@@ -1043,7 +1039,7 @@
          result# ~expr]
     {:result result# :elapsed (- (System/nanoTime) start#)}))
 
-; Q: Write a function which returns the total number of elements in a sequence.(p22)
+; Q093: Write a function which returns the total number of elements in a sequence.(p22)
 ; Special Restrictions
 ; count
 ; (= (__ '(1 2 3 3 1)) 5)
@@ -1054,7 +1050,7 @@
 (defn p22 [coll]
   (reduce (fn [x _] (inc x)) 0 coll))
 
-; Q: Write a function which reverses a sequence.(p23)
+; Q094: Write a function which reverses a sequence.(p23)
 ; Special Restrictions
 ; reverse
 ; rseq
@@ -1064,7 +1060,7 @@
 (defn p23 [coll]
   (reduce conj '() coll))
 
-; Q: Write a function which returns the first X fibonacci numbers.(p26)
+; Q095: Write a function which returns the first X fibonacci numbers.(p26)
 ; (= (__ 3) '(1 1 2))
 ; (= (__ 6) '(1 1 2 3 5 8))
 ; (= (__ 8) '(1 1 2 3 5 8 13 21))
@@ -1072,7 +1068,7 @@
 (defn p26 [n]
   (take n (map first (iterate (fn [[n m]] [m (+ n m)]) [1 1]))))
 
-; Q: Write a function which returns true if the given sequence is a palindrome.(p27)
+; Q096: Write a function which returns true if the given sequence is a palindrome.(p27)
 ; Hint: "racecar" does not equal '(\r \a \c \e \c \a \r)
 ; (false? (__ '(1 2 3 4 5)))
 ; (true? (__ "racecar"))
@@ -1082,7 +1078,7 @@
 (defn p27 [coll]
   (= (seq coll) (reverse coll)))
 
-; Q: Write a function which flattens a sequence.(p28)
+; Q097: Write a function which flattens a sequence.(p28)
 ; Special Restrictions
 ; flatten
 ; (= (__ '((1 2) 3 [4 [5 6]])) '(1 2 3 4 5 6))
@@ -1097,7 +1093,7 @@
         (concat (p28 x) (p28 coll'))
         (cons x (p28 coll'))))))
 
-; Q: Write a function which removes consecutive duplicates from a sequence.(p30)
+; Q098: Write a function which removes consecutive duplicates from a sequence.(p30)
 ; (= (apply str (__ "Leeeeeerrroyyy")) "Leroy")
 ; (= (__ [1 1 2 3 3 2 2 3]) '(1 2 3 2 3))
 ; (= (__ [[1 2] [1 2] [3 4] [1 2]]) '([1 2] [3 4] [1 2]))
@@ -1105,7 +1101,7 @@
 (defn p30 [coll]
   (reduce (fn [acc x] (if (= (last acc) x) acc (conj acc x))) [] coll))
 
-; Q: Write a function which packs consecutive duplicates into sub-lists.(p31)
+; Q099: Write a function which packs consecutive duplicates into sub-lists.(p31)
 ; (= (__ [1 1 2 1 1 1 3 3]) '((1 1) (2) (1 1 1) (3 3)))
 ; (= (__ [:a :a :b :b :c]) '((:a :a) (:b :b) (:c)))
 ; (= (__ [[1 2] [1 2] [3 4]]) '(([1 2] [1 2]) ([3 4])))
@@ -1117,7 +1113,7 @@
 (defn p31 [coll]
   (partition-by identity coll))
 
-; Q: Write a function which duplicates each element of a sequence.(p32)
+; Q100: Write a function which duplicates each element of a sequence.(p32)
 ; (= (__ [1 2 3]) '(1 1 2 2 3 3))
 ; (= (__ [:a :a :b :b]) '(:a :a :a :a :b :b :b :b))
 ; (= (__ [[1 2] [3 4]]) '([1 2] [1 2] [3 4] [3 4]))
@@ -1125,7 +1121,7 @@
 (defn p32 [coll]
   (mapcat #(list % %) coll))
 
-; Q: Write a function which replicates each element of a sequence a variable number of times.(p33)
+; Q101: Write a function which replicates each element of a sequence a variable number of times.(p33)
 ; (= (__ [1 2 3] 2) '(1 1 2 2 3 3))
 ; (= (__ [:a :b] 4) '(:a :a :a :a :b :b :b :b))
 ; (= (__ [4 5 6] 1) '(4 5 6))
@@ -1134,7 +1130,7 @@
 (defn p33 [coll n]
   (mapcat #(replicate n %) coll))
 
-; Q: Write a function which creates a list of all integers in a given range.(p34)
+; Q102: Write a function which creates a list of all integers in a given range.(p34)
 ; Special Restrictions
 ; range
 ; (= (__ 1 4) '(1 2 3))
@@ -1144,14 +1140,14 @@
   (when (< n m)
     (cons n (p34 (inc n) m))))
 
-; Q: Write a function which takes a variable number of parameters and returns the maximum value.(p38)
+; Q103: Write a function which takes a variable number of parameters and returns the maximum value.(p38)
 ; (= (__ 1 8 3 4) 8)
 ; (= (__ 30 20) 30)
 ; (= (__ 45 67 11) 67)
 (defn p38 [& coll]
   (reduce (fn [n m] (if (< n m) m n)) coll))
 
-; Q: Write a function which takes two sequences and returns the first item from each, then the second item from each, then the third, etc.(p39)
+; Q104: Write a function which takes two sequences and returns the first item from each, then the second item from each, then the third, etc.(p39)
 ; Special Restrictions
 ; interleave
 ; (= (__ [1 2 3] [:a :b :c]) '(1 :a 2 :b 3 :c))
@@ -1161,7 +1157,7 @@
 (defn p39 [xs ys]
  (mapcat list xs ys))
 
-; Q: Write a function which separates the items of a sequence by an arbitrary value.(p40)
+; Q105: Write a function which separates the items of a sequence by an arbitrary value.(p40)
 ; Special Restrictions
 ; interpose
 ; (= (__ 0 [1 2 3]) [1 0 2 0 3])
@@ -1178,7 +1174,7 @@
 ; (defn p40 [x coll]
 ;   (drop-last (reduce #(concat % [%2 x]) [] coll)))
 
-; Q: Write a function which drops every Nth item from a sequence.(p41)
+; Q106: Write a function which drops every Nth item from a sequence.(p41)
 ; (= (__ [1 2 3 4 5 6 7 8] 3) [1 2 4 5 7 8])
 ; (= (__ [:a :b :c :d :e :f] 2) [:a :c :e])
 ; (= (__ [1 2 3 4 5 6] 4) [1 2 3 5 6])
@@ -1187,7 +1183,7 @@
     (concat (take (dec n) coll) (p41 (drop n coll) n))))
 (fn [coll idx] (map second (filter #(not= 0 (rem (first %) idx)) (map vector (iterate inc 1) coll))))
 
-; Q: Write a function which calculates factorials.(p42)
+; Q107: Write a function which calculates factorials.(p42)
 ; (= (__ 1) 1)
 ; (= (__ 3) 6)
 ; (= (__ 5) 120)
@@ -1197,14 +1193,14 @@
     1
     (* n (p42 (dec n)))))
 
-; Q: Write a function which reverses the interleave process into x number of subsequences.(p43)
+; Q108: Write a function which reverses the interleave process into x number of subsequences.(p43)
 ; (= (__ [1 2 3 4 5 6] 2) '((1 3 5) (2 4 6)))
 ; (= (__ (range 9) 3) '((0 3 6) (1 4 7) (2 5 8)))
 ; (= (__ (range 10) 5) '((0 5) (1 6) (2 7) (3 8) (4 9)))
 (defn p43 [coll n]
   (apply (partial map list) (partition n coll)))
 
-; Q: Write a function which can rotate a sequence in either direction.(p44)
+; Q109: Write a function which can rotate a sequence in either direction.(p44)
 ; (= (__ 2 [1 2 3 4 5]) '(3 4 5 1 2))
 ; (= (__ -2 [1 2 3 4 5]) '(4 5 1 2 3))
 ; (= (__ 6 [1 2 3 4 5]) '(2 3 4 5 1))
@@ -1220,7 +1216,7 @@
 ;     (< n 0) (p44 (inc n) (cons (last coll) (drop-last coll)))
 ;     :else   (p44 (dec n) (conj (vec (rest coll)) (first coll)))))
 
-; Q: Write a function which takes a sequence consisting of items with different types
+; Q110: Write a function which takes a sequence consisting of items with different types
 ;    and splits them up into a set of homogeneous sub-sequences.
 ;    The internal order of each sub-sequence should be maintained,
 ;    but the sub-sequences themselves can be returned in any order
@@ -1231,7 +1227,7 @@
 (defn p50 [coll]
   (vals (group-by type coll)))
 
-; Q: Given a vector of integers, find the longest consecutive sub-sequence of increasing numbers.(p53)
+; Q111: Given a vector of integers, find the longest consecutive sub-sequence of increasing numbers.(p53)
 ;    If two sub-sequences have the same length, use the one that occurs first.
 ;    An increasing sub-sequence must have a length of 2 or greater to qualify.
 ; (= (__ [1 0 1 2 3 0 4 5]) [0 1 2 3])
@@ -1248,7 +1244,7 @@
               result' (vec (set (apply concat (take-while continuous? ps))))]
           (recur (rest coll) (if (< (count result) (count result')) result' result)))))))
 
-; Q: Write a function which returns a sequence of lists of x items each. Lists of less than x items should not be returned.(p54)
+; Q112: Write a function which returns a sequence of lists of x items each. Lists of less than x items should not be returned.(p54)
 ; Special Restrictions
 ; partition
 ; partition-all
@@ -1260,7 +1256,7 @@
     []
     (cons (take n coll) (p54 n (drop n coll)))))
 
-; Q: Write a function which returns a map containing the number of occurences of each distinct item in a sequence.(p55)
+; Q113: Write a function which returns a map containing the number of occurences of each distinct item in a sequence.(p55)
 ; Special Restrictions
 ; frequencies
 ; (= (__ [1 1 2 3 2 1 1]) {1 4, 2 2, 3 1})
@@ -1275,7 +1271,7 @@
 ;         ks (keys coll')]
 ;     (reduce merge (map (fn [n] (hash-map n (count (coll' n)))) ks))))
 
-; Q: Write a function which removes the duplicates from a sequence. Order of the items must be maintained.(p56)
+; Q114: Write a function which removes the duplicates from a sequence. Order of the items must be maintained.(p56)
 ; (= (__ [1 2 1 3 1 2 4]) [1 2 3 4])
 ; (= (__ [:a :a :b :b :c :c]) [:a :b :c])
 ; (= (__ '([2 4] [1 2] [1 3] [1 3])) '([2 4] [1 2] [1 3]))
@@ -1286,7 +1282,7 @@
   (reduce (fn [acc x] (if (some #(= x %) acc) acc (conj acc x))) [] coll))
 
 
-; Q: Write a function which allows you to create function compositions. 
+; Q115: Write a function which allows you to create function compositions.
 ;    The parameter list should take a variable number of functions,
 ;    and create a function applies them from right-to-left.(p58)
 ; Special Restrictions
@@ -1300,7 +1296,7 @@
     (fn [& xs]
       (reduce (fn [acc f] (f acc)) (apply f xs) fs))))
 
-; Q: Take a set of functions and return a new function that takes a variable number of arguments
+; Q116: Take a set of functions and return a new function that takes a variable number of arguments
 ; and returns a sequence containing the result of applying
 ; each function left-to-right to the argument list.(p59)
 ; Special Restrictions
@@ -1311,7 +1307,7 @@
 (defn p59 [& fs]
   (fn [& args] (for [f fs] (apply f args))))
 
-; Q: Write a function which behaves like reduce,
+; Q117: Write a function which behaves like reduce,
 ; but returns each intermediate value of the reduction.
 ; Your function must accept either two or three arguments,
 ; and the return sequence must be lazy.(p60)
@@ -1327,7 +1323,7 @@
       (lazy-seq (cons init (p60 f (f init (first args)) (rest args))))))
   ([f args] (p60 f (first args) (rest args))))
 
-; Q: Write a function which returns the first x number of prime numbers.(p67)
+; Q118: Write a function which returns the first x number of prime numbers.(p67)
 ; (= (__ 2) [2 3])
 ; (= (__ 5) [2 3 5 7 11])
 ; (= (last (__ 100)) 541)
@@ -1340,7 +1336,7 @@
                   (filter prime? (drop 2 (range))))]
     (take n (primes))))
 
-; Q: Write a function which takes a function f and a variable number of maps.
+; Q119: Write a function which takes a function f and a variable number of maps.
 ; Your function should return a map that consists of the rest of the maps conj-ed onto the first.
 ; If a key occurs in more than one map,
 ; the mapping(s) from the latter (left-to-right) should be combined with the mapping in the result by calling
@@ -1360,7 +1356,7 @@
               (reduce (fn [acc [k v]] (assoc acc k (if-let [v' (acc k)] (f v' v) v))) m1 m2))]
       (apply p69 f (merge' init (first args)) (rest args)))))
 
-; Q: Given a string of comma separated integers,
+; Q120: Given a string of comma separated integers,
 ; write a function which returns a new comma separated string that
 ; only contains the numbers which are perfect squares.(p74)
 ; (= (__ "4,5,6,7,8,9") "4,9")
@@ -1372,7 +1368,7 @@
        (interpose ",")
        (apply str)))
 
-; Q: Two numbers are coprime if their greatest common divisor equals 1.
+; Q121: Two numbers are coprime if their greatest common divisor equals 1.
 ; Euler's totient function f(x) is defined as the number of positive integers less than x which are coprime to x.
 ; The special case f(1) equals 1. Write a function which calculates Euler's totient function.(p75)
 ; (= (__ 1) 1)
@@ -1390,7 +1386,7 @@
             (coprime? [n m] (= 1 (gcd n m)))]
       (count (filter (fn [m] (coprime? n m)) (range 1 n))))))
 
-; Q: Write a function which finds all the anagrams in a vector of words.
+; Q122: Write a function which finds all the anagrams in a vector of words.
 ; A word x is an anagram of word y if all the letters in x can be rearranged in a different order to form y.
 ; Your function should return a set of sets, where each sub-set is a group of words which are anagrams of each other.
 ; Each sub-set should have at least two words. Words without any anagrams should not be included in the result.(p77)
@@ -1406,7 +1402,7 @@
        (map set)
        set))
 
-; Q: Reimplement the function described in "Intro to Trampoline".(p78)
+; Q123: Reimplement the function described in "Intro to Trampoline".(p78)
 ; Special Restrictions
 ; trampoline
 ; (= (letfn [(triple [x] #(sub-two (* 3 x)))
@@ -1424,7 +1420,7 @@
       f'
       (p78 f'))))
 
-; Q: A number is "perfect" if the sum of its divisors equal the number itself.
+; Q124: A number is "perfect" if the sum of its divisors equal the number itself.
 ; 6 is a perfect number because 1+2+3=6.
 ; Write a function which returns true for perfect numbers and false otherwise.(p80)
 ; (= (__ 6) true)
@@ -1436,7 +1432,7 @@
   (let [factors (for [n' (range 1 n) :when (zero? (mod n n'))] n')]
     (= n (reduce + factors))))
 
-; Q: Happy numbers are positive integers that follow a particular formula:
+; Q125: Happy numbers are positive integers that follow a particular formula:
 ;    take each individual digit, square it, and then sum the squares to get a new number.
 ;    Repeat with the new number and eventually, you might get to a number whose squared sum is 1.
 ;    This is a happy number. An unhappy number (or sad number) is one that loops endlessly.
@@ -1456,7 +1452,7 @@
           (_ (cons n acc) n)))))]
     (_ [] n)))
 
-; Q: Write a predicate which checks whether or not a given sequence represents a binary tree.
+; Q126: Write a predicate which checks whether or not a given sequence represents a binary tree.
 ;    Each node in the tree must have a value, a left child, and a right child.(p95)
 ; (= (__ '(:a (:b nil nil) nil))
 ;    true)
@@ -1481,7 +1477,7 @@
                (p95 n1)
                (p95 n2))))))
 
-; Q: Let us define a binary tree as "symmetric" if the left half of the tree is the mirror image of the right half of the tree.
+; Q127: Let us define a binary tree as "symmetric" if the left half of the tree is the mirror image of the right half of the tree.
 ;    Write a predicate to determine whether or not a given binary tree is symmetric.
 ;    (see To Tree, or not to Tree for a reminder on the tree representation we're using).(p96)
 ; (= (__ '(:a (:b nil nil) (:b nil nil))) true)
@@ -1502,7 +1498,7 @@
                (when l (rev-tr l))])]
     (= tr (rev-tr tr))))
 
-; Q: Pascal's triangle is a triangle of numbers computed using the following rules:
+; Q128: Pascal's triangle is a triangle of numbers computed using the following rules:
 ; - The first row is 1.
 ; - Each successive row is computed by adding together adjacent numbers in the row above, and adding a 1 to the beginning and end of the row.
 ; Write a function which returns the nth row of Pascal's Triangle.(p97)
@@ -1523,7 +1519,7 @@
             (lazy-seq (cons coll (p-triangle (concat [1] (map (partial reduce +) (partition 2 1 coll)) [1])))))]
     (nth (p-triangle [1]) (dec n))))
 
-; Q: A function f defined on a domain D induces an equivalence relation on D,as follows:
+; Q129: A function f defined on a domain D induces an equivalence relation on D,as follows:
 ;    a is equivalent to b with respect to f if and only if (f a) is equal to (f b).
 ;    Write a function with arguments f and D that computes the equivalence classes of D with respect to f.(p98)
 ; (= (__ #(* % %) #{-2 -1 0 1 2})
@@ -1537,7 +1533,7 @@
 (defn p98 [f coll]
   (set (map set (vals (group-by f coll)))))
 
-; Q: Write a function which calculates the least common multiple.
+; Q130: Write a function which calculates the least common multiple.
 ;    Your function should accept a variable number of positive integers or ratios.(p100)
 ; (== (__ 2 3) 6)
 ; (== (__ 5 3 7) 105)
@@ -1555,7 +1551,7 @@
             (/ (* n m) (gcd n m)))]
     (reduce lcm rs)))
 
-; Q: When working with java, you often need to create an object with fieldsLikeThis,
+; Q131: When working with java, you often need to create an object with fieldsLikeThis,
 ;    but you'd rather work with a hashmap that has :keys-like-this until it's time to convert.
 ;    Write a function which takes lower-case hyphen-separated strings and converts them to camel-case strings.(p101)
 ; (= (__ "something") "something")
@@ -1573,7 +1569,7 @@
 (defn p102 [s]
   (clojure.string/replace s #"-[a-z]" (comp clojure.string/upper-case last)))
 
-; Q: A balanced number is one whose component digits have the same sum on the left and right halves of the number.
+; Q132: A balanced number is one whose component digits have the same sum on the left and right halves of the number.
 ;    Write a function which accepts an integer n, and returns true iff n is balanced.(p115)
 ; (= true (__ 11))
 ; (= true (__ 121))
@@ -1583,14 +1579,14 @@
 ; (= true (__ 89098))
 ; (= true (__ 89089))
 ; (= (take 20 (filter __ (range)))
-;    [0 1 2 3 4 5 6 7 8 9 11 22 33 44 55 66 77 88 99 101]) 
+;    [0 1 2 3 4 5 6 7 8 9 11 22 33 44 55 66 77 88 99 101])
 (defn p115 [n]
   (let [ns (str n)
         m (Math/ceil (/ (count ns) 2))]
     (= (reduce + (map int (take m ns)))
        (reduce + (map int (take m (reverse ns)))))))
 
-; Q: Your friend Joe is always whining about Lisps using the prefix notation for math.
+; Q133: Your friend Joe is always whining about Lisps using the prefix notation for math.
 ;    Show him how you could easily write a function that does math using the infix notation.
 ;    Is your favorite language that flexible, Joe?
 ;    Write a function that accepts a variable length mathematical expression consisting of numbers and the operations +, -, *, and /.
@@ -1612,9 +1608,9 @@
           n
           (partition 2 coll)))
 
-; Q: Because Clojure's for macro allows you to "walk" over multiple sequences in a nested fashion,
+; Q134: Because Clojure's for macro allows you to "walk" over multiple sequences in a nested fashion,
 ;    it is excellent for transforming all sorts of sequences.
-;    If you don't want a sequence as your final output (say you want a map), 
+;    If you don't want a sequence as your final output (say you want a map),
 ;    you are often still best-off using for, because you can produce a sequence and feed it into a map, for example.
 ;    For this problem, your goal is to "flatten" a map of hashmaps.
 ;    Each key in your output map should be the "path"1 that you would have to take in the original map to get to a value,
@@ -1648,7 +1644,7 @@
           [k' v] v]
       [[k k'] v])))
 
-; Q: Write a function that, for any given input vector of numbers, returns an infinite lazy sequence of vectors,
+; Q135: Write a function that, for any given input vector of numbers, returns an infinite lazy sequence of vectors,
 ;    where each next one is constructed from the previous following the rules used in Pascal's Triangle. For example,
 ;    for [3 1 2], the next row is [3 4 3 2].
 ;    Beware of arithmetic overflow! In clojure (since version 1.3 in 2011),
@@ -1665,7 +1661,7 @@
                         (map (fn [[n m]] (+' n m)) (partition 2 1 coll))
                         [(last coll)])))))
 
-; Q: Write a function which generates the power set of a given set.
+; Q136: Write a function which generates the power set of a given set.
 ;    The power set of a set x is the set of all subsets of x, including the empty set and x itself.(p85)
 ; (= (__ #{1 :a}) #{#{1 :a} #{:a} #{} #{1}})
 ; (= (__ #{}) #{#{}})
@@ -1678,7 +1674,7 @@
               (map (fn [xs] (conj xs x)) acc)))
           #{#{}} coll))
 
-; Q: Given an input sequence of keywords and numbers, create a map such that each key in the map is a keyword,
+; Q137: Given an input sequence of keywords and numbers, create a map such that each key in the map is a keyword,
 ;    and the value is a sequence of all the numbers (if any) between it and the next keyword in the sequence.(p105)
 ; (= {} (__ []))
 ; (= {:a [1]} (__ [:a 1]))
@@ -1691,7 +1687,7 @@
       x
       (take-while #(not (keyword? %)) xs))))
 
-; Q: Write a function which returns a sequence of digits of a non-negative number (first argument) in numerical system
+; Q138: Write a function which returns a sequence of digits of a non-negative number (first argument) in numerical system
 ;    with an arbitrary base (second argument). Digits should be represented with their integer values,
 ;    e.g. 15 would be [1 5] in base 10, [1 1 1 1] in base 2 and [15] in base 16. (p137)
 ; (= [1 2 3 4 5 0 1] (__ 1234501 10))
@@ -1710,7 +1706,7 @@
                 (_ (rest ns) (rem n (first ns))))))]
       (_ ns n)))))
 
-; Q: Write a function that returns a lazy sequence of "pronunciations" of a sequence of numbers.
+; Q139: Write a function that returns a lazy sequence of "pronunciations" of a sequence of numbers.
 ;    A pronunciation of each element in the sequence consists of the number of repeating identical numbers and the number itself.
 ;    For example, [1 1] is pronounced as [2 1] ("two ones"), which in turn is pronounced as [1 2 1 1] ("one two, one one").
 ;    Your function should accept an initial sequence of numbers, and return an infinite lazy sequence of pronunciations,
@@ -1723,7 +1719,7 @@
   (let [result (mapcat (fn [coll'] [(count coll') (first coll')]) (partition-by identity coll))]
     (lazy-seq (cons result (p110 result)))))
 
-; Q: Write an oscillating iterate: a function that takes an initial value and a variable number of functions.
+; Q140: Write an oscillating iterate: a function that takes an initial value and a variable number of functions.
 ;    It should return a lazy sequence of the functions applied to the value in order,
 ;    restarting from the first function after it hits the end.(p144)
 ; (= (take 3 (__ 3.14 int double)) [3.14 3 3.0])
@@ -1736,7 +1732,7 @@
 (defn p144 [n & fs]
   (reductions (fn [n f] (f n)) n (cycle fs)))
 
-; Q: Given any number of sequences, each sorted from smallest to largest, find the smallest single number which appears in all of the sequences.
+; Q141: Given any number of sequences, each sorted from smallest to largest, find the smallest single number which appears in all of the sequences.
 ;    The sequences may be infinite, so be careful to search lazily.(p108)
 ; (= 3 (__ [3 4 5]))
 ; (= 4 (__ [1 2 3 4 5 6 7] [0.5 3/2 4 19]))
@@ -1754,7 +1750,7 @@
                                       coll))
                          coll))))))
 
-; Q: Write a function which flattens any nested combination of sequential things (lists, vectors, etc.),
+; Q142: Write a function which flattens any nested combination of sequential things (lists, vectors, etc.),
 ;    but maintains the lowest level sequential items. The result should be a sequence of sequences with only one level of nesting.(p93)
 ; (= (__ [["Do"] ["Nothing"]])
 ;    [["Do"] ["Nothing"]])
@@ -1771,7 +1767,7 @@
           (cons x (p93 xs))
           (concat (p93 x) (p93 xs)))))))
 
-; Q: Write a function that accepts a curried function of unknown arity n. Return an equivalent function of n arguments. 
+; Q143: Write a function that accepts a curried function of unknown arity n. Return an equivalent function of n arguments.
 ;    You may wish to read this.(p158)
 ; (= 10 ((__ (fn [a]
 ;              (fn [b]
@@ -1799,7 +1795,7 @@
 (defn p158 [f]
   (fn [& args] (reduce (fn [f' x] (f' x)) f args)))
 
-; Q: take-while is great for filtering sequences, but it limited: you can only examine a single item of the sequence at a time.
+; Q144: take-while is great for filtering sequences, but it limited: you can only examine a single item of the sequence at a time.
 ;    What if you need to keep track of some state as you go over the sequence?
 ;    Write a function which accepts an integer n, a predicate p, and a sequence.
 ;    It should return a lazy sequence of items in the list up to, but not including, the nth item that satisfies the predicate.(p114)
@@ -1823,7 +1819,7 @@
                    xs))))]
     (_ [] n coll)))
 
-; Q: Write a function that takes a two-argument predicate, a value, and a collection; and returns a new collection
+; Q145: Write a function that takes a two-argument predicate, a value, and a collection; and returns a new collection
 ;    where the value is inserted between every two items that satisfy the predicate.(p132)
 ; (= '(1 :less 6 :less 7 4 3) (__ < :less [1 6 7 4 3]))
 ; (= '(2) (__ > :more [2]))
@@ -1846,7 +1842,7 @@
             (if (p x y) [x v] [x])
             (p132 p v (rest coll))))))))
 
-; Q: This is the inverse of Problem 92, but much easier. Given an integer smaller than 4000,
+; Q146: This is the inverse of Problem 92, but much easier. Given an integer smaller than 4000,
 ;    return the corresponding roman numeral in uppercase, adhering to the subtractive principle.(p104)
 ;    http://www.numericana.com/answer/roman.htm#valid
 ; (= "I" (__ 1))
@@ -1877,7 +1873,7 @@
           (_ u \I \V \X))))))
 
 
-; Q: You can assume that the input will be well-formed, in upper-case, and follow the subtractive principle.
+; Q147: You can assume that the input will be well-formed, in upper-case, and follow the subtractive principle.
 ;    You don't need to handle any numbers greater than MMMCMXCIX (3999), the largest number representable with ordinary letters.(p92)
 ; (= 14 (__ "XIV"))
 ; (= 827 (__ "DCCCXXVII"))
@@ -1904,7 +1900,7 @@
         :else 0)))]
     (_ 0 rn)))
 
-; Q: Given a sequence S consisting of n elements generate all k-combinations of S,
+; Q148: Given a sequence S consisting of n elements generate all k-combinations of S,
 ;    i. e. generate all possible sets consisting of k distinct elements taken from S.
 ;    The number of k-combinations for a sequence is equal to the binomial coefficient.(p103)
 ;    [k-combinations](https://en.wikipedia.org/wiki/Combination)
@@ -1934,7 +1930,7 @@
                       tr)))]
     (set (map set (walk-tr-in-depth (gen-tree n s) [] n)))))
 
-; Q: A balanced prime is a prime number which is also the mean of the primes directly before and after it in the sequence of valid primes.
+; Q149: A balanced prime is a prime number which is also the mean of the primes directly before and after it in the sequence of valid primes.
 ;    Create a function which takes an integer n, and returns true iff it is a balanced prime.(p116)
 ; (= false (__ 4))
 ; (= true (__ 563))
@@ -1956,12 +1952,12 @@
         (= n (/ (+ (pre-prime' (dec n)) (post-prime' (inc n))) 2))))
 
 ; テスト無し(REPLで直接書くこと)
-; Q: 2つの文字列から文字を取り出して交互にはさみこめ。またそれを元に戻せ。
+; Q150: 2つの文字列から文字を取り出して交互にはさみこめ。またそれを元に戻せ。
 ; A:
 ; (apply str (interleave "abc" "xyz"))
 ; (apply str (take-nth 2 "axbycz"))
 ;
-; Q: 以下の数列をloop/recurを用いて生成せよ。
+; Q151: 以下の数列をloop/recurを用いて生成せよ。
 ;    [5 4 3 2 1]
 ; A:
 ; (loop [acc [] n 5]
@@ -1969,7 +1965,7 @@
 ;     acc
 ;     (recur (conj acc n) (dec n))))
 ;
-; Q: declareマクロを自作せよ。
+; Q152: declareマクロを自作せよ。
 ; A:
 ; (defmacro my-declare [& expr]
 ;   `(do ~@(map #(list 'def % nil) expr)))
