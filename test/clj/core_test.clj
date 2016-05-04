@@ -245,7 +245,7 @@
 
 (deftest ut-pyths
   (testing
-    (is (= (pyths 10) [[5 3 4] [10 6 8]]))
+    (is (= (pyths 10) [[3 4 5] [6 8 10]]))
   )
 )
 
@@ -739,7 +739,7 @@
 ; )
 
 (deftest ut-index-filter
-  (is (= (index-filter #{\a \b} "abcdbbb") [0 1 4 5 6]))
+  (is (= (set (index-filter #{\a \b} "abcdbbb")) #{0 1 4 5 6}))
   (is (= (index-filter #{\a \b} "xyz") []))
 )
 
@@ -975,9 +975,9 @@
 )
 
 (deftest ut-p53
-	(is (= (p53 [1 0 1 2 3 0 4 5]) [0 1 2 3]))
-	(is (= (p53 [5 6 1 3 2 7]) [5 6]))
-	(is (= (p53 [2 3 3 4 5]) [3 4 5]))
+	(is (= (set (p53 [1 0 1 2 3 0 4 5])) #{0 1 2 3}))
+	(is (= (set (p53 [5 6 1 3 2 7])) #{5 6}))
+	(is (= (set (p53 [2 3 3 4 5])) #{3 4 5}))
 	(is (= (p53 [7 6 5 4]) []))
 )
 

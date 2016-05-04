@@ -16,6 +16,8 @@
 ;         sum [1, 2, 3]  = 6
 ;         sum []         = 0
 ; A: Using reduce.
+;; (defn sum [ns]
+;;   (reduce + ns))
 (defn sum [ns]
   (reduce + ns))
 ; A: Using apply.
@@ -115,15 +117,15 @@
 (defn factors [n]
   (for [n' (range 1 (inc n)) :when (zero? (mod n n'))] n'))
 
-; Q011: 対(pair)のリストを探索し、検索キーと等しいキーを持つ対全てを探し出し、対応する値を取り出してリストにする関数my-findを書け。
+; Q011: 対(pair)のリストを探索し、検索キーと等しいキーを持つ対全てを探し出し、対応する値を取り出してリストにする関数my-findをリスト内包表記と分配束縛を用いて書け。
 (defn my-find [k ps]
   (for [[k' v] ps :when (= k k')] v))
 
-; Q012: 対のリストから、対の先頭の要素を取り出してリストを生成するfirstsを書け。
+; Q012: 対のリストから、対の先頭の要素を取り出してリストを生成するfirstsをリスト内包表記と分配束縛を用いて書け。
 (defn firsts [ps]
   (for [[k _] ps] k))
 
-; Q013: haskellのlengthをsumとリスト内包表記で書け。
+; Q013: haskellのlengthを、sumとリスト内包表記で書け。
 ; length :: [a] -> Int
 ; length xs
 ;     リスト xs の長さを返す。
@@ -136,44 +138,42 @@
 
 ; Q014: factorsを用いて、整数が素数か判定する関数primeを書け。
 (defn prime [n]
-  (= [1, n] (factors n)))
+  (= [1 n] (factors n)))
 
 ; Q015: primeを用いて与えられた上限数までの全ての素数を生成する関数primesを書け。
 (defn primes [n]
-  (for [n' (range (inc n)) :when (prime n')] n'))
+  (for [n' (range 1 (inc n)) :when (prime n')] n'))
 
 ; Q016: リストから隣り合う要素をマップにして返す関数pairsをzipmapを用いて書け。
 ; ex)
 ;   [1 2] => {1 2}
 ;   [1 2 3] => {1 2, 2 3}
 ;   [1 2 3 4] => {1 2, 2 3, 3 4}
-(defn pairs [xs]
-  (zipmap xs (rest xs)))
+(defn pairs [coll]
+  (zipmap coll (rest coll)))
 
 ; Q017: 順序クラスに属する任意の型の要素を持つリストが、整列されているか調べる関数sortedをpairs関数を用いて書け。
 ;    （本来、pairsのような処理を行いたい場合、Clojureではシーケンスライブラリのpartitionを使用する。）
-(defn sorted [xs]
-  (every? (fn [[x y]] (<= x y)) (pairs xs)))
+(defn sorted [coll]
+  (every? (fn [[n m]] (< n m)) (pairs coll)))
 
-; Q018: 目的とする値がリストのどの位置にあるかを調べて、その位置全てをリストとして返す関数positionsを書け。
-; (defn positions [x xs]
-;   (next (find (apply (partial merge-with list) (map (partial apply hash-map)  (map vector xs (iterate inc 0)))) x)))
-;(defn positions [x xs]
-;  (map first (filter #(= x (second %)) (zipmap (iterate inc 0) xs))))
-(defn positions [x xs]
-  (for [[idx x'] (zipmap (iterate inc 0) xs) :when (= x x')] idx))
+; Q018: 目的とする値がリストのどの位置にあるかを調べて、その位置全てをリストとして返す関数positionsを書け。(indexは0から開始される事)
+(defn positions [x coll]
+  (for [[i v] (zipmap (iterate inc 0) coll) :when (= x v)] i))
 
 ; Q019: 指定した特定の文字がいくつ含まれているか数える関数char-countを書け。
-; (defn char-count [c cs]
-;   (count (for [c' cs :when (= c c')] c')))
-(defn char-count [c s]
-  (count (filter #{c} s)))
+(defn char-count [c cs]
+  (count (filter #(= c %) cs)))
 
 ; Q020: 文字列から小文字を数える関数lowersを書け。
-(defn lowers [s]
-  (count (re-seq #"[a-z]" s)))
+;; (defn lowers [s]
+;;   (count (re-seq #"[a-z]" s)))
+(defn lowers [cs]
+  (count (filter #(Character/isLowerCase %) cs)))
 
 ; Q021: Unicodeコードポイント（整数、'a'が0）を文字に変換する関数int2letを書け。
+;(defn int2let [n]
+;  (char (+ n (int \a))))
 (defn int2let [n]
   (char (+ n (int \a))))
 
@@ -184,24 +184,14 @@
 ; Q023: 小文字をシフト数だけずらすshiftを書け。
 ;    (循環すること。)
 ;     ex) 'z'に対し、1ならば'a'となる）（小文字のみ対象とすること）
-; (defn shift [n c]
-;   (let [alph-cnt (count (range (int \a) (inc (int \z))))]
-;     (int2let (rem (+ n (let2int c)) alph-cnt))))
-; (defn shift [n c]
-;   (if-not ((set (map char (range (int \a) (inc (int \z))))) c)
-;     c
-;     (char (+ (rem (+ (- (int c) (int \a)) n) 26) (int \a)))))
 (defn shift [n c]
-  (let [m (inc (- (let2int \z) (let2int \a)))]
-    (int2let (rem (+ n (let2int c)) m))))
+  (let [alph-cnt (range (int \a) (inc (int \z)))
+        m (let2int c)]
+    (int2let (rem (+ n m) alph-cnt))))
 
 ; Q024: 与えられたシフト数で文字列を暗号化する関数my-encodeを書け。
-; (defn my-encode [n cs]
-;   (apply str (for [c cs] (shift n c))))
-;(defn my-encode [n s]
-;  (apply str (map #(shift n %) s)))
 (defn my-encode [n cs]
-  (apply str (map (partial shift n) cs)))
+  (clojure.string/join "" (map #(shift n %) cs)))
 
 ; Q025: 百分率を計算し、浮動小数点数として返す関数percentを書け。
 (defn percent [n m]
@@ -215,10 +205,14 @@
 ;  (let [cs (map char (range (int \a) (inc (int \z))))
 ;        cnt (lowers s)]
 ;    (map (fn [c] (percent (count (filter #((hash-set c) %) s)) cnt)) cs)))
+;; (defn freqs [cs]
+;;   (let [cs' (map char (range (int \a) (int \z)))
+;;         cnt (lowers cs)]
+;;     (map (fn [c] (percent (count (filter #(= c %) cs)) cnt)) cs')))
 (defn freqs [cs]
-  (let [cs' (map char (range (int \a) (int \z)))
-        cnt (lowers cs)]
-    (map (fn [c] (percent (count (filter #(= c %) cs)) cnt)) cs')))
+  (let [alph (map char (range (int \a) (inc (int \z))))
+        length (lowers cs)]
+    (map (fn [c] (percent (count (filter #(= c %) cs)) length)) alph)))
 
 ; Q027: カイ二乗検定を行う関数chisqrを書け。
 (defn chisqr [ob ex]
@@ -228,38 +222,38 @@
                ex)))
 
 ; Q028: 文字リストの要素をnだけ左に回転させる関数rotateを書け。（リストの先頭は末尾に接続していると考える）
-; (defn rotate [n cs]
-;   (apply str (concat (drop n cs) (take n cs))))
 (defn rotate [n cs]
-  (apply str (concat (drop n cs) (take n cs))))
+  (clojure.string/join (concat (drop n cs) (take n cs))))
 
 ; Q029: 1から100までの二乗の和を計算する式をリスト内包表記を用いて書け。
-; (reduce + (for [n (range 1 101)] (* n n)))
-(reduce + (for [n (range 1 (inc 100))] (Math/pow n 2)))
+; (reduce + (for [n (range 1 (inc 100))] (Math/pow n 2)))
+(reduce + (map #(Math/pow % 2) (range 1 (inc 100))))
 
-; Q030: 二つの生成器を持つリスト内包表記[(x,y) | x <- [1,2,3], y <- [4,5,6]]は、
+; Q030: 二つの生成器を持つリスト内包表記[(x,y) | x <- [1,2,3], y <- [4,5,6]]は(*)、
 ;    一つの生成器を持つリスト内包表記二つでも表現出来る事を示せ。
-;    ヒント：一方のリスト内包表記を他方の中に入れ、またライブラリ関数concatも使え。
+; * (for [x [1 2 3] y [4 5 6]] [x y])
 (apply concat (for [x [1 2 3]] (for [y [4 5 6]] [x y])))
 
 ; Q031: 与えられた上限までに含まれる完全数全てを算出する関数perfectsをリスト内包表記と関数factorsを使って定義せよ。
 ;    完全数：自分自身をのぞく約数の和が自分自身と等しい整数
 (defn perfects [n]
-  (for [n' (range 2 (dec n)) :when (= n' (- (reduce + (factors n')) n'))] n'))
+  (for [n' (range 2 n) :when (= n' (- (reduce + (factors n')) n'))] n'))
 
 ; Q032: ピタゴラス数のリスト(組み合わせ)を生成する関数pythsをリスト内包表記を使って定義せよ。ただし、ピタゴラス数の要素は与えられた上限n以下であるとする。
+;; (defn pyths [n]
+;;   (letfn [(range-closed [n] (range 1 (inc n)))]
+;;     (for [
+;;       x (range-closed n)
+;;       y (range-closed n)
+;;       z (range-closed n)
+;;       :when
+;;         (and
+;;           (= (Math/pow x 2) (+ (Math/pow y 2) (Math/pow z 2)))
+;;           (< y z))]
+;;       [x y z])))
 (defn pyths [n]
-  (letfn [(range-closed [n] (range 1 (inc n)))]
-    (for [
-      x (range-closed n)
-      y (range-closed n)
-      z (range-closed n)
-      :when
-        (and
-          (= (Math/pow x 2) (+ (Math/pow y 2) (Math/pow z 2)))
-          (< y z))]
-      [x y z])))
-
+  (let [ns (range 1 (inc n))]
+    (for [x ns y ns z ns :when (and (< x y) (= (+ (Math/pow x 2) (Math/pow y 2)) (Math/pow z 2)))] [x y z])))
 
 ; Q033: ある要素のみからなるリストを生成する関数my-replicateを書け。
 ;    ex) >replicate 3 True
@@ -1977,3 +1971,22 @@
 ; https://www.4clojure.com/problem/11
 ; https://www.4clojure.com/problem/47
 ; - gpsoftのclojure本でわからなかったところをリストして復習->トレーニング化
+
+(def my-number (ref 0))
+(def smallest (ref 1))
+(def biggest (ref 100))
+
+
+(defn guess-my-number []
+  (dosync (ref-set my-number (quot (+ (deref smallest) (deref biggest)) 2)))
+  (println (deref my-number)))
+
+(defn smaller []
+  (dosync (ref-set biggest (deref my-number)))
+  (guess-my-number))
+
+(defn bigger []
+  (dosync (ref-set smallest (deref my-number)))
+  (guess-my-number))
+
+
