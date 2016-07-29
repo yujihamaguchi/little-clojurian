@@ -239,6 +239,7 @@
 (defn perfects [n]
   (for [n' (range 2 n) :when (= n' (- (reduce + (factors n')) n'))] n'))
 
+
 ; Q032: ピタゴラス数のリスト(組み合わせ)を生成する関数pythsをリスト内包表記を使って定義せよ。ただし、ピタゴラス数の要素は与えられた上限n以下であるとする。
 ;; (defn pyths [n]
 ;;   (letfn [(range-closed [n] (range 1 (inc n)))]
@@ -255,7 +256,7 @@
   (let [ns (range 1 (inc n))]
     (for [x ns y ns z ns :when (and (< x y) (= (+ (Math/pow x 2) (Math/pow y 2)) (Math/pow z 2)))] [x y z])))
 
-; Q033: ある要素のみからなるリストを生成する関数my-replicateを書け。
+; Q033: ある要素のみからなるリストを生成する関数my-replicateを書け。(直接の再帰、それを使わないバージョンをそれぞれ書け)
 ;    ex) >replicate 3 True
 ;        [True, True, True]
 ;(defn my-replicate [n x]
@@ -274,6 +275,7 @@
 (defn scalarproduct [ns ms]
   (reduce + (for [[n m] (map vector ns ms)] (* n m))))
 
+
 ; Q035: 要素を逆転する関数myreverseを書け。
 ; A
 (defn myreverse [coll]
@@ -284,13 +286,12 @@
 ; Q036: 整列された要素を持つリストに要素を挿入する関数myinsertを書け。
 ; A
 (defn myinsert [x xs]
-  (if-not (seq xs)
+  (if (not (seq xs))
     [x]
     (if (<= x (first xs))
       (cons x xs)
       (cons (first xs) (myinsert x (rest xs))))))
-
-; Q037: 関数insertを用いてリストのソートを行う"挿入ソート"を行う関数isortを書け。
+; Q037: 関数myinsertを用いてリストのソートを行う"挿入ソート"を行う関数isortを書け。
 ; A
 (defn isort [xs]
   (if-not (seq xs)
@@ -310,10 +311,15 @@
 ;   (if (or (empty? xs) (empty? ys))
 ;     []
 ;     (cons (vector (first xs) (first ys)) (myzip (rest xs) (rest ys)))))
+;(defn myzip [xs ys]
+;  (if (and (seq xs) (seq ys))
+;    (cons (vector (first xs) (first ys)) (myzip (rest xs) (rest ys)))
+;    []))
 (defn myzip [xs ys]
-  (if (and (seq xs) (seq ys))
-    (cons (vector (first xs) (first ys)) (myzip (rest xs) (rest ys)))
-    []))
+  (cond
+    (not (seq xs)) []
+    (not (seq ys)) []
+    :else (cons [(first xs) (first ys)] (myzip (rest xs) (rest ys)))))
 
 ; Q040: evenとoddを相互再帰を用いて自作せよ。(declareを自作してそれを用いよ。)
 ;    ヒント：0は偶数、-3は奇数
@@ -327,7 +333,6 @@
 (defn myodd? [n]
   (and (not (zero? n))
        (myeven? (dec (Math/abs n)))))
-
 
 ; Q041: 0以上の整数nに対し、n番目のフィボナッチ数を求める関数fibonacciを書け。
 ; A
@@ -346,7 +351,7 @@
           xs' (rest xs)
           lt (for [x' xs' :when (< x' x)] x')
           ge (for [x' xs' :when (>= x' x)] x')]
-      (concat lt [x] ge))))
+      (concat (qsort lt) [x] (qsort ge)))))
 
 ; Q043: リストから偶数の位置の要素を取り出す関数evensと、奇数の位置の要素を取り出す関数oddsを相互再帰を用いて書け。
 ; A
@@ -1989,4 +1994,4 @@
   (dosync (ref-set smallest (deref my-number)))
   (guess-my-number))
 
-
+(defrecord Planet [name volume])
