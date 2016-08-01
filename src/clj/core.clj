@@ -376,7 +376,8 @@
     []
     (cons (first coll) (my-init (rest coll)))))
 
-; Q045: elemを再帰を用いて自作せよ。（二項演算子"||"を用いよ）
+; Q045: elemを再帰を用いて自作せよ。
+;       elem :: Eq a => a -> [a] -> Bool
 ; A
 (defn elem [x xs]
   (if-not (seq xs)
