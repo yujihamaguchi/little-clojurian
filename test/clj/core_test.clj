@@ -380,6 +380,8 @@
 
 (deftest ut-index
   (testing
+    (is (= (my-index [] 0) nil))
+    (is (= (my-index [] 1) nil))
     (is (= (my-index [1] 0) 1))
     (is (= (my-index [1 2] 1) 2))
   )

@@ -265,9 +265,9 @@
 ;    (cons x (my-replicate (dec n) x))))
 (defn my-replicate [n x]
   (letfn [(my-replicate' [n acc]
-    (if (zero? n)
-      acc
-      (my-replicate' (dec n) (cons x acc))))]
+            (if (zero? n)
+              acc
+              (my-replicate' (dec n) (cons x acc))))]
     (my-replicate' n [])))
 
 ; Q034: 二つの整数のリストの内積を求める関数scalarproductをリスト内包表記を用いて書け。
@@ -415,8 +415,8 @@
     (not (seq coll)) []
     (= (count coll) 1) coll
     :else
-      (let [[xs ys] (halve coll)]
-        (my-merge (msort xs) (msort ys)))))
+    (let [[xs ys] (halve coll)]
+      (my-merge (msort xs) (msort ys)))))
 
 ; Q049: replicateを再帰を用いて自作せよ。(my-replicate-rec [n x])
 ; A
@@ -458,14 +458,22 @@
 
 ; Q055: filterを再帰を用いて自作せよ。(my-filter-recur)
 ; A
-(defn my-filter-recur [p coll]
-  (if-not (seq coll)
+;(defn my-filter-recur [p coll]
+;  (if-not (seq coll)
+;    []
+;    (let [x (first coll)
+;          xs (rest coll)]
+;      (case (p x)
+;        true (cons x (my-filter-recur p xs))
+;        false (my-filter-recur p xs)))))
+(defn my-filter-recur [p xs]
+  (if-not (seq xs)
     []
-    (let [x (first coll)
-          xs (rest coll)]
-      (case (p x)
-        true (cons x (my-filter-recur p xs))
-        false (my-filter-recur p xs)))))
+    (let [x (first xs)
+          xs' (rest xs)]
+      (if (p x)
+        (cons x (my-filter-recur p xs'))
+        (my-filter-recur p xs')))))
 
 ; Q056: リストの先頭から述語を満たす連続した要素を取り出す関数takeWhileを自作せよ。(my-take-while)
 ; A:
@@ -484,7 +492,6 @@
 ; myFoldr :: (a -> b -> b) -> b -> [a] -> b
 ; myFoldr _ x' [] = x'
 ; myFoldr f x' (x:xs) = f x (myFoldr f x' xs)
-;
 (defn my-foldr [f x coll]
   (if-not (seq coll)
     x
@@ -585,7 +592,6 @@
     false
     (or (p (first coll)) (my-any p (rest coll)))))
 
-
 ; Q065: 暗号化された文字列は手に入れたが、シフト数は分からないとしよう。暗号文を解読するためにシフト数を推測したい。
 ;    これは次のように実現できる。すなわち暗号文に対する文字の出現頻度表を作り、この表を左に回転させながら、
 ;    期待される文字の出現頻度表に対するカイ二乗検定の値を計算する。そして、算出されたカイ二乗検定の値のリストの中で、
@@ -665,21 +671,21 @@
 
 ; # 集合
 (def compositions #{
-  {:name "The Art of the Fugue", :composer "J. S. Bach"}
-  {:name "Requiem", :composer "W. A. Mozart"}
-  {:name "Requiem", :composer "Giuseppe Verdi"}
-  {:name "Musical Offering", :composer "J. S. Bach"}})
+                    {:name "The Art of the Fugue", :composer "J. S. Bach"}
+                    {:name "Requiem", :composer "W. A. Mozart"}
+                    {:name "Requiem", :composer "Giuseppe Verdi"}
+                    {:name "Musical Offering", :composer "J. S. Bach"}})
 (def composers #{
-  {:composer "J. S. Bach" :country "Germany"}
-  {:composer "W. A. Mozart" :country "Austria"}
-  {:composer "Giuseppe Verdi" :country "Italy"}})
+                 {:composer "J. S. Bach" :country "Germany"}
+                 {:composer "W. A. Mozart" :country "Austria"}
+                 {:composer "Giuseppe Verdi" :country "Italy"}})
 (def nations #{
-  {:nation "Germany" :language "Germany"}
-  {:nation "Austria" :language "German"}
-  {:nation "Italy" :language "Italian"}})
+               {:nation "Germany" :language "Germany"}
+               {:nation "Austria" :language "German"}
+               {:nation "Italy" :language "Italian"}})
 
-; Q067: compositionsのキーワード:nameの別名として:titleを持つ集合を取得せよ。(set1関数の戻り値として)
 (use 'clojure.set)
+; Q067: compositionsのキーワード:nameの別名として:titleを持つ集合を取得せよ。(set1関数の戻り値として)
 (defn set1 []
   (rename compositions {:name :title}))
 
@@ -748,8 +754,8 @@
 ; それを防ぐ為に、関数ではなくシーケンスを見せることでキャッシュが頭から作られるのを保証せよ。(m-seq, f-seq)
 (defmacro elapsed-time [expr]
   `(let [start# (System/currentTimeMillis)]
-    ~expr
-    (- (System/currentTimeMillis) start#)))
+     ~expr
+     (- (System/currentTimeMillis) start#)))
 
 (declare f m)
 (defn f [n]
@@ -768,16 +774,15 @@
 (def m-seq (map m (range)))
 
 
-; Q077: s-list（シンボルとシンボルのリスト両方を要素に出来るリスト）、oldsym、newsymを引数に取り、s-listの中のoldsymをすべてnewsymに置き換える関数replace-symbolを、
+; Q077-01: s-list（シンボルとシンボルのリスト両方を要素に出来るリスト）、oldsym、newsymを引数に取り、s-listの中のoldsymをすべてnewsymに置き換える関数replace-symbolを、
 ; シンボル（と見られる要素）の置換を行うreplace-symbol-expression関数との相互再帰で書け。
 ; (replace-symbol '((a b) (((b g r) (f r)) c (d e)) b) 'b 'a)
 ; ;= ((a a) (((a g r) (f r)) c (d e)) a)
 ; この関数は深くネストした構造をあたえるとスタックを溢れさせる可能性がある。これを避ける為に遅延評価を用いること。
-; また、マルチメソッドを用いたバージョンも書け。
 ;
 ; 相互再帰版
 ; (declare replace-symbol replace-symbol-expression)
-
+;
 ; (defn replace-symbol [coll oldsym newsym]
 ;   (if-not (seq coll)
 ;     []
@@ -785,7 +790,7 @@
 ;       (cons
 ;         (replace-symbol-expression (first coll) oldsym newsym)
 ;         (replace-symbol (rest coll) oldsym newsym)))))
-
+;
 ; (defn replace-symbol-expression [sym-expr oldsym newsym]
 ;   (if (symbol? sym-expr)
 ;     (if (= sym-expr oldsym)
@@ -793,6 +798,7 @@
 ;       sym-expr)
 ;     (replace-symbol sym-expr oldsym newsym)))
 
+; Q077-02: また、マルチメソッドを用いたバージョンも書け。
 ; マルチメソッド版
 (defn- coll-or-scalar [x & _] (if (coll? x) :collection :scalar))
 
@@ -810,7 +816,7 @@
   (if (= sym oldsym) newsym sym))
 
 ; Q078: 名前（username）をパラメータとし、"{greeting-prefix}, {username}"の文字列を返す関数を返す、
-;    挨拶の種類（greeting-prefix）をパラメータとする関数make-greeterを書け。
+;       挨拶の種類（greeting-prefix）をパラメータとする関数make-greeterを書け。
 ; ((make-greeter "Hello") "Yuji")
 ; ;= "Hello, Yuji"
 ; ((make-greeter "Aloha") "Yuji")
@@ -818,6 +824,7 @@
 (defn make-greeter [greeting-prefix]
   (fn [username] (str greeting-prefix ", " username)))
 
+0 1 1 2 3 5 8 13 21 34
 ; Q079: n番目のフィボナッチ数を返す、recurで明示的な再帰を行う関数recur-fiboを書け。
 ; (recur-fibo 9)
 ; ;= 34N
@@ -854,11 +861,23 @@
 ;   reader will attempt to convert its argument to a BufferedReader.
 ; WHEN SHOULD I USE READER
 ;   When a lazy sequence of the results are needed or to create a new BufferedReader.
+;(use '[clojure.java.io :only [reader]])
+;(defn clojure-loc [f]
+;  (reduce + (for [f' (file-seq f) :when (re-seq #"\.clj$" (.getName f'))]
+;              (with-open [rdr (reader f')]
+;                (count (filter #(re-seq #"\S" %) (line-seq rdr)))))))
+;(use '[clojure.java.io :only [reader]])
+;(defn clojure-loc [f]
+;  (for [f' (file-seq f) :when (re-seq #"\.clj$" (.getName f'))]
+;    (reduce +
+;            (with-open [rdr (reader f')]
+;              (count (filter #(re-seq #"\S" %) (line-seq rdr)))))))
 (use '[clojure.java.io :only [reader]])
-(defn clojure-loc [f]
-  (reduce + (for [f' (file-seq f) :when (re-seq #"\.clj$" (.getName f'))]
-              (with-open [rdr (reader f')]
-                (count (filter #(re-seq #"\S" %) (line-seq rdr)))))))
+(defn clojure-loc [dir]
+  (reduce +
+          (for [file (file-seq dir) :when (re-seq #"\.clj$" (.getName file))]
+            (with-open [rdr (reader file)]
+              (filter #(re-seq #"\S" %) (line-seq rdr))))))
 
 ; Q082: 文字列中の文字で、探すべき文字のセットにマッチするもののインデックスを得る関数index-filterを書け。（indexed関数を用いよ。）
 ; ([pred coll])
@@ -889,19 +908,27 @@
 
 ; Q: マクロand、orをmy-and、my-orとして自作せよ。
 ; A
+;(defmacro my-and
+;  ([] true)
+;  ([x] x)
+;  ([x & rest]
+;   `(let [and# ~x]
+;      (if and# (my-and ~@rest) and#))))
+;
+;(defmacro my-or
+;  ([] false)
+;  ([x] x)
+;  ([x & rest]
+;   `(let [or# ~x]
+;      (if or# or# (my-or ~@rest)))))
 (defmacro my-and
   ([] true)
   ([x] x)
-  ([x & rest]
-    `(let [and# ~x]
-      (if and# (my-and ~@rest) and#))))
-
+  ([x & rest] `(if ~x (my-and ~@rest) false)))
 (defmacro my-or
   ([] false)
   ([x] x)
-  ([x & rest]
-    `(let [or# ~x]
-      (if or# or# (my-or ~@rest)))))
+  ([x & rest] `(if ~x true (my-or ~@rest))))
 
 ; Q083: 相互再帰を使って、my-odd?およびmy-even?を定義せよ。(*utのコメントアウト部分でStackOverflowエラー発生課題残*)
 ; A
@@ -962,9 +989,9 @@
 ; - trampolineを使った明示的な相互再帰
 (defn tail-fibo [n]
   (letfn [(tail-fibo- [n m l]
-    (if (zero? l)
-      n
-      (recur m (+' n m) (dec l))))]
+            (if (zero? l)
+              n
+              (recur m (+' n m) (dec l))))]
     (tail-fibo- 0 1 n)))
 
 ; Q086: *out*を一時的に新たなStringWriterに束縛し、exprsを評価して、評価中に*out*へ出力されたものを文字列にして返すwith-out-strマクロを自作せよ。(my-with-out-str)
@@ -972,6 +999,10 @@
 ; ;= "hello, world"
 ; refer: [Let vs. Binding in Clojure](http://stackoverflow.com/questions/1523240/let-vs-binding-in-clojure)
 ; A
+;(defmacro my-with-out-str [& exprs]
+;  `(binding [*out* (java.io.StringWriter.)]
+;     (do ~@exprs)
+;     (str *out*)))
 (defmacro my-with-out-str [& exprs]
   `(binding [*out* (java.io.StringWriter.)]
     (do ~@exprs)
@@ -1037,7 +1068,7 @@
 (defmacro bench [expr]
   `(let [start# (System/nanoTime)
          result# ~expr]
-    {:result result# :elapsed (- (System/nanoTime) start#)}))
+     {:result result# :elapsed (- (System/nanoTime) start#)}))
 
 ; Q093: Write a function which returns the total number of elements in a sequence.(p22)
 ; Special Restrictions
@@ -1057,6 +1088,11 @@
 ; (= (__ [1 2 3 4 5]) [5 4 3 2 1])
 ; (= (__ (sorted-set 5 7 2 7)) '(7 5 2))
 ; (= (__ [[1 2][3 4][5 6]]) [[5 6][3 4][1 2]])
+; my answer 20161106
+;(defn p23 [xs]
+;  (if (not (seq xs))
+;    []
+;    (conj (p23 (vec (rest xs))) (first xs))))
 (defn p23 [coll]
   (reduce conj '() coll))
 
@@ -1106,12 +1142,12 @@
 ; (= (__ [:a :a :b :b :c]) '((:a :a) (:b :b) (:c)))
 ; (= (__ [[1 2] [1 2] [3 4]]) '(([1 2] [1 2]) ([3 4])))
 ; A:
-; (defn p31 [coll]
-;   (when (seq coll)
-;     (let [x (first coll)]
-;       (cons (take-while #(= x %) coll) (p31 (drop-while #(= x %) coll))))))
-(defn p31 [coll]
-  (partition-by identity coll))
+;(defn p31 [coll]
+;  (partition-by identity coll))
+ (defn p31 [coll]
+   (when (seq coll)
+     (let [x (first coll)]
+       (cons (take-while #(= x %) coll) (p31 (drop-while #(= x %) coll))))))
 
 ; Q100: Write a function which duplicates each element of a sequence.(p32)
 ; (= (__ [1 2 3]) '(1 1 2 2 3 3))
@@ -1155,7 +1191,7 @@
 ; (= (__ [1 2 3 4] [5]) [1 5])
 ; (= (__ [30 20] [25 15]) [30 25 20 15])
 (defn p39 [xs ys]
- (mapcat list xs ys))
+  (mapcat list xs ys))
 
 ; Q105: Write a function which separates the items of a sequence by an arbitrary value.(p40)
 ; Special Restrictions
@@ -1181,7 +1217,6 @@
 (defn p41 [coll n]
   (when (seq coll)
     (concat (take (dec n) coll) (p41 (drop n coll) n))))
-(fn [coll idx] (map second (filter #(not= 0 (rem (first %) idx)) (map vector (iterate inc 1) coll))))
 
 ; Q107: Write a function which calculates factorials.(p42)
 ; (= (__ 1) 1)
@@ -1197,8 +1232,11 @@
 ; (= (__ [1 2 3 4 5 6] 2) '((1 3 5) (2 4 6)))
 ; (= (__ (range 9) 3) '((0 3 6) (1 4 7) (2 5 8)))
 ; (= (__ (range 10) 5) '((0 5) (1 6) (2 7) (3 8) (4 9)))
-(defn p43 [coll n]
-  (apply (partial map list) (partition n coll)))
+;(defn p43 [coll n]
+;  (apply (partial map list) (partition n coll)))
+(defn p43 [xs n]
+  (apply (partial map list) (partition n xs)))
+
 
 ; Q109: Write a function which can rotate a sequence in either direction.(p44)
 ; (= (__ 2 [1 2 3 4 5]) '(3 4 5 1 2))
@@ -1209,6 +1247,7 @@
 (defn p44 [n coll]
   (let [n' (mod n (count coll))]
     (concat (drop n' coll) (take n' coll))))
+
 ; my naive answer
 ; (defn p44 [n coll]
 ;   (cond
@@ -1243,6 +1282,21 @@
         (let [ps (partition 2 1 coll)
               result' (vec (set (apply concat (take-while continuous? ps))))]
           (recur (rest coll) (if (< (count result) (count result')) result' result)))))))
+; my answer 2016/12/24
+;(defn p53 [xs]
+;  (letfn [(continuous? [[n m]] (= (inc n) m))
+;          (concat-linked-pairs [ps]
+;            (if-not (seq (next ps))
+;              (first ps)
+;              (cons (first (first ps)) (concat-linked-pairs (rest ps)))))
+;          (p53' [xs]
+;            (if-not (seq xs)
+;              []
+;              (let [ps' (partition 2 1 xs)
+;                    ps'' (drop-while (complement continuous?) ps')]
+;                (letfn [(continuous? [[n m]] (= (inc n) m))]
+;                  (cons (concat-linked-pairs (take-while continuous? ps'')) (p53' (concat-linked-pairs (drop-while continuous? ps''))))))))]
+;    (reduce (fn [xs ys] (if (>= (count xs) (count ys)) xs ys)) '() (p53' xs))))
 
 ; Q112: Write a function which returns a sequence of lists of x items each. Lists of less than x items should not be returned.(p54)
 ; Special Restrictions
@@ -1280,7 +1334,12 @@
 ; distinct
 (defn p56 [coll]
   (reduce (fn [acc x] (if (some #(= x %) acc) acc (conj acc x))) [] coll))
-
+; my answer 2016/12/30
+;(defn p56 [xs]
+;  (if-not (seq xs)
+;    []
+;    (let [x (first xs)]
+;      (cons x (p56 (filter #(not (= x %)) (rest xs)))))))
 
 ; Q115: Write a function which allows you to create function compositions.
 ;    The parameter list should take a variable number of functions,
@@ -1318,9 +1377,9 @@
 ; (= (last (__ * 2 [3 4 5])) (reduce * 2 [3 4 5]) 120)
 (defn p60
   ([f init args]
-    (if-not (seq args)
-      [init]
-      (lazy-seq (cons init (p60 f (f init (first args)) (rest args))))))
+   (if-not (seq args)
+     [init]
+     (lazy-seq (cons init (p60 f (f init (first args)) (rest args))))))
   ([f args] (p60 f (first args) (rest args))))
 
 ; Q118: Write a function which returns the first x number of prime numbers.(p67)
@@ -1329,11 +1388,11 @@
 ; (= (last (__ 100)) 541)
 (defn p67 [n]
   (letfn [(factors [n]
-                   (filter (fn [m] (= 0 (mod n m))) (range 1 (inc n))))
+            (filter (fn [m] (= 0 (mod n m))) (range 1 (inc n))))
           (prime? [n]
-                  (= [1 n] (factors n)))
+            (= [1 n] (factors n)))
           (primes []
-                  (filter prime? (drop 2 (range))))]
+            (filter prime? (drop 2 (range))))]
     (take n (primes))))
 
 ; Q119: Write a function which takes a function f and a variable number of maps.
@@ -1443,13 +1502,13 @@
 ; (= (__ 3) false)
 (defn p86 [n]
   (letfn [(_ [acc n]
-    (let [ns (map #(Integer/parseInt (str %)) (str n))
-          n (reduce + (map #(* % %) ns))]
-      (if (= 1 n)
-        true
-        (if (some #(= n %) acc)
-          false
-          (_ (cons n acc) n)))))]
+            (let [ns (map #(Integer/parseInt (str %)) (str n))
+                  n (reduce + (map #(* % %) ns))]
+              (if (= 1 n)
+                true
+                (if (some #(= n %) acc)
+                  false
+                  (_ (cons n acc) n)))))]
     (_ [] n)))
 
 ; Q126: Write a predicate which checks whether or not a given sequence represents a binary tree.
@@ -1495,7 +1554,7 @@
 (defn p96 [tr]
   (letfn [(rev-tr [[p l r]]
             [p (when r (rev-tr r))
-               (when l (rev-tr l))])]
+             (when l (rev-tr l))])]
     (= tr (rev-tr tr))))
 
 ; Q128: Pascal's triangle is a triangle of numbers computed using the following rules:
@@ -1640,9 +1699,9 @@
 ;       (vals coll))))
 (defn p146 [coll]
   (into {}
-    (for [[k v] coll
-          [k' v] v]
-      [[k k'] v])))
+        (for [[k v] coll
+              [k' v] v]
+          [[k k'] v])))
 
 ; Q135: Write a function that, for any given input vector of numbers, returns an infinite lazy sequence of vectors,
 ;    where each next one is constructed from the previous following the rules used in Pascal's Triangle. For example,
@@ -1671,7 +1730,7 @@
 (defn p85 [coll]
   (reduce (fn [acc x]
             (into acc
-              (map (fn [xs] (conj xs x)) acc)))
+                  (map (fn [xs] (conj xs x)) acc)))
           #{#{}} coll))
 
 ; Q137: Given an input sequence of keywords and numbers, create a map such that each key in the map is a keyword,
@@ -1700,11 +1759,11 @@
     [0]
     (let [ns (reverse (take-while (fn [k] (<= k n)) (map (fn [l] (Math/pow m l)) (range))))]
       (letfn [(_ [ns n]
-        (if-not (seq ns)
-          []
-          (cons (int (quot n (first ns)))
-                (_ (rest ns) (rem n (first ns))))))]
-      (_ ns n)))))
+                (if-not (seq ns)
+                  []
+                  (cons (int (quot n (first ns)))
+                        (_ (rest ns) (rem n (first ns))))))]
+        (_ ns n)))))
 
 ; Q139: Write a function that returns a lazy sequence of "pronunciations" of a sequence of numbers.
 ;    A pronunciation of each element in the sequence consists of the number of repeating identical numbers and the number itself.
@@ -1854,11 +1913,11 @@
 ; (= "XLVIII" (__ 48))
 (defn p104 [n]
   (letfn [(_ [n c1 c2 c3]
-    (cond
-      (< n 4) (repeat n c1)
-      (= n 4) [c1 c2]
-      (= n 9) [c1 c3]
-      (> n 4) (cons c2 (repeat (- n 5) c1))))]
+            (cond
+              (< n 4) (repeat n c1)
+              (= n 4) [c1 c2]
+              (= n 9) [c1 c3]
+              (> n 4) (cons c2 (repeat (- n 5) c1))))]
     (let [th (quot n 1000)
           r (rem n 1000)
           h (quot r 100)
@@ -1866,11 +1925,11 @@
           t (quot r 10)
           u (rem r 10)]
       (apply str
-        (concat
-          (repeat th \M)
-          (_ h \C \D \M)
-          (_ t \X \L \C)
-          (_ u \I \V \X))))))
+             (concat
+               (repeat th \M)
+               (_ h \C \D \M)
+               (_ t \X \L \C)
+               (_ u \I \V \X))))))
 
 
 ; Q147: You can assume that the input will be well-formed, in upper-case, and follow the subtractive principle.
@@ -1881,23 +1940,23 @@
 ; (= 48 (__ "XLVIII"))
 (defn p92 [rn]
   (letfn [(_ [acc rn]
-    (if-not (seq rn)
-      acc
-      (cond
-        (re-seq #"^M+" rn) (_ (+ acc (* 1000 (count (take-while #(= \M %) rn)))) (apply str (drop-while #(= \M %) rn)))
-        (re-seq #"^CD" rn) (_ (+ acc 400) (apply str (drop 2 rn)))
-        (re-seq #"^CM" rn) (_ (+ acc 900) (apply str (drop 2 rn)))
-        (re-seq #"^C+" rn) (_ (+ acc (* 100 (count (take-while #(= \C %) rn)))) (apply str (drop-while #(= \C %) rn)))
-        (re-seq #"^D+" rn) (_ (+ acc 500 (* 100 (count (take-while #(= \C %) (rest rn))))) (apply str (drop-while #(= \C %) (rest rn))))
-        (re-seq #"^XL" rn) (_ (+ acc 40) (apply str (drop 2 rn)))
-        (re-seq #"^XC" rn) (_ (+ acc 90) (apply str (drop 2 rn)))
-        (re-seq #"^X+" rn) (_ (+ acc (* 10 (count (take-while #(= \X %) rn)))) (apply str (drop-while #(= \X %) rn)))
-        (re-seq #"^L+" rn) (_ (+ acc 50 (* 10 (count (take-while #(= \X %) (rest rn))))) (apply str (drop-while #(= \X %) (rest rn))))
-        (re-seq #"^IV" rn) (_ (+ acc 4) (apply str (drop 2 rn)))
-        (re-seq #"^IX" rn) (_ (+ acc 9) (apply str (drop 2 rn)))
-        (re-seq #"^I+" rn) (_ (+ acc (* 1 (count (take-while #(= \I %) rn)))) (apply str (drop-while #(= \I %) rn)))
-        (re-seq #"^V+" rn) (_ (+ acc 5 (* 1 (count (take-while #(= \I %) (rest rn))))) (apply str (drop-while #(= \I %) (rest rn))))
-        :else 0)))]
+            (if-not (seq rn)
+              acc
+              (cond
+                (re-seq #"^M+" rn) (_ (+ acc (* 1000 (count (take-while #(= \M %) rn)))) (apply str (drop-while #(= \M %) rn)))
+                (re-seq #"^CD" rn) (_ (+ acc 400) (apply str (drop 2 rn)))
+                (re-seq #"^CM" rn) (_ (+ acc 900) (apply str (drop 2 rn)))
+                (re-seq #"^C+" rn) (_ (+ acc (* 100 (count (take-while #(= \C %) rn)))) (apply str (drop-while #(= \C %) rn)))
+                (re-seq #"^D+" rn) (_ (+ acc 500 (* 100 (count (take-while #(= \C %) (rest rn))))) (apply str (drop-while #(= \C %) (rest rn))))
+                (re-seq #"^XL" rn) (_ (+ acc 40) (apply str (drop 2 rn)))
+                (re-seq #"^XC" rn) (_ (+ acc 90) (apply str (drop 2 rn)))
+                (re-seq #"^X+" rn) (_ (+ acc (* 10 (count (take-while #(= \X %) rn)))) (apply str (drop-while #(= \X %) rn)))
+                (re-seq #"^L+" rn) (_ (+ acc 50 (* 10 (count (take-while #(= \X %) (rest rn))))) (apply str (drop-while #(= \X %) (rest rn))))
+                (re-seq #"^IV" rn) (_ (+ acc 4) (apply str (drop 2 rn)))
+                (re-seq #"^IX" rn) (_ (+ acc 9) (apply str (drop 2 rn)))
+                (re-seq #"^I+" rn) (_ (+ acc (* 1 (count (take-while #(= \I %) rn)))) (apply str (drop-while #(= \I %) rn)))
+                (re-seq #"^V+" rn) (_ (+ acc 5 (* 1 (count (take-while #(= \I %) (rest rn))))) (apply str (drop-while #(= \I %) (rest rn))))
+                :else 0)))]
     (_ 0 rn)))
 
 ; Q148: Given a sequence S consisting of n elements generate all k-combinations of S,
@@ -1918,8 +1977,8 @@
             (if (zero? n)
               []
               (map
-              (fn [a]
-                (cons a (gen-tree (dec n) (clojure.set/difference s (hash-set a))))) s)))
+                (fn [a]
+                  (cons a (gen-tree (dec n) (clojure.set/difference s (hash-set a))))) s)))
           (walk-tr-in-depth [tr acc n]
             (if (zero? n)
               [acc]
@@ -1944,12 +2003,12 @@
 (defn post-prime [n] (if (prime? n) n (post-prime (inc n))))
 (def post-prime' (memoize post-prime))
 (defn p116 [n]
-;  (let [factors (memoize (fn [n] (for [n' (range 1 (inc n)) :when (zero? (mod n n'))] n')))
-;        prime? (memoize (fn [n] (= [1, n] (factors n))))]
-    (and (prime?' n)
-;      (let [pre-prime (memoize (fn [n] (if (or (<= n 0) (prime? n)) n (pre-prime (dec n)))))
-;            post-prime (memoize (fn [n] (if (prime? n) n (post-prime (inc n)))))]
-        (= n (/ (+ (pre-prime' (dec n)) (post-prime' (inc n))) 2))))
+  ;  (let [factors (memoize (fn [n] (for [n' (range 1 (inc n)) :when (zero? (mod n n'))] n')))
+  ;        prime? (memoize (fn [n] (= [1, n] (factors n))))]
+  (and (prime?' n)
+       ;      (let [pre-prime (memoize (fn [n] (if (or (<= n 0) (prime? n)) n (pre-prime (dec n)))))
+       ;            post-prime (memoize (fn [n] (if (prime? n) n (post-prime (inc n)))))]
+       (= n (/ (+ (pre-prime' (dec n)) (post-prime' (inc n))) 2))))
 
 ; テスト無し(REPLで直接書くこと)
 ; Q150: 2つの文字列から文字を取り出して交互にはさみこめ。またそれを元に戻せ。
@@ -1996,3 +2055,31 @@
   (guess-my-number))
 
 (defrecord Planet [name volume])
+
+(defrecord Planet [
+                   name
+                   moons
+                   volume                                   ;; km^3
+                   mass                                     ;; kg
+                   aphelion                                 ;; km, farthest from sun
+                   perihelion                               ;; km, closest to sun
+                   ])
+
+;; Positional factory function
+(def earth
+  (->Planet "Earth" 1 1.08321e12 5.97219e24 152098232 147098290))
+;; Map factory function
+(def earth
+  (map->Planet {
+                :name       "Earth"
+                :moons      1
+                :volume     1.08321e12
+                :mass       5.97219e24
+                :aphelion   152098232
+                :perihelion 147098290}))
+
+; 作業用
+(defn is-matched-partial? []
+  (let [ss (read-string (slurp "./resources/item-keys.txt"))]
+    (spit "./resources/compare-result.txt" (apply str (for [[n s1 s2] ss] (str n "\t" (if (empty? (clojure.set/intersection s1 s2)) "FALSE" "TRUE") "\n"))))))
+
