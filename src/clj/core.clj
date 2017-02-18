@@ -385,7 +385,7 @@
     (or (= x (first xs))
         (elem x (rest xs)))))
 
-; Q046: !!の前置記法版のindex関数を再帰を用いて自作せよ。(my-index)
+; Q046: !!の前�������記法版のindex関数を再帰を用いて自作せよ。(my-index)
 ; A
 (defn my-index [coll n]
   (if (zero? n)
@@ -1395,6 +1395,7 @@
             (filter prime? (drop 2 (range))))]
     (take n (primes))))
 
+
 ; Q119: Write a function which takes a function f and a variable number of maps.
 ; Your function should return a map that consists of the rest of the maps conj-ed onto the first.
 ; If a key occurs in more than one map,
@@ -1408,12 +1409,26 @@
 ;    {1 7, 2 10, 3 15})
 ; (= (__ concat {:a [3], :b [6]} {:a [4 5], :c [8 9]} {:b [7]})
 ;    {:a [3 4 5], :b [6 7], :c [8 9]})
-(defn p69 [f init & args]
-  (if-not (seq args)
-    init
-    (letfn [(merge' [m1 m2]
-              (reduce (fn [acc [k v]] (assoc acc k (if-let [v' (acc k)] (f v' v) v))) m1 m2))]
-      (apply p69 f (merge' init (first args)) (rest args)))))
+; (defn p69 [f init & args]
+;   (if-not (seq args)
+;     init
+;     (letfn [(merge' [m1 m2]
+;               (reduce (fn [acc [k v]] (assoc acc k (if-let [v' (acc k)] (f v' v) v))) m1 m2))]
+;       (apply p69 f (merge' init (first args)) (rest args)))))
+(defn p69
+  ([f init & coll]
+      (if-not (seq coll)
+              init
+              (reduce (fn [m1 m2] ((set (concat (keys m1) init coll))))
+; my answer 2017/02/18
+; (defn p69 [f & ms]
+;   (letfn [(merge-by-key [m1 m2 k]
+;                         {k (f (k m1) (k m2))})
+;           (merge-m [m1 m2]
+;                   (let [ks (clojure.set/union (keys m1) (kyes m2))]
+;                         (map (partial merge-by-key m1 m2) ks)))]
+;     (reduce merge-m (first ms) (rest ms))))
+
 
 ; Q120: Given a string of comma separated integers,
 ; write a function which returns a new comma separated string that
@@ -2082,4 +2097,7 @@
 (defn is-matched-partial? []
   (let [ss (read-string (slurp "./resources/item-keys.txt"))]
     (spit "./resources/compare-result.txt" (apply str (for [[n s1 s2] ss] (str n "\t" (if (empty? (clojure.set/intersection s1 s2)) "FALSE" "TRUE") "\n"))))))
+
+
+
 
