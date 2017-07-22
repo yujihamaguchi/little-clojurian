@@ -385,7 +385,7 @@
     (or (= x (first xs))
         (elem x (rest xs)))))
 
-; Q046: !!の前�������記法版のindex関数を再帰を用いて自作せよ。(my-index)
+; Q046: !!の前�����������記法版のindex関数を再帰を用いて自作せよ。(my-index)
 ; A
 (defn my-index [coll n]
   (if (zero? n)
@@ -1409,17 +1409,12 @@
 ;    {1 7, 2 10, 3 15})
 ; (= (__ concat {:a [3], :b [6]} {:a [4 5], :c [8 9]} {:b [7]})
 ;    {:a [3 4 5], :b [6 7], :c [8 9]})
-; (defn p69 [f init & args]
-;   (if-not (seq args)
-;     init
-;     (letfn [(merge' [m1 m2]
-;               (reduce (fn [acc [k v]] (assoc acc k (if-let [v' (acc k)] (f v' v) v))) m1 m2))]
-;       (apply p69 f (merge' init (first args)) (rest args)))))
-(defn p69
-  ([f init & coll]
-      (if-not (seq coll)
-              init
-              (reduce (fn [m1 m2] ((set (concat (keys m1) init coll))))
+(defn p69 [f init & args]
+  (if-not (seq args)
+    init
+    (letfn [(merge' [m1 m2]
+              (reduce (fn [acc [k v]] (assoc acc k (if-let [v' (acc k)] (f v' v) v))) m1 m2))]
+      (apply p69 f (merge' init (first args)) (rest args)))))
 ; my answer 2017/02/18
 ; (defn p69 [f & ms]
 ;   (letfn [(merge-by-key [m1 m2 k]
@@ -1437,10 +1432,10 @@
 ; (= (__ "15,16,25,36,37") "16,25,36")
 (defn p74 [s]
   (->> s
-       (re-seq #"\d+")
-       (filter (fn [n] (zero? (mod (Math/sqrt (Integer/parseInt n)) 1))))
-       (interpose ",")
-       (apply str)))
+      (re-seq #"\d+")
+      (filter (fn [n] (zero? (mod (Math/sqrt (Integer/parseInt n)) 1))))
+      (interpose ",")
+      (apply str)))
 
 ; Q121: Two numbers are coprime if their greatest common divisor equals 1.
 ; Euler's totient function f(x) is defined as the number of positive integers less than x which are coprime to x.
@@ -1459,6 +1454,13 @@
                 (gcd m (mod n m))))
             (coprime? [n m] (= 1 (gcd n m)))]
       (count (filter (fn [m] (coprime? n m)) (range 1 n))))))
+; my answer 2017/03/12
+; (defn p75 [n]
+;   (letfn [(gcd [n m]
+;               (clojure.set/intersection (set (factors n)) (set (factors m))))
+;           (coprime? [n m]
+;               (= #{1} (gcd n m)))]
+;     (count (filter (fn [m] ((partial coprime? n) m)) (range 1 (inc n))))))
 
 ; Q122: Write a function which finds all the anagrams in a vector of words.
 ; A word x is an anagram of word y if all the letters in x can be rearranged in a different order to form y.
@@ -1470,11 +1472,11 @@
 ;    #{#{"veer" "ever"} #{"lake" "kale"} #{"mite" "item"}})
 (defn p77 [coll]
   (->> coll
-       (group-by sort)
-       (filter (fn [[k v]] (< 1 (count v))))
-       vals
-       (map set)
-       set))
+      (group-by sort)
+      (filter (fn [[k v]] (< 1 (count v))))
+      vals
+      (map set)
+      set))
 
 ; Q123: Reimplement the function described in "Intro to Trampoline".(p78)
 ; Special Restrictions
@@ -1494,6 +1496,7 @@
       f'
       (p78 f'))))
 
+
 ; Q124: A number is "perfect" if the sum of its divisors equal the number itself.
 ; 6 is a perfect number because 1+2+3=6.
 ; Write a function which returns true for perfect numbers and false otherwise.(p80)
@@ -1505,6 +1508,9 @@
 (defn p80 [n]
   (let [factors (for [n' (range 1 n) :when (zero? (mod n n'))] n')]
     (= n (reduce + factors))))
+; my answer 2017/04/07
+; (defn p80 [n]
+;   (= n (reduce + (drop-last (factors n)))))
 
 ; Q125: Happy numbers are positive integers that follow a particular formula:
 ;    take each individual digit, square it, and then sum the squares to get a new number.
@@ -1515,6 +1521,17 @@
 ; (= (__ 986543210) true)
 ; (= (__ 2) false)
 ; (= (__ 3) false)
+; my answer 2017/04/15
+; (defn p86 [n]
+;   (letfn [(convert-digits [n]
+;                           (map #(Character/digit % 10) (str n)))
+;           (sum-sq [ns]
+;                   (reduce + (map #(* % %) ns)))
+;           (is-happy [ns n]
+;             (let [n (sum-sq (convert-digits n))]
+;               (or (= n 1)
+;                   (and (not (contains? ns n)) (is-happy (conj ns n) n)))))]
+;     (is-happy #{} n)))
 (defn p86 [n]
   (letfn [(_ [acc n]
             (let [ns (map #(Integer/parseInt (str %)) (str n))
@@ -1527,7 +1544,8 @@
     (_ [] n)))
 
 ; Q126: Write a predicate which checks whether or not a given sequence represents a binary tree.
-;    Each node in the tree must have a value, a left child, and a right child.(p95)
+;       (Bottom leaf node's value is always nil or false)
+;       Each node in the tree must have a value, a left child, and a right child.(p95)
 ; (= (__ '(:a (:b nil nil) nil))
 ;    true)
 ; (= (__ '(:a (:b nil nil)))
@@ -1545,11 +1563,11 @@
 (defn p95 [n]
   (or (nil? n)
       (and (coll? n)
-           (= 3 (count n))
-           (let [[n' n1 n2] n]
-             (and
-               (p95 n1)
-               (p95 n2))))))
+          (= 3 (count n))
+          (let [[n' n1 n2] n]
+            (and
+              (p95 n1)
+              (p95 n2))))))
 
 ; Q127: Let us define a binary tree as "symmetric" if the left half of the tree is the mirror image of the right half of the tree.
 ;    Write a predicate to determine whether or not a given binary tree is symmetric.
@@ -1569,7 +1587,7 @@
 (defn p96 [tr]
   (letfn [(rev-tr [[p l r]]
             [p (when r (rev-tr r))
-             (when l (rev-tr l))])]
+            (when l (rev-tr l))])]
     (= tr (rev-tr tr))))
 
 ; Q128: Pascal's triangle is a triangle of numbers computed using the following rules:
@@ -1592,6 +1610,26 @@
   (letfn [(p-triangle [coll]
             (lazy-seq (cons coll (p-triangle (concat [1] (map (partial reduce +) (partition 2 1 coll)) [1])))))]
     (nth (p-triangle [1]) (dec n))))
+; my answer 2017/05/06
+; (defn p97 [n]
+;   (letfn [(factorial [n m]
+;                     (if (zero? m)
+;                         1
+;                         (* n (factorial (dec n) (dec m)))))
+;           (combination [n k]
+;                       (let [n' (factorial n k)
+;                             k' (factorial k k)]
+;                           (if (zero? k')
+;                               1
+;                               (/ n' k'))))]
+;     (map #(combination (dec n) %) (range 0 n))))
+;
+; my answer 2017/05/14
+; (defn p97 [n]
+;   (case n
+;         1 [1]
+;         2 [1 1]
+;         (concat [1] (map (fn [[n m]] (+ n m)) (partition 2 1 (p97 (dec n)))) [1])))
 
 ; Q129: A function f defined on a domain D induces an equivalence relation on D,as follows:
 ;    a is equivalent to b with respect to f if and only if (f a) is equal to (f b).
@@ -1631,17 +1669,29 @@
 ; (= (__ "something") "something")
 ; (= (__ "multi-word-key") "multiWordKey")
 ; (= (__ "leaveMeAlone") "leaveMeAlone")
-; (defn p102 [s]
-;   (letfn [(_p102
-;             ([c] [c])
-;             ([c c' & cs] (if (= \- c)
-;                            (cons (Character/toUpperCase c') (apply _p102 cs))
-;                            (cons c (apply _p102 (cons c' cs))))))]
-;     (->> (map identity s)
-;          (apply _p102)
-;          (apply str))))
 (defn p102 [s]
-  (clojure.string/replace s #"-[a-z]" (comp clojure.string/upper-case last)))
+  (letfn [(_p102
+            ([c] [c])
+            ([c c' & cs] (if (= \- c)
+                            (cons (Character/toUpperCase c') (apply _p102 cs))
+                            (cons c (apply _p102 (cons c' cs))))))]
+    (->> (map identity s)
+          (apply _p102)
+          (apply str))))
+; my answer 2017/06/14
+; (defn p102 [s]
+;   (letfn [(p102'
+;             ([] nil)
+;             ([c] c)
+;             ([c1 c2 & rest] (if (= c1 \-)
+;                                 (str (Character/toUpperCase c2) (apply p102' rest))
+;                                 (str c1 (apply p102' (cons c2 rest))))))]
+;           (apply p102' (map identity s))))
+; my answer 2017/06/10
+; (defn p102 [s]
+;   (clojure.string/replace s #"-([a-z])" #(clojure.string/upper-case (%1 1))))
+; (defn p102 [s]
+;   (clojure.string/replace s #"-[a-z]" (comp clojure.string/upper-case last)))
 
 ; Q132: A balanced number is one whose component digits have the same sum on the left and right halves of the number.
 ;    Write a function which accepts an integer n, and returns true iff n is balanced.(p115)
@@ -1658,7 +1708,34 @@
   (let [ns (str n)
         m (Math/ceil (/ (count ns) 2))]
     (= (reduce + (map int (take m ns)))
-       (reduce + (map int (take m (reverse ns)))))))
+      (reduce + (map int (take m (reverse ns)))))))
+
+(defn map-sum
+  [acc tr]
+  (when (seq tr)
+        (let [n (first tr)
+              ns (rest tr)]
+            (if (coll? n)
+                (cons (map-sum acc n) (map-sum acc ns))
+                (cons {(+ acc n) n} (map-sum (+ acc n) ns))))))
+
+(defn filter-sum
+  [m tr]
+  (println tr)
+  (when (seq tr)
+        (let [n (first tr)
+              ns (rest tr)]
+            (println "n: " n)
+            (println "ns: " ns)
+            (if (map? n)
+                (let [acc (first (keys n))
+                      v (first (vals n))]
+                    (println "acc: " acc)
+                    (println "v: " v)
+                     (if (<= acc m)
+                         (cons v (filter-sum m ns))
+                         (filter-sum m ns)))
+                (cons (filter-sum m n) (filter-sum m ns))))))
 
 ; Q133: Your friend Joe is always whining about Lisps using the prefix notation for math.
 ;    Show him how you could easily write a function that does math using the infix notation.
@@ -2025,7 +2102,7 @@
        ;            post-prime (memoize (fn [n] (if (prime? n) n (post-prime (inc n)))))]
        (= n (/ (+ (pre-prime' (dec n)) (post-prime' (inc n))) 2))))
 
-; テスト無し(REPLで直接書くこと)
+; テスト無し(REPLで���接書くこと)
 ; Q150: 2つの文字列から文字を取り出して交互にはさみこめ。またそれを元に戻せ。
 ; A:
 ; (apply str (interleave "abc" "xyz"))
