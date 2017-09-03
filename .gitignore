@@ -1,6 +1,6 @@
 .lein-repl-history
 *.sw*
 .nrepl-port
-target/*
 *.iml
 .idea/*
+target/
