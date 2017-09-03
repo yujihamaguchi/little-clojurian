@@ -2,3 +2,5 @@
 *.sw*
 .nrepl-port
 target/*
+*.iml
+.idea/*
