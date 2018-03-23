@@ -85,9 +85,9 @@
 
 (deftest concat-test
   (testing
-    (is (= (my-concat [1 2] [3 4]) [1 2 3 4]))
-    (is (= (my-concat [1 2] [3]) [1 2 3]))
-    (is (= (my-concat [1 2]) [1 2]))
+      (is (= (my-concat [[1 2] [3 4]]) [1 2 3 4]))
+    (is (= (my-concat [[1 2] [3]]) [1 2 3]))
+    (is (= (my-concat [[1 2]]) [1 2]))
   )
 )
 

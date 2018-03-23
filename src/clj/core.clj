@@ -29,32 +29,31 @@
 ;;    0
 ;;    (+ (first ns) (sum (rest ns)))))
 
-                                        ; Q003: クイックソート関数qsort01を書け
-
-(defn qsort01 [xs]
+;; Q003: クイックソート関数qsort01を書け
+(defn qsort01
+  [xs]
   (if-not (seq xs)
     []
     (let [x (first xs)
-          xs' (rest xs)
-          lt (for [x' xs' :when (< (int x') (int x))] x')
-          ge (for [x' xs' :when (>= (int x') (int x))] x')]
-      (concat (qsort01 lt) [x] (qsort01 ge)))))
+          lt (for [x' xs :when (< (int x') (int x))] x')
+          gt (for [x' xs :when (> (int x') (int x))] x')]
+      (concat (qsort01 lt) [x] (qsort01 gt)))))
 
-                                        ; Q004: haskellのproductと同様の機能の関数を書け(reduceを用いるパターン、applyを用いるパターン、再帰を用いるパターン)
-                                        ; product :: (Num a) => [a] -> a
-                                        ; product ns
-                                        ;     数値のリスト ns の全要素の積を返す。
-                                        ;     see also: sum, foldl
-                                        ;         product [2, 3, 4]   = 24
-                                        ;         product [4, 5, 0]   = 0
-                                        ;         product []          = 1
-                                        ; A: Using reduce.
-                                        ; (defn product [ns]
-                                        ;   (reduce * ns))
-                                        ; A: Using apply.
-                                        ; (defn product [ns]
-                                        ;   (apply * ns))
-                                        ; A: Using recursion.
+;; Q004: haskellのproductと同様の機能の関数を書け(reduceを用いるパターン、applyを用いるパターン、再帰を用いるパターン)
+;; product :: (Num a) => [a] -> a
+;; product ns
+;;     数値のリスト ns の全要素の積を返す。
+;;     see also: sum, foldl
+;;         product [2, 3, 4]   = 24
+;;         product [4, 5, 0]   = 0
+;;         product []          = 1
+;; A: Using reduce.
+;; (defn product [ns]
+;;   (reduce * ns))
+;; A: Using apply.
+;; (defn product [ns]
+;;   (apply * ns))
+;; A: Using recursion.
 (defn product [ns]
   (if-not (seq ns)
     1
@@ -70,48 +69,62 @@
           ge (for [x' xs' :when (>= (int x') (int x))] x')]
       (concat (rqsort ge) [x] (rqsort lt)))))
 
-
-                                        ; Q006: haskellのinitと同様の機能の関数my-initを書け(再帰を用いるバージョンも書くこと)
-                                        ; init :: [a] -> [a]
-                                        ; リスト xs の最後の要素を除いたリストを返す。
-                                        ;     init [1,2,3]   = [1,2]
-                                        ;     init [1]       = []
+;; Q006: haskellのinitと同様の機能の関数my-initを書け(再帰を用いるバージョンも書くこと)
+;; init :: [a] -> [a]
+;; リスト xs の最後の要素を除いたリストを返す。
+;;     init [1,2,3]   = [1,2]
+;;     init [1]       = []
 (defn my-init [xs]
   ((comp reverse rest reverse) xs))
-                                        ; A: Using recursion.
-                                        ;(defn my-init [xs]
-                                        ;  (if-not (seq (rest xs))
-                                        ;    []
-                                        ;    (cons (first xs) (my-init (rest xs)))))
+;; A: Using recursion.
+;;(defn my-init [xs]
+;;  (if-not (seq (rest xs))
+;;    []
+;;    (cons (first xs) (my-init (rest xs)))))
 
-                                        ; Q007: haskellのlastと同様の機能の関数を書け(再帰を用いるバージョンも書くこと)
-                                        ; last :: [a] -> a
-                                        ;     リストの最後の要素を返す。
-                                        ;         last [1,2,3]   = 3
-                                        ;         last []        = エラー
+;; Q007: haskellのlastと同様の機能の関数を書け(再帰を用いるバージョンも書くこと)
+;; last :: [a] -> a
+;;     リストの最後の要素を返す。
+;;         last [1,2,3]   = 3
+;;         last []        = エラー
 (defn my-last [xs]
   ((comp first reverse) xs))
-                                        ; A: Using recursion.
-                                        ;(defn my-last [xs]
-                                        ;  (if-not (seq (rest xs))
-                                        ;    (first xs)
-                                        ;    (my-last (rest xs))))
+;; A: Using recursion.
+;;(defn my-last [xs]
+;;  (if-not (seq (rest xs))
+;;    (first xs)
+;;    (my-last (rest xs))))
 
-                                        ; Q008: 偶数の長さを持つリストを半分ずつに分割する関数halveを書け。
+;; Q008: 偶数の長さを持つリストを半分ずつに分割する関数halveを書け。
 (defn halve [xs]
   (when (seq xs)
     (let [n (quot (count xs) 2)]
       [(take n xs) (drop n xs)])))
 
-                                        ; Q009: concatをリスト内包表記で実装したmy-concatを書け。
-                                        ; concat :: [[a]] -> [a]
-                                        ; concat xs
-                                        ;     リストのリスト xs を一つのリストに連結する。
-                                        ;         concat [[1,2], [3,4], [5,6]]    = [1,2,3,4,5,6]
-                                        ;         concat ["ab", "cd", "ef"]       = "abcdef"
-                                        ;         concat [[]]                     = []
-                                        ;         concat []                       = []
-(defn my-concat [& xss]
+;; Q009: concatをリスト内包表記で実装したmy-concatを書け。
+;; concat :: [[a]] -> [a]
+;; concat xs
+;;     リストのリスト xs を一つのリストに連結する。
+;;         concat [[1,2], [3,4], [5,6]]    = [1,2,3,4,5,6]
+;;         concat ["ab", "cd", "ef"]       = "abcdef"
+;;         concat [[]]                     = []
+;;         concat []                       = []
+(defn my-concat
+  [xss]
+  (for [xs xss x xs] x))
+
+
+
+
+
+
+
+
+
+
+
+#_(defn my-concat
+  [& xss]
   (for [xs xss x xs] x))
 
                                         ; Q010: 正の整数に対し、すべての約数を計算する関数factorsを書け
