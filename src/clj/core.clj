@@ -113,97 +113,86 @@
   [xss]
   (for [xs xss x xs] x))
 
+;; Q010: 正の整数に対し、すべての約数を計算する関数factorsを書け
+(defn factors
+  [n]
+  (for [n' (range 1 (inc n)) :when (zero? (rem n n'))] n'))
 
-
-
-
-
-
-
-
-
-
-#_(defn my-concat
-  [& xss]
-  (for [xs xss x xs] x))
-
-                                        ; Q010: 正の整数に対し、すべての約数を計算する関数factorsを書け
-(defn factors [n]
-  (for [n' (range 1 (inc n)) :when (zero? (mod n n'))] n'))
-
-                                        ; Q011: 対(pair)のリストを探索し、検索キーと等しいキーを持つ対全てを探し出し、対応する値を取り出してリストにする関数my-findをリスト内包表記と分配束縛を用いて書け。
-(defn my-find [k ps]
+;; Q011: 対(pair)のリストを探索し、検索キーと等しいキーを持つ対全てを探し出し、対応する値を取り出してリストにする関数my-findをリスト内包表記と分配束縛を用いて書け。
+(defn my-find
+  [k ps]
   (for [[k' v] ps :when (= k k')] v))
 
-                                        ; Q012: 対のリストから、対の先頭の要素を取り出してリストを生成するfirstsをリスト内包表記と分配束縛を用いて書け。
+;; Q012: 対のリストから、対の先頭の要素を取り出してリストを生成するfirstsをリスト内包表記と分配束縛を用いて書け。
 (defn firsts [ps]
   (for [[k _] ps] k))
 
-                                        ; Q013: haskellのlengthを、sumとリスト内包表記で書け。
-                                        ; length :: [a] -> Int
-                                        ; length xs
-                                        ;     リスト xs の長さを返す。
-                                        ;         length [1,2,3]   = 3
-                                        ;         length "abcde"   = 5
-                                        ;         length []        = 0
-                                        ;         length ""        = 0
+;; Q013: haskellのlengthを、sumとリスト内包表記で書け。
+;; length :: [a] -> Int
+;; length xs
+;;     リスト xs の長さを返す。
+;;         length [1,2,3]   = 3
+;;         length "abcde"   = 5
+;;         length []        = 0
+;;         length ""        = 0
 (defn length [coll]
   (sum (for [_ coll] 1)))
 
-                                        ; Q014: factorsを用いて、整数が素数か判定する関数primeを書け。
+;; Q014: factorsを用いて、整数が素数か判定する関数primeを書け。
 (defn prime [n]
   (= [1 n] (factors n)))
 
-                                        ; Q015: primeを用いて与えられた上限数までの全ての素数を生成する関数primesを書け。
-(defn primes [n]
+;; Q015: primeを用いて与えられた上限数までの全ての素数を生成する関数primesを書け。
+(defn primes
+  [n]
   (for [n' (range 1 (inc n)) :when (prime n')] n'))
 
-                                        ; Q016: リストから隣り合う要素をマップにして返す関数pairsをzipmapを用いて書け。
-                                        ; ex)
-                                        ;   [1 2] => {1 2}
-                                        ;   [1 2 3] => {1 2, 2 3}
-                                        ;   [1 2 3 4] => {1 2, 2 3, 3 4}
-(defn pairs [coll]
+;; Q016: リストから隣り合う要素をマップにして返す関数pairsをzipmapを用いて書け。
+;; ex)
+;;   [1 2] => {1 2}
+;;   [1 2 3] => {1 2, 2 3}
+;;   [1 2 3 4] => {1 2, 2 3, 3 4}
+(defn pairs
+  [coll]
   (zipmap coll (rest coll)))
 
-                                        ; Q017: 順序クラスに属する任意の型の要素を持つリストが、整列されているか調べる関数sortedをpairs関数を用いて書け。
-                                        ;    （本来、pairsのような処理を行いたい場合、Clojureではシーケンスライブラリのpartitionを使用する。）
+;; Q017: 順序クラスに属する任意の型の要素を持つリストが、整列されているか調べる関数sortedをpairs関数を用いて書け。
+;;    （本来、pairsのような処理を行いたい場合、Clojureではシーケンスライブラリのpartitionを使用する。）
 (defn sorted [coll]
   (every? (fn [[n m]] (< n m)) (pairs coll)))
 
-                                        ; Q018: 目的とする値がリストのどの位置にあるかを調べて、その位置全てをリストとして返す関数positionsを書け。(indexは0から開始される事)
-(defn positions [x coll]
-  (for [[i v] (zipmap (iterate inc 0) coll) :when (= x v)] i))
+;; Q018: 目的とする値がリストのどの位置にあるかを調べて、その位置全てをリストとして返す関数positionsを書け。(indexは0から開始される事)
+(defn positions
+  [x xs]
+  (for [[i x'] (zipmap (range) xs) :when (= x x')] i))
 
-                                        ; Q019: 指定した特定の文字がいくつ含まれているか数える関数char-countを書け。
+;; Q019: 指定した特定の文字がいくつ含まれているか数える関数char-countを書け。
 (defn char-count [c cs]
   (count (filter #(= c %) cs)))
 
-                                        ; Q020: 文字列から小文字を数える関数lowersを書け。
-;; (defn lowers [s]
-;;   (count (re-seq #"[a-z]" s)))
-(defn lowers [cs]
-  (count (filter #(Character/isLowerCase %) cs)))
+;; Q020: 文字列から小文字を数える関数lowersを書け。
+#_(defn lowers [cs]
+    (count (filter #(Character/isLowerCase %) cs)))
+(defn lowers [s]
+  (count (re-seq #"[a-z]" s)))
 
-                                        ; Q021: Unicodeコードポイント（整数、'a'が0）を文字に変換する関数int2letを書け。
-                                        ;(defn int2let [n]
-                                        ;  (char (+ n (int \a))))
+;; Q021: Unicodeコードポイント（整数、'a'が0）を文字に変換する関数int2letを書け。
 (defn int2let [n]
   (char (+ n (int \a))))
 
-                                        ; Q022: 文字をUnicodeのコードポイント（整数）に変換する関数let2intを書け。（'a'が0番とする）
+;; Q022: 文字をUnicodeのコードポイント（整数）に変換する関数let2intを書け。（'a'が0番とする）
 (defn let2int [c]
   (- (int c) (int \a)))
 
-                                        ; Q023: 小文字をシフト数だけずらすshiftを書け。
-                                        ;    (循環すること。)
-                                        ;     ex) 'z'に対し、1ならば'a'となる）（小文字のみ対象とすること）
+;; Q023: 小文字をシフト数だけずらすshiftを書け。
+;;    (循環すること。)
+;;     ex) 'z'に対し、1ならば'a'となる）（小文字のみ対象とすること）
 (defn shift [n c]
   (let [alph-cnt (range (int \a) (inc (int \z)))
         m (let2int c)]
     (int2let (rem (+ n m) alph-cnt))))
 
-                                        ; Q024: 与えられたシフト数で文字列を暗号化する関数my-encodeを書け。
+;; Q024: 与えられたシフト数で文字列を暗号化する関数my-encodeを書け。
 (defn my-encode [n cs]
   (clojure.string/join "" (map #(shift n %) cs)))
 
