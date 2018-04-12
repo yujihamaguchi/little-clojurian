@@ -193,31 +193,24 @@
     (int2let (rem (+ n m) alph-cnt))))
 
 ;; Q024: 与えられたシフト数で文字列を暗号化する関数my-encodeを書け。
-(defn my-encode [n cs]
-  (clojure.string/join "" (map #(shift n %) cs)))
+(defn my-encode
+  [n cs]
+  (apply str (map (partial shift n) cs)))
 
-                                        ; Q025: 百分率を計算し、浮動小数点数として返す関数percentを書け。
-(defn percent [n m]
-  (float (* (/ n m) 100)))
+;; Q025: 百分率を計算し、浮動小数点数として返す関数percentを書け。
+(defn percent
+  [n m]
+  (* (/ n m) 100))
 
-                                        ; Q026: 任意の文字列に対して文字の出現頻度表を返す関数freqsを書け。（lowersとcountとpercentを用いる）
-                                        ; (defn freqs [cs]
-                                        ;   (let [alph-cs (map char (range (int \a) (inc (int \z))))]
-                                        ;     (for [c alph-cs] (percent (count (for [c' cs :when (= c c')] c')) (lowers cs)))))
-                                        ;(defn freqs [s]
-                                        ;  (let [cs (map char (range (int \a) (inc (int \z))))
-                                        ;        cnt (lowers s)]
-                                        ;    (map (fn [c] (percent (count (filter #((hash-set c) %) s)) cnt)) cs)))
-;; (defn freqs [cs]
-;;   (let [cs' (map char (range (int \a) (int \z)))
-;;         cnt (lowers cs)]
-;;     (map (fn [c] (percent (count (filter #(= c %) cs)) cnt)) cs')))
-(defn freqs [cs]
-  (let [alph (map char (range (int \a) (inc (int \z))))
-        length (lowers cs)]
-    (map (fn [c] (percent (count (filter #(= c %) cs)) length)) alph)))
+;; Q026: 任意の文字列に対して文字の出現頻度表を返す関数freqsを書け。（lowersとchar-countとpercentを用いる）
+(defn freqs
+  [cs]
+  (let [table (map int2let (range (let2int \a) (let2int \z)))
+        n (count table)
+        cs' (lowers cs)]
+    (for [c table] (percent (char-count c cs') n))))
 
-                                        ; Q027: カイ二乗検定を行う関数chisqrを書け。
+;; Q027: カイ二乗検定を行う関数chisqrを書け。
 (defn chisqr [ob ex]
   (reduce +
           (map (fn [o e] (float (/ (Math/pow (- e o) 2) e)))
