@@ -211,32 +211,34 @@
     (for [c table] (percent (char-count c cs') n))))
 
 ;; Q027: カイ二乗検定を行う関数chisqrを書け。
-(defn chisqr [ob ex]
-  (reduce +
-          (map (fn [o e] (float (/ (Math/pow (- e o) 2) e)))
-               ob
-               ex)))
+(defn chisqr
+  [obs exs]
+  (letfn [(square
+            [n]
+            (* n n))]
+    (sum (map (fn [ob ex] (float (/ (square (- ob ex)) ex))) obs exs))))
 
-                                        ; Q028: 文字リストの要素をnだけ左に回転させる関数rotateを書け。（リストの先頭は末尾に接続していると考える）
-(defn rotate [n cs]
-  (clojure.string/join (concat (drop n cs) (take n cs))))
+;; Q028: 文字リストの要素をnだけ左に回転させる関数rotateを書け。（リストの先頭は末尾に接続していると考える）
+(defn rotate
+  [n cs]
+  (apply str (concat (drop n cs) (take n cs))))
 
-                                        ; Q029: 1から100までの二乗の和を計算する式をリスト内包表記を用いて書け。
-                                        ; (reduce + (for [n (range 1 (inc 100))] (Math/pow n 2)))
-(reduce + (map #(Math/pow % 2) (range 1 (inc 100))))
+;; Q029: 1から100までの二乗の和を計算する式をリスト内包表記を用いて書け。
+(reduce + (for [n (range 1 (inc 100))] (Math/pow n 2)))
 
-                                        ; Q030: 二つの生成器を持つリスト内包表記[(x,y) | x <- [1,2,3], y <- [4,5,6]]は(*)、
-                                        ;    一つの生成器を持つリスト内包表記二つでも表現出来る事を示せ。
-                                        ; * (for [x [1 2 3] y [4 5 6]] [x y])
-(apply concat (for [x [1 2 3]] (for [y [4 5 6]] [x y])))
+;; Q030: 2つの生成器を持つリスト内包表記 [(x,y) | x <- [1,2,3], y <- [4,5,6]] は(*)、
+;;       1つの生成器を持つリスト内包表記2つでも表現出来る事を示せ。
+;; * (for [x [1 2 3] y [4 5 6]] [x y])
+(=  (for [x [1 2 3] y [4 5 6]] [x y])
+    (apply concat (for [x [1 2 3]] (for [y [4 5 6]] [x y]))))
 
-                                        ; Q031: 与えられた上限までに含まれる完全数全てを算出する関数perfectsをリスト内包表記と関数factorsを使って定義せよ。
-                                        ;    完全数：自分自身をのぞく約数の和が自分自身と等しい整数
-(defn perfects [n]
-  (for [n' (range 2 n) :when (= n' (- (reduce + (factors n')) n'))] n'))
+;; Q031: 与えられた上限までに含まれる完全数全てを算出する関数perfectsをリスト内包表記と関数factorsを使って定義せよ。
+;;       完全数：自分自身をのぞく約数の和が自分自身と等しい整数
+(defn perfects
+  [n]
+  (for [n' (range 1 n) :when (= n' (- (sum (factors n')) n'))] n'))
 
-
-                                        ; Q032: ピタゴラス数のリスト(組み合わせ)を生成する関数pythsをリスト内包表記を使って定義せよ。ただし、ピタゴラス数の要素は与えられた上限n以下であるとする。
+;; Q032: ピタゴラス数のリスト(組み合わせ)を生成する関数pythsをリスト内包表記を使って定義せよ。ただし、ピタゴラス数の要素は与えられた上限n以下であるとする。
 ;; (defn pyths [n]
 ;;   (letfn [(range-closed [n] (range 1 (inc n)))]
 ;;     (for [
@@ -252,74 +254,81 @@
   (let [ns (range 1 (inc n))]
     (for [x ns y ns z ns :when (and (< x y) (= (+ (Math/pow x 2) (Math/pow y 2)) (Math/pow z 2)))] [x y z])))
 
-                                        ; Q033: ある要素のみからなるリストを生成する関数my-replicateを書け。(直接の再帰、それを使わないバージョンをそれぞれ書け)
-                                        ;    ex) >replicate 3 True
-                                        ;        [True, True, True]
-                                        ;(defn my-replicate [n x]
-                                        ;  (if (zero? n)
-                                        ;    []
-                                        ;    (cons x (my-replicate (dec n) x))))
+;; Q033: ある要素のみからなるリストを生成する関数my-replicateを書け。(直接の再帰、それを使わないバージョンをそれぞれ書け)
+;;    ex) >replicate 3 True
+;;        [True, True, True]
 (defn my-replicate [n x]
-  (letfn [(my-replicate' [n acc]
-            (if (zero? n)
-              acc
-              (my-replicate' (dec n) (cons x acc))))]
-    (my-replicate' n [])))
+;; 直接の再帰
+ (if (zero? n)
+   []
+   (cons x (my-replicate (dec n) x))))
+;; 直接の再帰ではない
+;; (defn my-replicate [n x]
+;;   (letfn [(my-replicate' [n acc]
+;;             (if (zero? n)
+;;               acc
+;;               (my-replicate' (dec n) (cons x acc))))]
+;;     (my-replicate' n [])))
 
-                                        ; Q034: 二つの整数のリストの内積を求める関数scalarproductをリスト内包表記を用いて書け。
-                                        ; A
+;; Q034: 二つの整数のリストの内積を求める関数scalarproductをリスト内包表記を用いて書け。
+;; A
 (defn scalarproduct [ns ms]
   (reduce + (for [[n m] (map vector ns ms)] (* n m))))
 
-
-                                        ; Q035: 要素を逆転する関数myreverseを書け。
-                                        ; A
+;; Q035: 要素を逆転する関数myreverseを書け。
+;; A
 (defn myreverse [coll]
   (if-not (seq coll)
     []
     (conj (myreverse (rest coll)) (first coll))))
 
-                                        ; Q036: 整列された要素を持つリストに要素を挿入する関数myinsertを書け。
-                                        ; A
+;; Q036: 整列された要素を持つリストに要素を挿入する関数myinsertを書け。
+;; A
 (defn myinsert [x xs]
   (if (not (seq xs))
     [x]
-    (if (<= x (first xs))
-      (cons x xs)
-      (cons (first xs) (myinsert x (rest xs))))))
-                                        ; Q037: 関数myinsertを用いてリストのソートを行う"挿入ソート"を行う関数isortを書け。
-                                        ; A
-(defn isort [xs]
+    (let [x' (first xs)
+          xs' (rest xs)]
+      (if (<= x x')
+        (cons x xs)
+        (cons x' (myinsert x xs'))))))
+
+;; Q037: 関数myinsertを用いてリストのソートを行う"挿入ソート"を行う関数isortを書け。
+;; A
+(defn isort
+  [xs]
   (if-not (seq xs)
     []
     (myinsert (first xs) (isort (rest xs)))))
 
-                                        ; Q038: dropを再帰を用いて自作せよ。
-                                        ; A
-(defn mydrop [n coll]
+;; Q038: dropを再帰を用いて自作(mydrop)せよ。
+;; A
+(defn mydrop
+  [n coll]
   (if (zero? n)
     coll
     (mydrop (dec n) (rest coll))))
 
-                                        ; Q039: zipを再帰を用いて自作せよ。
-                                        ; A
-                                        ; (defn myzip [xs ys]
-                                        ;   (if (or (empty? xs) (empty? ys))
-                                        ;     []
-                                        ;     (cons (vector (first xs) (first ys)) (myzip (rest xs) (rest ys)))))
-                                        ;(defn myzip [xs ys]
-                                        ;  (if (and (seq xs) (seq ys))
-                                        ;    (cons (vector (first xs) (first ys)) (myzip (rest xs) (rest ys)))
-                                        ;    []))
-(defn myzip [xs ys]
+;; Q039: zipを再帰を用いて自作(myzip)せよ。
+;; A
+(defn myzip
+  [xs ys]
   (cond
     (not (seq xs)) []
     (not (seq ys)) []
     :else (cons [(first xs) (first ys)] (myzip (rest xs) (rest ys)))))
+;; (defn myzip [xs ys]
+;;   (if (or (empty? xs) (empty? ys))
+;;     []
+;;     (cons (vector (first xs) (first ys)) (myzip (rest xs) (rest ys)))))
+;;(defn myzip [xs ys]
+;;  (if (and (seq xs) (seq ys))
+;;    (cons (vector (first xs) (first ys)) (myzip (rest xs) (rest ys)))
+;;    []))
 
-                                        ; Q040: evenとoddを相互再帰を用いて自作せよ。(declareを自作してそれを用いよ。)
-                                        ;    ヒント：0は偶数、-3は奇数
-                                        ; A
+;; Q040: evenとoddを相互再帰を用いて自作せよ。(declareを自作して(mydeclare)それを用いよ。)
+;;       ヒント：0は偶数、-3は奇数
+;; A
 (defmacro mydeclare [& expr]
   `(do ~@(map #(list 'def %) expr)))
 (mydeclare myeven? myodd?)
@@ -330,17 +339,18 @@
   (and (not (zero? n))
        (myeven? (dec (Math/abs n)))))
 
-                                        ; Q041: 0以上の整数nに対し、n番目のフィボナッチ数を求める関数fibonacciを書け。
-                                        ; A
+;; Q041: 0以上の整数nに対し、n番目のフィボナッチ数を求める関数fibonacciを書け。
+;; A
 (defn fibonacci [n]
   (case n
     0 0
     1 1
     (+ (fibonacci (- n 1)) (fibonacci (- n 2)))))
 
-                                        ; Q042: qsortを再帰を用いて書け。
-                                        ; A
-(defn qsort [xs]
+;; Q042: qsortを再帰を用いて書け。
+;; A
+(defn qsort
+  [xs]
   (if-not (seq xs)
     []
     (let [x (first xs)
@@ -349,50 +359,63 @@
           ge (for [x' xs' :when (>= x' x)] x')]
       (concat (qsort lt) [x] (qsort ge)))))
 
-                                        ; Q043: リストから偶数の位置の要素を取り出す関数evensと、奇数の位置の要素を取り出す関数oddsを相互再帰を用いて書け。
-                                        ; A
+;; Q043: リストから偶数の位置の要素を取り出す関数evensと、奇数の位置の要素を取り出す関数oddsを相互再帰を用いて書け。
+;; A
 (declare evens odds)
-(defn evens [xs]
+
+(defn evens
+  [xs]
   (if-not (seq xs)
     []
     (odds (rest xs))))
-(defn odds [xs]
+
+(defn odds
+  [xs]
   (if-not (seq xs)
     []
     (cons (first xs) (evens (rest xs)))))
 
-                                        ; Q044: initを自作せよ。
-                                        ; A
-                                        ; (defn init [xs]
-                                        ;   (if (or (empty? xs) (= (count xs) 1))
-                                        ;     []
-                                        ;     (cons (first xs) (init (rest xs)))))
+;; Q044: initを自作せよ。(再帰を用いたもの、遅延評価関数を用いたもの両方）
+;; A
+;; 再帰版
 (defn my-init [coll]
   (if-not (seq (rest coll))
     []
     (cons (first coll) (my-init (rest coll)))))
 
-                                        ; Q045: elemを再帰を用いて自作せよ。
-                                        ;       elem :: Eq a => a -> [a] -> Bool
-                                        ; A
-(defn elem [x xs]
-  (if-not (seq xs)
-    false
-    (or (= x (first xs))
-        (elem x (rest xs)))))
+;; 遅延評価関数版
+#_(defn my-init
+  [xs]
+  (-> xs
+       reverse
+       rest
+       reverse))
 
-                                        ; Q046: !!の前�����������記法版のindex関数を再帰を用いて自作せよ。(my-index)
-                                        ; A
-(defn my-index [coll n]
-  (if (zero? n)
-    (first coll)
-    (my-index (rest coll) (dec n))))
+;; Q045: elemを再帰を用いて自作せよ。
+;;       elem :: Eq a => a -> [a] -> Bool
+;; A
+(defn elem
+  [x xs]
+  (when (seq xs)
+    (or
+     (= x (first xs))
+     (elem x (rest xs)))))
 
-                                        ; Q047: 整列されたリストを二つとり、一つの整列されたリストにして返す関数mergeを自作せよ。
-                                        ;    insertやisort等、整列されたリストを処理する関数は用いてはならない。
-                                        ;    ex) merge [2,5,6] [1,3,4] ==> [1,2,3,4,5,6]
-                                        ; A
-(defn my-merge [xs ys]
+;; Q046: !!の前置記法版のindex関数を再帰を用いて自作せよ。(my-index)
+;; A
+(defn my-index
+  [xs n]
+  (when (seq xs)
+    (if (zero? n)
+      (first xs)
+      (my-index (rest xs) (dec n)))))
+
+;; Q047: 整列されたリストを二つとり、一つの整列されたリストにして返す関数mergeを自作せよ。
+;;    insertやisort等、整列されたリストを処理する関数は用いてはならない。
+;;    ex) merge [2,5,6] [1,3,4] ==> [1,2,3,4,5,6]
+;; A
+(defn my-merge
+  [xs ys]
   (cond
     (not (seq xs)) ys
     (not (seq ys)) xs
@@ -402,66 +425,75 @@
                  (cons x (my-merge (rest xs) ys))
                  (cons y (my-merge xs (rest ys)))))))
 
-                                        ; Q048: 関数my-mergeを用いてマージソートを実行する関数msortを再帰を用いて書け。
-                                        ;    マージソートは、引数のリストを二つに分割し、それぞれを整列した後、再び一つに戻す事で、整列を実現する。
-                                        ;    最初に、リストを半分に分割する関数halveを書け。
-                                        ; A
-(defn msort [coll]
+;; Q048: 関数my-mergeを用いてマージソートを実行する関数msortを再帰を用いて書け。
+;;       マージソートは、引数のリストを二つに分割し、それぞれを整列した後、再び一つに戻す事で、整列を実現する。
+;;       最初に、リストを半分に分割する関数halveを書け。
+;; A
+(defn msort
+  [xs]
   (cond
-    (not (seq coll)) []
-    (= (count coll) 1) coll
-    :else
-    (let [[xs ys] (halve coll)]
-      (my-merge (msort xs) (msort ys)))))
+    (not (seq xs)) []
+    (not (next xs)) xs
+    :else (let [[xs1 xs2] (halve xs)]
+            (my-merge (msort xs1) (msort xs2)))))
 
-                                        ; Q049: replicateを再帰を用いて自作せよ。(my-replicate-rec [n x])
-                                        ; A
-(defn my-replicate-rec [n x]
+;; Q049: replicateを再帰を用いて自作せよ。(my-replicate-rec [n x])
+;; A
+(defn my-replicate-rec
+  [n x]
   (if (zero? n)
     []
     (cons x (my-replicate-rec (dec n) x))))
 
-                                        ; Q050: 負でない整数に対する累乗演算を行うmyを定義せよ。
-                                        ; A
-(defn my [n m]
+;; Q050: 負でない整数に対する累乗演算を行うmyを定義せよ。
+;; A
+(defn my
+  [n m]
   (if (zero? m)
     1
     (* n (my n (dec m)))))
 
-                                        ; Q051: mapをリスト内包表記を用いて自作せよ。
-                                        ; A
-(defn my-map [f coll]
-  (for [x coll] (f x)))
+;; Q051: mapをリスト内包表記を用いて自作せよ。
+;; A
+(defn my-map
+  [f xs]
+  (for [x xs] (f x)))
 
-                                        ; Q052: filterをリスト内包表記を用いて自作せよ。
-                                        ; A
-(defn my-filter [f coll]
-  (for [x coll :when (f x)] x))
+;; Q052: filterをリスト内包表記を用いて自作せよ。
+;; A
+(defn my-filter
+  [f xs]
+  (for [x xs :when (f x)] x))
 
-                                        ; Q053: mapを再帰を用いて自作せよ。(my-map-recur)
-                                        ; A
-(defn my-map-recur [f coll]
-  (if-not (seq coll)
+;; Q053: mapを再帰を用いて自作せよ。(my-map-recur)
+;; A
+;; 直接の再帰を用いたパターン
+(defn my-map-recur
+  [f xs]
+  (if-not (seq xs)
     []
-    (cons (f (first coll)) (my-map-recur f (rest coll)))))
+    (cons (f (first xs)) (my-map-recur f (rest xs)))))
 
-                                        ; Q054: リストの先頭から述語を満たす連続した要素を取り除く関数dropWhileを自作せよ。
-                                        ; A:
+;; recurを用いたパターン
+#_(defn my-map-recur
+  [f xs]
+  (letfn [(my-map-recur' [f xs acc]
+            (if-not (seq xs)
+              acc
+              (my-map-recur' f (rest xs) (conj acc (f (first xs))))))]
+    (my-map-recur' f xs [])))
+
+;; Q054: リストの先頭から述語を満たす連続した要素を取り除く関数drop-whileを自作せよ。
+;; A:
 (defn my-drop-while [p xs]
   (if (or (empty? xs) (not (p (first xs))))
     xs
     (my-drop-while p (rest xs))))
 
-                                        ; Q055: filterを再帰を用いて自作せよ。(my-filter-recur)
-                                        ; A
-                                        ;(defn my-filter-recur [p coll]
-                                        ;  (if-not (seq coll)
-                                        ;    []
-                                        ;    (let [x (first coll)
-                                        ;          xs (rest coll)]
-                                        ;      (case (p x)
-                                        ;        true (cons x (my-filter-recur p xs))
-                                        ;        false (my-filter-recur p xs)))))
+;; Q055: filterを再帰を用いて自作せよ。(my-filter-recur)
+;;       線形再帰、末尾再帰、recurを用いた末尾再帰の3パターンを書くこと
+;; A
+;; 線形再帰
 (defn my-filter-recur [p xs]
   (if-not (seq xs)
     []
@@ -470,59 +502,76 @@
       (if (p x)
         (cons x (my-filter-recur p xs'))
         (my-filter-recur p xs')))))
+;; 末尾再帰
+#_(defn my-filter-recur
+  [f xs]
+  (letfn [(my-filter-recur'
+            [xs acc]
+            (if-not (seq xs)
+              acc
+              (let [x (first xs)
+                    xs' (rest xs)]
+                (my-filter-recur' xs' (if (f x) (conj acc x) acc)))))]
+    (my-filter-recur' xs [])))
+;; recurを用いた末尾再帰
+#_(defn my-filter-recur
+  [f xs]
+  (loop [xs' xs acc []]
+    (if-not (seq xs')
+      acc
+      (let [x (first xs')
+            xs'' (rest xs')]
+        (recur xs'' (if (f x) (conj acc x) acc))))))
 
-                                        ; Q056: リストの先頭から述語を満たす連続した要素を取り出す関数takeWhileを自作せよ。(my-take-while)
-                                        ; A:
-(defn my-take-while [p coll]
-  (if (not (and (seq coll) (p (first coll))))
+;; Q056: リストの先頭から述語を満たす連続した要素を取り出す関数takeWhileを自作せよ。(my-take-while)
+;; A:
+(defn my-take-while
+  [f xs]
+  (if (or (not (seq xs)) (not (f (first xs))))
     []
-    (cons (first coll) (my-take-while p (rest coll)))))
+    (cons (first xs) (my-take-while f (rest xs)))))
 
-                                        ; Q057: 以下の様に使用できる関数foldrを自作せよ。(my-foldr)
-                                        ; cons = foldr (:) []
-                                        ; sum = foldr (+) 0
-                                        ; product = foldr (*) 1
-                                        ; or = foldr (||) False
-                                        ; and = foldr (&&) True
-                                        ; A:
-                                        ; myFoldr :: (a -> b -> b) -> b -> [a] -> b
-                                        ; myFoldr _ x' [] = x'
-                                        ; myFoldr f x' (x:xs) = f x (myFoldr f x' xs)
-(defn my-foldr [f x coll]
-  (if-not (seq coll)
+;; Q057-01: 以下の様に使用できる関数foldrを自作せよ。(my-foldr)
+;; cons = foldr (:) []
+;; sum = foldr (+) 0
+;; product = foldr (*) 1
+;; or = foldr (||) False
+;; and = foldr (&&) True
+;; A:
+;; myFoldr :: (a -> b -> b) -> b -> [a] -> b
+;; myFoldr _ x' [] = x'
+;; myFoldr f x' (x:xs) = f x (myFoldr f x' xs)
+(defn my-foldr
+  [f x xs]
+  (if-not (seq xs)
     x
-    (f (first coll) (my-foldr f x (rest coll)))))
+    (f (first xs) (my-foldr f x (rest xs)))))
 
-                                        ; Q057: ビットのリストで表現される二進表記を整数に変換する関数bit2intを書け。
-                                        ;    ・iterateを用いること
-                                        ;    ・二進表記は逆順であること
-                                        ; type Bit = Int
-                                        ; bit2int :: [Bit] -> Int
-                                        ; bit2int bits = sum [b * w | (b, w) <- zip bits weights]
-                                        ;                 where
-                                        ;                   weights = iterate (*2) 1
-                                        ; my answer 2014/05/15
-                                        ; (defn bit2int [bs]
-                                        ;   (letfn [(bit2int' [bs i]
-                                        ;     (if (empty? bs)
-                                        ;       0
-                                        ;       (+ (* (first bs) (Math/pow 2 i)) (bit2int' (rest bs) (inc i)))))]
-                                        ;     (bit2int' bs 0)))
-(defn bit2int [bits]
-  (reduce + (map #(* %1 %2) bits (map #(Math/pow 2 %) (range)))))
+;; Q057-02: ビットのリストで表現される二進表記を整数に変換する関数bit2intを書け。
+;;    ・iterateを用いること
+;;    ・二進表記は逆順であること
+;; type Bit = Int
+;; bit2int :: [Bit] -> Int
+;; bit2int bits = sum [b * w | (b, w) <- zip bits weights]
+;;                 where
+;;                   weights = iterate (*2) 1
+(defn bit2int
+  [bs]
+  (reduce +
+          (map #(* %1 %2) bs (iterate #(* 2 %) 1))))
 
-                                        ; Q058: 負でない整数を二進表記へ変換する関数int2bitを書け。(0は正の整数ではない)
-                                        ; A
-                                        ; (defn int2bit [n]
-                                        ;   (if (zero? n)
-                                        ;     [0]
-                                        ;     (let [ms (reverse (take-while #(<= (Math/pow 2 %) n) (iterate inc 0)))]
-                                        ;       (letfn [(r' [ms n]
-                                        ;         (println "ms: " ms ", n:" n)
-                                        ;         (if (empty? ms)
-                                        ;           []
-                                        ;           (cons (if (>= n (Math/pow 2 (first ms))) 1 0) (r' (rest ms) (- n (if (>= n (Math/pow 2 (first ms))) (Math/pow 2 (first ms)) 0))))))]
-                                        ;         (r' ms n)))))
+;; Q058: 負でない整数を二進表記へ変換する関数int2bitを書け。(0は正の整数ではない)
+;; A
+;; (defn int2bit [n]
+;;   (if (zero? n)
+;;     [0]
+;;     (let [ms (reverse (take-while #(<= (Math/pow 2 %) n) (iterate inc 0)))]
+;;       (letfn [(r' [ms n]
+;;         (println "ms: " ms ", n:" n)
+;;         (if (empty? ms)
+;;           []
+;;           (cons (if (>= n (Math/pow 2 (first ms))) 1 0) (r' (rest ms) (- n (if (>= n (Math/pow 2 (first ms))) (Math/pow 2 (first ms)) 0))))))]
+;;         (r' ms n)))))
 (defn int2bit [n]
   (if (zero? n)
     []

@@ -232,9 +232,12 @@
 (deftest chisqr-test
   (testing
     (is (= (chisqr [1 2 3] [4 5 6]) 5.549999952316284))
-    (is (= (chisqr [1 2 3] [4 5]) 4.049999952316284))
-  )
-)
+    (is (= (chisqr [1 2 3] [4 5]) 4.049999952316284))))
+
+(deftest rotate-test
+  (testing
+      (is (= (rotate 1 "abc") "bca"))))
+
 
 (deftest perfects-test
   (testing
@@ -245,7 +248,7 @@
 
 (deftest pyths-test
   (testing
-    (is (= (pyths 10) [[3 4 5] [6 8 10]]))
+      (is (= (set (map set (pyths 10))) #{#{3 4 5} #{6 8 10}}))
   )
 )
 
