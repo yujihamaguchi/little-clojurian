@@ -34,7 +34,7 @@
   [xs]
   (if-not (seq xs)
     []
-    (let [x (first xs)
+    (let [x  (first xs)
           lt (for [x' xs :when (< (int x') (int x))] x')
           gt (for [x' xs :when (> (int x') (int x))] x')]
       (concat (qsort01 lt) [x] (qsort01 gt)))))
@@ -562,80 +562,75 @@
 
 ;; Q058: 負でない整数を二進表記へ変換する関数int2bitを書け。(0は正の整数ではない)
 ;; A
-;; (defn int2bit [n]
-;;   (if (zero? n)
-;;     [0]
-;;     (let [ms (reverse (take-while #(<= (Math/pow 2 %) n) (iterate inc 0)))]
-;;       (letfn [(r' [ms n]
-;;         (println "ms: " ms ", n:" n)
-;;         (if (empty? ms)
-;;           []
-;;           (cons (if (>= n (Math/pow 2 (first ms))) 1 0) (r' (rest ms) (- n (if (>= n (Math/pow 2 (first ms))) (Math/pow 2 (first ms)) 0))))))]
-;;         (r' ms n)))))
 (defn int2bit [n]
   (if (zero? n)
     []
     (cons (mod n 2) (int2bit (quot n 2)))))
 
-                                        ; Q059: 二進表記が必ず8ビットになるように切り詰めたり適切な数の0を詰め込んだりする関数make8を書け。
-                                        ; A
-                                        ; my answer 2014/05/19
-                                        ; (defn make8 [bs]
-                                        ;   (concat bs (replicate (- 8 (count bs)) 0)))
-                                        ; (defn make8 [bs]
-                                        ;   (vec (take 8 (concat bs (replicate 7 0)))))
-(defn make8 [bs]
+;; Q059: 二進表記が必ず8ビットになるように切り詰めたり適切な数の0を詰め込んだりする関数make8を書け。
+;; A
+(defn make8
+  [bs]
   (take 8 (concat bs (repeat 0))))
 
-                                        ; Q060: ビット列を8ビットの二進表記に分割する関数chop8を書け。
-                                        ; A
+;; Q060: ビット列を8ビットの二進表記に分割する関数chop8を書け。
+;; A
 (defn chop8 [bs]
   (if (empty? bs)
     []
     (lazy-seq (cons (make8 (take 8 bs)) (chop8 (drop 8 bs))))))
 
-                                        ; Q061: ビットのリストを文字列に復号する関数decodeを書け。
-                                        ;    リストを分割し、二進表記をUnicodeのコードポイント（整数）へ変換し、文字へ直して、全体として文字列にする。
-                                        ;    関数合成を用いて実装せよ。
-                                        ; A
+;; Q061: ビットのリストを文字列に復号する関数decodeを書け。(threading macroを使ったものも)
+;;    リストを分割し、二進表記をUnicodeのコードポイント（整数）へ変換し、文字へ直して、全体として文字列にする。
+;;    関数合成を用いて実装せよ。
+;; A
 (defn decode [bs]
   (apply str (map (comp char bit2int) (chop8 bs))))
+#_(defn decode
+  [bs]
+  (-> bs
+      chop8
+      ((partial map bit2int))
+      ((partial map char))
+      ((partial apply str))))
 
-                                        ; Q062: 文字列をビット列に符号化する関数encodeを書け。
-                                        ;    それぞれの文字列をunicodeのコードポイント（整数）に変換し、さらに8ビットの二進表記に直して、全体を連結することで、ビットのリストを作る。高階関数mapと関数合成を用いて実装せよ。
-                                        ; A
-(defn encode [cs]
-  (apply concat (map (comp make8 int2bit int) cs)))
+;; Q062: 文字列をビット列に符号化する関数encodeを書け。
+;;    それぞれの文字列をunicodeのコードポイント（整数）に変換し、さらに8ビットの二進表記に直して、全体を連結することで、ビットのリストを作る。高階関数mapと関数合成を用いて実装せよ。
+;; A
+(defn encode
+  [cs]
+  (apply concat (mapcat (comp chop8 int2bit int) cs)))
 
-                                        ; Q063: 関数allを自作せよ。(my-all)
-                                        ; Prelude.all
-                                        ; all :: (a -> Bool) -> [a] -> Bool
-                                        ; all f xs
-                                        ;     xs の要素 x について、f x がすべて True なら True。
-                                        ;     see also: any, and
-                                        ;         all (==1) [5,4,3,2,1]   = False
-                                        ;         all (==1) [1,1,1]       = True
-                                        ;         all (==1) []            = True
-                                        ; A
+;; Q063: 関数allを自作せよ。(my-all)
+;; Prelude.all
+;; all :: (a -> Bool) -> [a] -> Bool
+;; all f xs
+;;     xs の要素 x について、f x がすべて True なら True。
+;;     see also: any, and
+;;         all (==1) [5,4,3,2,1]   = False
+;;         all (==1) [1,1,1]       = True
+;;         all (==1) []            = True
+;; A
 (defn my-all [p coll]
   (if-not (seq coll)
     true
     (and (p (first coll)) (my-all p (rest coll)))))
 
-                                        ; Q064: 関数anyを自作せよ。(my-any)
-                                        ; Prelude.any
-                                        ; any :: (a -> Bool) -> [a] -> Bool
-                                        ; any f xs
-                                        ;     xs のいずれかの要素 x について f x が True ならば True。
-                                        ;     see also: all, or
-                                        ;         any (== 1) [5, 4, 3, 2, 1]   = True
-                                        ;         any (== 1) [5, 4, 1, 2, 3]   = True
-                                        ;         any (== 1) [5, 4, 3, 2]      = False
-                                        ; A
-(defn my-any [p coll]
-  (if-not (seq coll)
+;; Q064: 関数anyを自作せよ。(my-any)
+;; Prelude.any
+;; any :: (a -> Bool) -> [a] -> Bool
+;; any f xs
+;;     xs のいずれかの要素 x について f x が True ならば True。
+;;     see also: all, or
+;;         any (== 1) [5, 4, 3, 2, 1]   = True
+;;         any (== 1) [5, 4, 1, 2, 3]   = True
+;;         any (== 1) [5, 4, 3, 2]      = False
+;; A
+(defn my-any
+  [p xs]
+  (if-not (seq xs)
     false
-    (or (p (first coll)) (my-any p (rest coll)))))
+    (or (p (first xs)) (my-any p (rest xs)))))
 
                                         ; Q065: 暗号化された文字列は手に入れたが、シフト数は分からないとしよう。暗号文を解読するためにシフト数を推測したい。
                                         ;    これは次のように実現できる。すなわち暗号文に対する文字の出現頻度表を作り、この表を左に回転させながら、
@@ -710,11 +705,13 @@
 (defn crack [s]
   (shift-string s (guess-shift-count (round-shift-string s) table)))
 
-                                        ; Q066: ファイルが過去半時間の間に更新されたかどうか調べる述語recently-modified?を書け。
-(defn recently-modified? [f]
-  (>= (* 1000 60 30) (- (System/currentTimeMillis) (.lastModified f))))
+;; Q066: ファイルが過去半時間の間に更新されたかどうか調べる述語recently-modified?を書け。
+;;       （パラメータとして、java.io.File オブジェクトが渡される想定）
+(defn recently-modified?
+  [f]
+  (>= (* 30 60 1000) (- (System/currentTimeMillis) (.lastModified f))))
 
-                                        ; # 集合
+;; #{集合}
 (def compositions #{
                     {:name "The Art of the Fugue", :composer "J. S. Bach"}
                     {:name "Requiem", :composer "W. A. Mozart"}
@@ -730,39 +727,45 @@
                {:nation "Italy" :language "Italian"}})
 
 (use 'clojure.set)
-                                        ; Q067: compositionsのキーワード:nameの別名として:titleを持つ集合を取得せよ。(set1関数の戻り値として)
-(defn set1 []
+;; Q067: compositionsのキーワード:nameの別名として:titleを持つ集合を取得せよ。(set1関数の戻り値として)
+(defn set1
+  []
   (rename compositions {:name :title}))
 
-                                        ; Q068: compositionsから:nameが"Requiem"のレコードを抽出せよ（set2関数の戻り値として）
+;; Q068: compositionsから:nameが"Requiem"のレコードを抽出せよ（set2関数の戻り値として）
 (defn set2 []
   (select #(= "Requiem" (:name %)) compositions))
 
-                                        ; Q069: compositionsから:nameキーの値のみを射影せよ。（set3関数の戻り値として）
+;; Q069: compositionsから:nameキーの値のみを射影せよ。（set3関数の戻り値として）
 (defn set3 []
   (project compositions [:name]))
 
-                                        ; Q070: compositionsとcomposersを自然結合せよ。（set4関数の戻り値として）
+;; Q070: compositionsとcomposersを自然結合せよ。（set4関数の戻り値として）
 (defn set4 []
   (join compositions composers))
 
-                                        ; Q071: composersとnationsを:countryと:nationで結合せよ。（set5関数の戻り値として）
+;; Q071: composersとnationsを:countryと:nationで結合せよ。（set5関数の戻り値として）
 (defn set5 []
   (join composers nations {:country :nation}))
 
-                                        ; Q072: compositionsから:nameが"Requiem"のレコードを抽出し、composersと自然結合し、:countryキーで射影せよ。（set6関数の戻り値として）
-(defn set6 []
-  (project (join (select #(= "Requiem" (:name %)) compositions) composers) [:country]))
+;; Q072: compositionsから:nameが"Requiem"のレコードを抽出し、composersと自然結合し、:countryキーで射影せよ。（set6関数の戻り値として）
+(defn set6
+  []
+  (-> (select #(= "Requiem" (:name %)) compositions)
+      (join composers)
+      (project [:country])))
 
-                                        ; Q073: 最底部にbottomというシンボルを持つ、任意のnレベルまでネストしたリストを作るdeeply-nested関数を書け。
-(defn deeply-nested [n]
+;; Q073: 最底部にbottomというシンボルを持つ、任意のnレベルまでネストしたリストを作るdeeply-nested関数を書け。
+(defn deeply-nested
+  [n]
   (if (zero? n)
     'bottom
     (list (deeply-nested (dec n)))))
 
-                                        ; Q074: 以下のコイントスの結果データ（:h 表、:t 裏）について、 表が2回続けて出たケースをカウントする関数count-heads-pairsをloop/recurを用いて書け。
-                                        ; (count-heads-pairs [:h :t :t :h :h :h])
-                                        ; ;= 2
+
+;; Q074: 以下のコイントスの結果データ（:h 表、:t 裏）について、 表が2回続けて出たケースをカウントする関数count-heads-pairsをloop/recurを用いて書け。
+;; (count-heads-pairs [:h :t :t :h :h :h])
+;; ;= 2
 (defn count-heads-pairs [coll]
   (loop [acc 0 coll coll]
     (if-not (next coll)
