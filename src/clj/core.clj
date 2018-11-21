@@ -774,43 +774,48 @@
         (recur (inc acc) (rest coll))
         (recur acc (rest coll))))))
 
-                                        ; Q075: 以下の変換を行う関数by-pairsを、lazy-seqを用いて書け。
-                                        ;     変換前：[:h :t :t :h :h :h]
-                                        ;     変換後：((:h :t) (:t :t) (:t :h) (:h :h) (:h :h))
+;; Q075: 以下の変換を行う関数by-pairsを、lazy-seqを用いて書け。
+;;     変換前：[:h :t :t :h :h :h]
+;;     変換後：((:h :t) (:t :t) (:t :h) (:h :h) (:h :h))
 (defn by-pairs [coll]
   (if-not (next coll)
     '()
     (lazy-seq (cons (take 2 coll) (by-pairs (rest coll))))))
 
-                                        ; Q076: ホフスタッタの男女シーケンスを書け。(f, m)
-                                        ;
-                                        ; F(0) = 1; M(0) = 0
-                                        ; F(n) = n - M(F(n-1)), n>0
-                                        ; M(n) = n - F(M(n-1)), n>0
-                                        ;
-                                        ; また、メモ化を行い性能を改善せよ。
-                                        ;
-                                        ;   シーケンス中の1つの値を計算するために、2つの値を最初から計算せねばならず、そのそれぞれについてまた2つずつの値を最初から計算することになる。
-                                        ;   メモ化された関数を呼ぶと、それはまず与えられた引数を、過去に計算した入力と出力のマップと比べる。もし引数が過去に与えられていたものであれば、
-                                        ;   再び計算をしなくても、直ちに結果を返すことが出来る。
-                                        ;
-                                        ; また、式の処理時間を計測するマクロを書け（elapsed-time)
-                                        ;
-                                        ; また、メモ化はキャッシュが既に作られていれば再帰を途中で止めることができるけれど、
-                                        ; キャッシュが空の状態で大きな数に対するmやfを計算しようとすると、
-                                        ; キャッシュが作られる前にスタックが溢れてしまう。
-                                        ; それを防ぐ為に、関数ではなくシーケンスを見せることでキャッシュが頭から作られるのを保証せよ。(m-seq, f-seq)
-(defmacro elapsed-time [expr]
+;; Q076: ホフスタッタの男女シーケンスを書け。(f, m)
+;;
+;; F(0) = 1;; M(0) = 0
+;; F(n) = n - M(F(n-1)), n>0
+;; M(n) = n - F(M(n-1)), n>0
+;;
+;; また、メモ化を行い性能を改善せよ。
+;;
+;;   シーケンス中の1つの値を計算するために、2つの値を最初から計算せねばならず、そのそれぞれについてまた2つずつの値を最初から計算することになる。
+;;   メモ化された関数を呼ぶと、それはまず与えられた引数を、過去に計算した入力と出力のマップと比べる。もし引数が過去に与えられていたものであれば、
+;;   再び計算をしなくても、直ちに結果を返すことが出来る。
+;;
+;; また、式の処理時間を計測するマクロを書け（elapsed-time)
+;;
+;; また、メモ化はキャッシュが既に作られていれば再帰を途中で止めることができるけれど、
+;; キャッシュが空の状態で大きな数に対するmやfを計算しようとすると、
+;; キャッシュが作られる前にスタックが溢れてしまう。
+;; それを防ぐ為に、関数ではなくシーケンスを見せることでキャッシュが頭から作られるのを保証せよ。(m-seq, f-seq)
+(declare f m)
+
+(defmacro elapsed-time
+  [expr]
   `(let [start# (System/currentTimeMillis)]
      ~expr
      (- (System/currentTimeMillis) start#)))
 
-(declare f m)
-(defn f [n]
+(defn f
+  [n]
   (if (zero? n)
     1
     (- n (m (f (dec n))))))
-(defn m [n]
+
+(defn m
+  [n]
   (if (zero? n)
     0
     (- n (f (m (dec n))))))
@@ -821,63 +826,81 @@
 (def f-seq (map f (range)))
 (def m-seq (map m (range)))
 
+;; Q077-01: s-list（シンボルとシンボルのリスト両方を要素に出来るリスト）、oldsym、newsymを引数に取り、s-listの中のoldsymをすべてnewsymに置き換える関数replace-symbolを、
+;; シンボル（と見られる要素）の置換を行うreplace-symbol-expression関数との相互再帰で書け。
+;; (replace-symbol '((a b) (((b g r) (f r)) c (d e)) b) 'b 'a)
+;; ;;= ((a a) (((a g r) (f r)) c (d e)) a)
+;; この関数は深くネストした構造をあたえるとスタックを溢れさせる可能性がある。これを避ける為に遅延評価を用いること。
 
-                                        ; Q077-01: s-list（シンボルとシンボルのリスト両方を要素に出来るリスト）、oldsym、newsymを引数に取り、s-listの中のoldsymをすべてnewsymに置き換える関数replace-symbolを、
-                                        ; シンボル（と見られる要素）の置換を行うreplace-symbol-expression関数との相互再帰で書け。
-                                        ; (replace-symbol '((a b) (((b g r) (f r)) c (d e)) b) 'b 'a)
-                                        ; ;= ((a a) (((a g r) (f r)) c (d e)) a)
-                                        ; この関数は深くネストした構造をあたえるとスタックを溢れさせる可能性がある。これを避ける為に遅延評価を用いること。
-                                        ;
-                                        ; 相互再帰版
-                                        ; (declare replace-symbol replace-symbol-expression)
-                                        ;
-                                        ; (defn replace-symbol [coll oldsym newsym]
-                                        ;   (if-not (seq coll)
-                                        ;     []
-                                        ;     (lazy-seq
-                                        ;       (cons
-                                        ;         (replace-symbol-expression (first coll) oldsym newsym)
-                                        ;         (replace-symbol (rest coll) oldsym newsym)))))
-                                        ;
-                                        ; (defn replace-symbol-expression [sym-expr oldsym newsym]
-                                        ;   (if (symbol? sym-expr)
-                                        ;     (if (= sym-expr oldsym)
-                                        ;       newsym
-                                        ;       sym-expr)
-                                        ;     (replace-symbol sym-expr oldsym newsym)))
+;; 相互再帰版
+(declare replace-symbol replace-symbol-expression)
 
-                                        ; Q077-02: また、マルチメソッドを用いたバージョンも書け。
-                                        ; マルチメソッド版
-(defn- coll-or-scalar [x & _] (if (coll? x) :collection :scalar))
-
-(defmulti replace-symbol coll-or-scalar)
-
-(defmethod replace-symbol :collection [coll oldsym newsym]
+(defn replace-symbol [coll oldsym newsym]
   (if-not (seq coll)
     []
     (lazy-seq
      (cons
-      (replace-symbol (first coll) oldsym newsym)
+      (replace-symbol-expression (first coll) oldsym newsym)
       (replace-symbol (rest coll) oldsym newsym)))))
 
-(defmethod replace-symbol :scalar [sym oldsym newsym]
-  (if (= sym oldsym) newsym sym))
+(defn replace-symbol-expression [sym-expr oldsym newsym]
+  (if (symbol? sym-expr)
+    (if (= sym-expr oldsym)
+      newsym
+      sym-expr)
+    (replace-symbol sym-expr oldsym newsym)))
 
-                                        ; Q078: 名前（username）をパラメータとし、"{greeting-prefix}, {username}"の文字列を返す関数を返す、
-                                        ;       挨拶の種類（greeting-prefix）をパラメータとする関数make-greeterを書け。
-                                        ; ((make-greeter "Hello") "Yuji")
-                                        ; ;= "Hello, Yuji"
-                                        ; ((make-greeter "Aloha") "Yuji")
-                                        ; ;= "Aloha, Yuji"
-(defn make-greeter [greeting-prefix]
-  (fn [username] (str greeting-prefix ", " username)))
+;; Q077-02: また、マルチメソッドを用いたバージョンも書け。
+;; マルチメソッド版
+;; 2018/11/18 my not bad answer
+;; (defmulti replace-symbol (fn [expr _ _] (symbol? expr)))
 
-0 1 1 2 3 5 8 13 21 34
-                                        ; Q079: n番目のフィボナッチ数を返す、recurで明示的な再帰を行う関数recur-fiboを書け。
-                                        ; (recur-fibo 9)
-                                        ; ;= 34N
-                                        ; (recur-fibo 1000000)
-                                        ; ;= 195 ...(中略)... 875N
+;; (defmethod replace-symbol false
+;;   [s-list oldsym newsym]
+;;   (if-not (seq s-list)
+;;     []
+;;     (lazy-seq
+;;      (cons
+;;       (replace-symbol (first s-list) oldsym newsym)
+;;       (replace-symbol (rest s-list) oldsym newsym)))))
+
+;; (defmethod replace-symbol true
+;;   [symbol-expr oldsym newsym]
+;;   (if (= symbol-expr oldsym)
+;;     newsym
+;;     symbol-expr))
+;; お手本通りの答え
+;; (defn- coll-or-scalar [x & _] (if (coll? x) :collection :scalar))
+
+;; (defmulti replace-symbol coll-or-scalar)
+
+;; (defmethod replace-symbol :collection [coll oldsym newsym]
+;;   (if-not (seq coll)
+;;     []
+;;     (lazy-seq
+;;      (cons
+;;       (replace-symbol (first coll) oldsym newsym)
+;;       (replace-symbol (rest coll) oldsym newsym)))))
+
+;; (defmethod replace-symbol :scalar [sym oldsym newsym]
+;;   (if (= sym oldsym) newsym sym))
+
+;; Q078: 名前（username）をパラメータとし、"{greeting-prefix}, {username}"の文字列を返す関数を返す、
+;;       挨拶の種類（greeting-prefix）をパラメータとする関数make-greeterを書け。
+;; ((make-greeter "Hello") "Yuji")
+;; ;;= "Hello, Yuji"
+;; ((make-greeter "Aloha") "Yuji")
+;; ;;= "Aloha, Yuji"
+(defn make-greeter
+  [greeting-prefix]
+  (fn [username]
+    (str greeting-prefix ", " username)))
+
+;; Q079: n番目のフィボナッチ数を返す、recurで明示的な再帰を行う関数recur-fiboを書け。
+;; (recur-fibo 9)
+;; ;;= 34N
+;; (recur-fibo 1000000)
+;; ;;= 195 ...(中略)... 875N
 (defn recur-fibo [n]
   (letfn [(recur-fibo- [n f1 f2]
             (if (zero? n)
@@ -885,41 +908,48 @@
               (recur (dec n) f2 (+' f1 f2))))]
     (recur-fibo- n 0 1)))
 
-                                        ; Q080: 遅延評価されるフィボナッチ数列を生成する関数lazy-seq-fiboを書け。
-                                        ; A:
-                                        ; my answer 2014/11/03
-                                        ; (defn lazy-seq-fibo []
-                                        ;   (map first (iterate (fn [[n m]] [m (+' n m)]) [0 1])))
+;; Q080: 遅延評価されるフィボナッチ数列を生成する関数lazy-seq-fiboを書け。
+;; A:
+;; my answer 2018/11/22
 (defn lazy-seq-fibo
-  ([] (lazy-seq-fibo 1 1))
-  ([n m] (lazy-seq (cons m (lazy-seq-fibo m (+' n m))))))
+  []
+  (letfn [(lazy-seq-fibo-
+            [n m]
+            (lazy-seq (cons n (lazy-seq-fibo- m (+ n m)))))]
+    (lazy-seq-fibo- 0 1)))
+;; my answer 2014/11/03
+;; (defn lazy-seq-fibo []
+;;   (map first (iterate (fn [[n m]] [m (+' n m)]) [0 1])))
+;; (defn lazy-seq-fibo
+;;   ([] (lazy-seq-fibo 1 1))
+;;   ([n m] (lazy-seq (cons m (lazy-seq-fibo m (+' n m))))))
 
-                                        ; Q081: 以下のように、指定したディレクトリ／ファイル以下のClojureソースファイルの（空行を除いた）行数の合計をカウントする関数clojure-locを書け。
-                                        ;
-                                        ; (clojure-loc (java.io.File. "C:/Dropbox/_training/clojure-master/src/clj/clojure"))
-                                        ; ;= 16606
-                                        ; (clojure-loc (java.io.File. "C:/Dropbox/_training/clojure-master/src/clj/clojure/core.clj"))
-                                        ; ;= 6149
-                                        ; [参考] https://coderwall.com/p/f1a9xa
-                                        ; WHAT IS SLURP?
-                                        ;   slurp is technically a fully realized result of a clojure.java.io/reader.
-                                        ; WHEN SHOULD I USE SLURP?
-                                        ;   When memory is not a concern.
-                                        ; WHAT IS READER?
-                                        ;   reader will attempt to convert its argument to a BufferedReader.
-                                        ; WHEN SHOULD I USE READER
-                                        ;   When a lazy sequence of the results are needed or to create a new BufferedReader.
-                                        ;(use '[clojure.java.io :only [reader]])
-                                        ;(defn clojure-loc [f]
-                                        ;  (reduce + (for [f' (file-seq f) :when (re-seq #"\.clj$" (.getName f'))]
-                                        ;              (with-open [rdr (reader f')]
-                                        ;                (count (filter #(re-seq #"\S" %) (line-seq rdr)))))))
-                                        ;(use '[clojure.java.io :only [reader]])
-                                        ;(defn clojure-loc [f]
-                                        ;  (for [f' (file-seq f) :when (re-seq #"\.clj$" (.getName f'))]
-                                        ;    (reduce +
-                                        ;            (with-open [rdr (reader f')]
-                                        ;              (count (filter #(re-seq #"\S" %) (line-seq rdr)))))))
+;; Q081: 以下のように、指定したディレクトリ／ファイル以下のClojureソースファイルの（空行を除いた）行数の合計をカウントする関数clojure-locを書け。
+;;
+;; (clojure-loc (java.io.File. "C:/Dropbox/_training/clojure-master/src/clj/clojure"))
+;; ;;= 16606
+;; (clojure-loc (java.io.File. "C:/Dropbox/_training/clojure-master/src/clj/clojure/core.clj"))
+;; ;;= 6149
+;; [参考] https://coderwall.com/p/f1a9xa
+;; WHAT IS SLURP?
+;;   slurp is technically a fully realized result of a clojure.java.io/reader.
+;; WHEN SHOULD I USE SLURP?
+;;   When memory is not a concern.
+;; WHAT IS READER?
+;;   reader will attempt to convert its argument to a BufferedReader.
+;; WHEN SHOULD I USE READER
+;;   When a lazy sequence of the results are needed or to create a new BufferedReader.
+;;(use '[clojure.java.io :only [reader]])
+;;(defn clojure-loc [f]
+;;  (reduce + (for [f' (file-seq f) :when (re-seq #"\.clj$" (.getName f'))]
+;;              (with-open [rdr (reader f')]
+;;                (count (filter #(re-seq #"\S" %) (line-seq rdr)))))))
+;;(use '[clojure.java.io :only [reader]])
+;;(defn clojure-loc [f]
+;;  (for [f' (file-seq f) :when (re-seq #"\.clj$" (.getName f'))]
+;;    (reduce +
+;;            (with-open [rdr (reader f')]
+;;              (count (filter #(re-seq #"\S" %) (line-seq rdr)))))))
 (use '[clojure.java.io :only [reader]])
 (defn clojure-loc [dir]
   (reduce +
