@@ -738,10 +738,9 @@
 ;   (is (= (rem (nth (lazy-seq-fibo) 1000000) 1000) 875N))
 ; )
 
-; (deftest ut-clojure-loc
-;   (is (= (clojure-loc (java.io.File. "C:/Dropbox/_training/clojure-master/src/clj/clojure")) 17082))
-;   (is (= (clojure-loc (java.io.File. "C:/Dropbox/_training/clojure-master/src/clj/clojure/core.clj")) 6576))
-; )
+(deftest ut-clojure-loc
+  (is (= (clojure-loc (java.io.File. "/home/yuji/sources/personal/clojure-QA/resources/clojure-loc/")) 5))
+)
 
 (deftest index-filter-test
   (is (= (set (index-filter #{\a \b} "abcdbbb")) #{0 1 4 5 6}))

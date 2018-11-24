@@ -939,23 +939,21 @@
 ;;   reader will attempt to convert its argument to a BufferedReader.
 ;; WHEN SHOULD I USE READER
 ;;   When a lazy sequence of the results are needed or to create a new BufferedReader.
-;;(use '[clojure.java.io :only [reader]])
-;;(defn clojure-loc [f]
-;;  (reduce + (for [f' (file-seq f) :when (re-seq #"\.clj$" (.getName f'))]
-;;              (with-open [rdr (reader f')]
-;;                (count (filter #(re-seq #"\S" %) (line-seq rdr)))))))
-;;(use '[clojure.java.io :only [reader]])
-;;(defn clojure-loc [f]
-;;  (for [f' (file-seq f) :when (re-seq #"\.clj$" (.getName f'))]
-;;    (reduce +
-;;            (with-open [rdr (reader f')]
-;;              (count (filter #(re-seq #"\S" %) (line-seq rdr)))))))
+;; my answer 2018/11/24
+#_(defn clojure-loc
+  [file]
+  (->> file
+      (file-seq)
+      (filter (fn [file] (re-seq #"\.clj$" (.getName file))))
+      (map (fn [file] (.getAbsolutePath file)))
+      (map (fn [file-name] (count (clojure.string/split (slurp file-name) #"\n"))))
+      (reduce +)))
+
 (use '[clojure.java.io :only [reader]])
-(defn clojure-loc [dir]
-  (reduce +
-          (for [file (file-seq dir) :when (re-seq #"\.clj$" (.getName file))]
-            (with-open [rdr (reader file)]
-              (filter #(re-seq #"\S" %) (line-seq rdr))))))
+(defn clojure-loc [f]
+ (reduce + (for [f' (file-seq f) :when (re-seq #"\.clj$" (.getName f'))]
+             (with-open [rdr (reader f')]
+               (count (filter #(re-seq #"\S" %) (line-seq rdr)))))))
 
                                         ; Q082: 文字列中の文字で、探すべき文字のセットにマッチするもののインデックスを得る関数index-filterを書け。（indexed関数を用いよ。）
                                         ; ([pred coll])
