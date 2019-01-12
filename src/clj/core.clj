@@ -925,11 +925,13 @@
 ;;   ([n m] (lazy-seq (cons m (lazy-seq-fibo m (+' n m))))))
 
 ;; Q081: 以下のように、指定したディレクトリ／ファイル以下のClojureソースファイルの（空行を除いた）行数の合計をカウントする関数clojure-locを書け。
+;; (下記「参考」に目を通し、slurpを使用しないバージョンも書け)
 ;;
 ;; (clojure-loc (java.io.File. "C:/Dropbox/_training/clojure-master/src/clj/clojure"))
 ;; ;;= 16606
 ;; (clojure-loc (java.io.File. "C:/Dropbox/_training/clojure-master/src/clj/clojure/core.clj"))
 ;; ;;= 6149
+;; 
 ;; [参考] https://coderwall.com/p/f1a9xa
 ;; WHAT IS SLURP?
 ;;   slurp is technically a fully realized result of a clojure.java.io/reader.
@@ -939,130 +941,145 @@
 ;;   reader will attempt to convert its argument to a BufferedReader.
 ;; WHEN SHOULD I USE READER
 ;;   When a lazy sequence of the results are needed or to create a new BufferedReader.
-;; my answer 2018/11/24
+;; [slurpを使う]
+(defn clojure-loc
+  [f]
+  (letfn [(is-clj-file?
+            [f]
+            (re-seq #"\.clj$" (.getName f)))
+          (row-count
+            [f]
+            (count (re-seq #"\S" (slurp (.getAbsolutePath f)))))]
+    (reduce + (for [f' (file-seq f) :when (is-clj-file? f')] (row-count f')))))
+;; [readerを使う]
 #_(defn clojure-loc
-  [file]
-  (->> file
-      (file-seq)
-      (filter (fn [file] (re-seq #"\.clj$" (.getName file))))
-      (map (fn [file] (.getAbsolutePath file)))
-      (map (fn [file-name] (count (clojure.string/split (slurp file-name) #"\n"))))
-      (reduce +)))
+  [f]
+  (letfn [(is-clj-file?
+            [f]
+            (re-seq #"\.clj$" (.getName f)))
+          (row-count
+            [f]
+            (with-open [rdr (clojure.java.io/reader (.getAbsolutePath f))]
+              (count (filter #(not (empty? %)) (line-seq rdr)))))]
+    (reduce + (for [f' (file-seq f) :when (is-clj-file? f')] (row-count f')))))
 
-(use '[clojure.java.io :only [reader]])
-(defn clojure-loc [f]
- (reduce + (for [f' (file-seq f) :when (re-seq #"\.clj$" (.getName f'))]
-             (with-open [rdr (reader f')]
-               (count (filter #(re-seq #"\S" %) (line-seq rdr)))))))
+;; Q082: 文字列中の文字で、探すべき文字のセットにマッチするもののインデックスを得る関数index-filterを書け。
+;; ([pred coll])
+;; ex)
+;; (index-filter #{\a \b} "abcdbbb")
+;; ;;= (0 1 4 5 6)
+;; (index-filter #{\a \b} "xyz")
+;; ;;= ()
+(defn index-filter
+  [p cs]
+  (for [[i v] (zipmap (range) cs) :when (p v)] i))
 
-                                        ; Q082: 文字列中の文字で、探すべき文字のセットにマッチするもののインデックスを得る関数index-filterを書け。（indexed関数を用いよ。）
-                                        ; ([pred coll])
-                                        ; ex)
-                                        ; (index-filter #{\a \b} "abcdbbb")
-                                        ; ;= (0 1 4 5 6)
-                                        ; (index-filter #{\a \b} "xyz")
-                                        ; ;= ()
-(defn index-filter [p coll]
-  (for [[k v] (indexed coll) :when (p v)] k))
-
-                                        ; 以下の./resources/compositions.xmlから、作曲家（composer）の名前だけを抜き出す関数（get-composer)を書け。
-                                        ; <compositions>
-                                        ;   <composition composer="J. S. Bach">
-                                        ;     <name>The Art of the Fugue</name>
-                                        ;   </composition>
-                                        ;   <composition composer="J. S. Bach">
-                                        ;     <name>Musical Offering</name>
-                                        ;   </composition>
-                                        ;   <composition composer="W. A. Mozart">
-                                        ;     <name>Requiem</name>
-                                        ;   </composition>
-                                        ; </compositions>
-                                        ; A:
+;; Q083: 以下の./resources/compositions.xmlから、作曲家（composer）の名前だけを抜き出す関数（get-composer)を書け。
+;; <compositions>
+;;   <composition composer="J. S. Bach">
+;;     <name>The Art of the Fugue</name>
+;;   </composition>
+;;   <composition composer="J. S. Bach">
+;;     <name>Musical Offering</name>
+;;   </composition>
+;;   <composition composer="W. A. Mozart">
+;;     <name>Requiem</name>
+;;   </composition>
+;; </compositions>
+;; A:
 (use '[clojure.xml :as xml])
-(defn get-composer [xml-file-name]
-  (for [a (xml-seq (xml/parse xml-file-name)) :when (= :composition (:tag a))] (:composer (:attrs a))))
+(defn get-composer
+  [f]
+  (for [a (xml-seq (xml/parse f))
+        :when (= :composition (:tag a))]
+    (:composer (:attrs a))))
 
-                                        ; Q: マクロand、orをmy-and、my-orとして自作せよ。
-                                        ; A
-                                        ;(defmacro my-and
-                                        ;  ([] true)
-                                        ;  ([x] x)
-                                        ;  ([x & rest]
-                                        ;   `(let [and# ~x]
-                                        ;      (if and# (my-and ~@rest) and#))))
-                                        ;
-                                        ;(defmacro my-or
-                                        ;  ([] false)
-                                        ;  ([x] x)
-                                        ;  ([x & rest]
-                                        ;   `(let [or# ~x]
-                                        ;      (if or# or# (my-or ~@rest)))))
+;; Q083-2: マクロand、orをmy-and、my-orとして自作せよ。
+;; A
 (defmacro my-and
   ([] true)
-  ([x] x)
-  ([x & rest] `(if ~x (my-and ~@rest) false)))
+  ([p] p)
+  ([p & ps]
+   `(if (not ~p)
+      false
+      (my-and ~@ps))))
+
 (defmacro my-or
   ([] false)
-  ([x] x)
-  ([x & rest] `(if ~x true (my-or ~@rest))))
+  ([p] p)
+  ([p & ps]
+   `(if ~p
+      true
+      (my-or ~@ps))))
 
-;; Q083: 相互再帰を使って、my-odd?およびmy-even?を定義せよ。(*utのコメントアウト部分でStackOverflowエラー発生課題残*)
+;;(defmacro my-and
+;;  ([] true)
+;;  ([x] x)
+;;  ([x & rest]
+;;   `(let [and# ~x]
+;;      (if and# (my-and ~@rest) and#))))
+;;
+;;(defmacro my-or
+;;  ([] false)
+;;  ([x] x)
+;;  ([x & rest]
+;;   `(let [or# ~x]
+;;      (if or# or# (my-or ~@rest)))))
+
+
+;; Q083-3: 相互再帰を使って、my-odd?およびmy-even?を定義せよ。(*utのコメントアウト部分でStackOverflowエラー発生課題残*)
 ;; A
 (declare my-odd? my-even?)
 
-(defn my-odd? [n]
+(defn my-odd?
+  [n]
   (if (zero? n)
     false
     (my-even? (dec n))))
 
-(defn my-even? [n]
+(defn my-even?
+  [n]
   (if (zero? n)
     true
     (my-odd? (dec n))))
 
-                                        ; Q084: 任意のディレクトリのファイル、ディレクトリ名をシーケンスとして取得する関数list-filesを書け。
-                                        ; A
-(import 'java.io.File)
-(defn list-files [base-dir]
-  (map #(.getName %) (.listFiles (File. base-dir))))
 
-                                        ; Q: Clojureの..マクロを真似するchainマクロを書け。
-                                        ; ヒント: <TBD>引数の個数はマッチング出来る
-                                        ;
-                                        ; | マクロ呼び出し                     | 展開後                         |
-                                        ; | ----------------------------- | ----------------------------- |
-                                        ; | (chain arm getHand)           | (. arm getHand)               |
-                                        ; | (chain arm getHand getFinger) | (. (. arm getHand) getFinger) |
-                                        ;
-                                        ; (macroexpand '(chain arm getHand))
-                                        ; ;= (. arm getHand)
-                                        ; (macroexpand '(chain arm getHand getFinger))
-                                        ; ;= (. (. arm getHand) getFinger)
-                                        ; ; example
-                                        ; (chain " abc " trim length)
-                                        ; ;= 3
+;; Q084: 任意のディレクトリ以下のファイル、ディレクトリ名をシーケンスとして取得する関数list-filesを書け。
+;; A
+(defn list-files
+  [d]
+  (map #(.getName %) (.listFiles (java.io.File. d))))
+
+;; Q084-2: Clojureの..マクロを真似するchainマクロを書け。
+;;
+;; | マクロ呼び出し                     | 展開後                         |
+;; | ----------------------------- | ----------------------------- |
+;; | (chain arm getHand)           | (. arm getHand)               |
+;; | (chain arm getHand getFinger) | (. (. arm getHand) getFinger) |
+;;
+;; (macroexpand '(chain arm getHand))
+;; ;;= (. arm getHand)
+;; (macroexpand '(chain arm getHand getFinger))
+;; ;;= (. (. arm getHand) getFinger)
+;; ;; example
+;; (chain " abc " trim length)
+;; ;;= 3
 (defmacro chain
   ([x form] `(. ~x ~form))
   ([x form & more] `(chain (. ~x ~form) ~@more)))
-                                        ; my answer 2014/11/15
-                                        ; (defmacro chain [obj & methods]
-                                        ;   (case (count methods)
-                                        ;     0 nil
-                                        ;     1 `(. ~obj ~(first methods))
-                                        ;     `(chain (. ~obj ~(first methods)) ~@(rest methods))))
 
-                                        ; Q085: n番目のフィボナッチ数を返す、末尾再帰を用いたtail-fibo関数を書け。
-                                        ; A
-                                        ; user=> (tail-fibo 1000000)
-                                        ; StackOverflowError   java.math.BigInteger.add (:-1)
-                                        ; *末尾再帰で書いたにも関わらず、大きなnを与えるとやはり落ちてしまう。
-                                        ;  Haskellのような関数型言語は簡単にTCOを行えるのだが、JVMは関数型言語向けには設計されていないので、
-                                        ;  JVM上で直接走る言語で、自動的にTCOを行える言語は存在しない。TCOが無いことは残念なことではあるが、
-                                        ;  そのせいで関数型プログラミングが全くできなくなってしまうというわけではない。
-                                        ;  Clojureは以下のいくつかの現実的な代替方法を用意している。
-                                        ; - recurを使った明示的な自己再帰
-                                        ; - 遅延シーケンス
-                                        ; - trampolineを使った明示的な相互再帰
+;; Q085: n番目のフィボナッチ数を返す、末尾再帰を用いたtail-fibo関数を書け。
+;; A
+;; user=> (tail-fibo 1000000)
+;; StackOverflowError   java.math.BigInteger.add (:-1)
+;; *末尾再帰で書いたにも関わらず、大きなnを与えるとやはり落ちてしまう。
+;;  Haskellのような関数型言語は簡単にTCOを行えるのだが、JVMは関数型言語向けには設計されていないので、
+;;  JVM上で直接走る言語で、自動的にTCOを行える言語は存在しない。TCOが無いことは残念なことではあるが、
+;;  そのせいで関数型プログラミングが全くできなくなってしまうというわけではない。
+;;  Clojureは以下のいくつかの現実的な代替方法を用意している。
+;; - recurを使った明示的な自己再帰
+;; - 遅延シーケンス
+;; - trampolineを使った明示的な相互再帰
 (defn tail-fibo [n]
   (letfn [(tail-fibo- [n m l]
             (if (zero? l)
@@ -2320,3 +2337,12 @@
 (defn is-matched-partial? []
   (let [ss (read-string (slurp "./resources/item-keys.txt"))]
     (spit "./resources/compare-result.txt" (apply str (for [[n s1 s2] ss] (str n "\t" (if (empty? (clojure.set/intersection s1 s2)) "FALSE" "TRUE") "\n"))))))
+
+;; Q153: resources ディレクトリ配下の config.edn から都市名(city)を抽出する関数 configured-city を書け
+(defn configured-city
+  []
+  (-> (clojure.java.io/resource "config.edn")
+      slurp
+      load-string
+      :addr
+      :city))

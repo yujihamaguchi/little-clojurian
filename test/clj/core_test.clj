@@ -739,8 +739,10 @@
 ; )
 
 (deftest ut-clojure-loc
-  (is (= (clojure-loc (java.io.File. "/home/yuji/sources/personal/clojure-QA/resources/clojure-loc/")) 5))
-)
+  (is (= (clojure-loc (java.io.File. "/home/yuji/sources/personal/clojure-QA/resources/clojure-loc/")) 4))
+  (is (= (clojure-loc (java.io.File. "/home/yuji/sources/personal/clojure-QA/resources/clojure-loc/baz.clj")) 2))
+  (is (= (clojure-loc (java.io.File. "/home/yuji/sources/personal/clojure-QA/resources/clojure-loc/foo.txt")) 0))
+  )
 
 (deftest index-filter-test
   (is (= (set (index-filter #{\a \b} "abcdbbb")) #{0 1 4 5 6}))
@@ -1328,3 +1330,6 @@
   (is (= true (p116 1103)))
   (is (= 1103 (nth (filter p116 (range)) 15)))
 )
+
+(deftest configured-city-test
+  (is (= (configured-city) "Tokyo")))
