@@ -833,8 +833,9 @@
 
 (deftest fibo-test
   (is (= (take 10 (fibo)) '(0 1 1 2 3 5 8 13 21 34)))
-  ; (is (= (rem (nth (fibo) 1000000) 1000) 875N))
-)
+  ;; パスするが、テスト実行時間が長くなるので普段はコメントアウトしている
+  ;; (is (= (rem (nth (fibo) 1000000) 1000) 875N))
+  )
 
 (deftest stack-consuming-fibo-test
   (is (= (stack-consuming-fibo 0) 0))
@@ -844,6 +845,7 @@
   (is (= (stack-consuming-fibo 4) 3))
   (is (= (stack-consuming-fibo 5) 5))
   (is (= (stack-consuming-fibo 6) 8))
+  (is (thrown? java.lang.StackOverflowError (stack-consuming-fibo 1000000N)))
 )
 
 (deftest blank?-test
@@ -1331,5 +1333,5 @@
   (is (= 1103 (nth (filter p116 (range)) 15)))
 )
 
-(deftest configured-city-test
+#_(deftest configured-city-test
   (is (= (configured-city) "Tokyo")))

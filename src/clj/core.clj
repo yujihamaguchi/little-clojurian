@@ -1,4 +1,5 @@
-(ns clj.core)
+(ns clj.core
+  (:require [clojure.core.match :refer [match]]))
 
 (def table [8.2 1.5 2.8 4.3 12.7 2.2 2.0 6.1 7.0 0.2 0.8 4.0 2.4 6.7 7.5 1.9 0.1 6.0 6.3 9.1 2.8 1.0 2.4 0.2 2.0 0.1])
 
@@ -931,7 +932,7 @@
 ;; ;;= 16606
 ;; (clojure-loc (java.io.File. "C:/Dropbox/_training/clojure-master/src/clj/clojure/core.clj"))
 ;; ;;= 6149
-;; 
+;;
 ;; [参考] https://coderwall.com/p/f1a9xa
 ;; WHAT IS SLURP?
 ;;   slurp is technically a fully realized result of a clojure.java.io/reader.
@@ -1080,293 +1081,333 @@
 ;; - recurを使った明示的な自己再帰
 ;; - 遅延シーケンス
 ;; - trampolineを使った明示的な相互再帰
-(defn tail-fibo [n]
-  (letfn [(tail-fibo- [n m l]
-            (if (zero? l)
+(defn tail-fibo
+  [i]
+  (letfn [(tail-fibo-
+            [i n m]
+            (if (zero? i)
               n
-              (recur m (+' n m) (dec l))))]
-    (tail-fibo- 0 1 n)))
+              (recur (dec i) m (+ n m))))]
+    (tail-fibo- i 0 1)))
 
-                                        ; Q086: *out*を一時的に新たなStringWriterに束縛し、exprsを評価して、評価中に*out*へ出力されたものを文字列にして返すwith-out-strマクロを自作せよ。(my-with-out-str)
-                                        ; (my-with-out-str (print "hello, ") (print "world"))
-                                        ; ;= "hello, world"
-                                        ; refer: [Let vs. Binding in Clojure](http://stackoverflow.com/questions/1523240/let-vs-binding-in-clojure)
-                                        ; A
-                                        ;(defmacro my-with-out-str [& exprs]
-                                        ;  `(binding [*out* (java.io.StringWriter.)]
-                                        ;     (do ~@exprs)
-                                        ;     (str *out*)))
-(defmacro my-with-out-str [& exprs]
+;; Q086: *out*を一時的に新たなStringWriterに束縛し、exprsを評価して、評価中に*out*へ出力されたものを文字列にして返すwith-out-strマクロを自作せよ。(my-with-out-str)
+;; (my-with-out-str (print "hello, ") (print "world"))
+;; ;;= "hello, world"
+;; refer: [Let vs. Binding in Clojure](http://stackoverflow.com/questions/1523240/let-vs-binding-in-clojure)
+(defmacro my-with-out-str
+  [& exprs]
   `(binding [*out* (java.io.StringWriter.)]
-     (do ~@exprs)
-     (str *out*)))
+    (do ~@exprs)
+    (str *out*)))
 
-                                        ; Q087: 任意のファイルの空行を除いた行数を表示する関数count-not-empty-lineを書け。
-                                        ; A
-(use '[clojure.java.io :only [reader]])
-(defn count-not-empty-line [f]
-  (with-open [rdr (reader f)]
-    (count (filter #(re-find #"\w" %) (line-seq rdr)))))
+;; Q087: 任意のファイルの空行を除いた行数を表示する関数count-not-empty-lineを書け。
+;; ex) (= (count-not-empty-line (java.io.File. "./resources/ut-count-not-empty-line/01.txt")) 3)
+;; A
+(defn count-not-empty-line
+  [f]
+  (with-open [r (clojure.java.io/reader f)]
+    (->> (line-seq r)
+         (filter #(not (clojure.string/blank? %)))
+         count)))
 
-                                        ; Q088: 以下の動作をする関数count-runsをpartitionを用いて書け。（先立って、filterしてcountするcount-if関数を書け。また、関数合成と部分適用も使用せよ。）
-                                        ; (count-runs 2 #(= :h %) [:h :t :t :h :h :h])
-                                        ; ;= 2
-                                        ; (count-runs 2 #(= :t %) [:h :t :t :h :h :h])
-                                        ; ;= 1
-                                        ; (count-runs 3 #(= :h %) [:h :t :t :h :h :h])
-                                        ; ;= 1
+;; Q088: 以下の動作をする関数count-runsをpartitionを用いて書け。
+;;       （先立って、filterしてcountするcount-if関数を書け。また、関数合成と部分適用も使用せよ。）
+;; (count-runs 2 #(= :h %) [:h :t :t :h :h :h])
+;; ;;= 2
+;; (count-runs 2 #(= :t %) [:h :t :t :h :h :h])
+;; ;;= 1
+;; (count-runs 3 #(= :h %) [:h :t :t :h :h :h])
+;; ;;= 1
 (def count-if (comp count filter))
-(defn count-runs [n p coll]
-  (count-if #(every? p %) (partition n 1 coll)))
+(defn count-runs
+  [n p coll]
+  (count-if (partial every? p) (partition n 1 coll)))
 
-                                        ; Q089: シーケンスライブラリの関数であるiterateを用いてフィボナッチ数列を生成する関数fiboを書け。
-                                        ; この関数は以下のように大きな値に対しても動作する。
-                                        ; (take 10 (fibo))
-                                        ; ;= (0 1 1 2 3 5 8 13 21 34)
-                                        ; (rem (nth (fibo) 1000000) 1000)
-                                        ; ;= 875N
-                                        ; A
-(defn fibo []
+;; Q089: シーケンスライブラリの関数であるiterateを用いてフィボナッチ数列を生成する関数fiboを書け。
+;; この関数は以下のように大きな値に対しても動作する。
+;; (take 10 (fibo))
+;; ;;= (0 1 1 2 3 5 8 13 21 34)
+;; (rem (nth (fibo) 1000000) 1000)
+;; ;;= 875N
+;; A
+(defn fibo
+  []
   (map first (iterate (fn [[n m]] [m (+' n m)]) [0 1])))
 
-                                        ; Q090: n番目のフィボナッチ数を返す、単純な再帰を使ったstack-consuming-fibo関数を書け。
-                                        ; (stack-consuming-fibo 9)
-                                        ; ;= 34
-                                        ; (stack-consuming-fibo 1000000N)
-                                        ; ;= StackOverflowError   clojure.lang.Numbers.toBigInt (Numbers.java:249)
-                                        ; *再帰のせいで、n>1に対するstack-consuming-fibo1回の呼び出しはさらにstack-consuming-fibo2回の呼び出しを引き起こす。
-                                        ; JVMレベルではこれらの呼び出しはJavaのメソッド呼び出しになり、各呼び出しごとにスタックフレームというデータ構造がアロケートされる。
-                                        ; stack-consuming-fiboはnに比例したスタックフレームを作り、いずれJVMスタックを使い尽くして先の例で見られたStackOverflowErrorを引き起こす。
-                                        ; Clojureの関数呼び出しは常にスタックフレームを作りスタック領域を使うのでスタック消費型と呼ばれる。
-                                        ; Clojureでは、stack-consuming-fiboがやっているようなスタックを消費する再帰はほぼ常に避けるべきだ。
-                                        ; A
-(defn stack-consuming-fibo [n]
+;; Q090: n番目のフィボナッチ数を返す、単純な再帰を使ったstack-consuming-fibo関数を書け。
+;; (stack-consuming-fibo 9)
+;; ;;= 34
+;; (stack-consuming-fibo 1000000N)
+;; ;;= StackOverflowError   clojure.lang.Numbers.toBigInt (Numbers.java:249)
+;; *再帰のせいで、 n>1 に対する stack-consuming-fibo 1回の呼び出しはさらに stack-consuming-fibo 2回の呼び出しを引き起こす。
+;; JVMレベルではこれらの呼び出しはJavaのメソッド呼び出しになり、各呼び出しごとにスタックフレームというデータ構造がアロケートされる。
+;; stack-consuming-fibo は n に比例したスタックフレームを作り、いずれJVMスタックを使い尽くして先の例で見られた StackOverflowError を引き起こす。
+;; Clojure の関数呼び出しは常にスタックフレームを作りスタック領域を使うのでスタック消費型と呼ばれる。
+;; Clojure では、 stack-consuming-fibo がやっているようなスタックを消費する再帰はほぼ常に避けるべきだ。
+;; A
+(defn stack-consuming-fibo
+  [n]
   (case n
     0 0
     1 1
     (+ (stack-consuming-fibo (- n 1))
        (stack-consuming-fibo (- n 2)))))
 
-                                        ; Q091: 文字列がブランクかどうか調べるblank?関数を書け。
+;; Q091: 文字列が空白文字だけで構成されているか否か調べるblank?関数を書け。
 (defn blank? [cs]
   (every? #(Character/isWhitespace %) cs))
+;; my answer 2019-01-31
+#_(defn blank?
+  [cs]
+  (empty? (re-seq #"\w" cs)))
 
-                                        ; Q092: timeマクロの変種で、何回もの実行結果を後で集めやすいようにしたbenchというマクロを書け。
-                                        ; ; (bench (str "a" "b"))
-                                        ; {:result "ab", :elapsed 53026}
-                                        ; ; は次のとおり展開される
-                                        ; (let [start (System/nanoTime)
-                                        ;       result (str "a" "b")]
-                                        ;   {:result result :elapsed (- (System/nanoTime) start)})
-(defmacro bench [expr]
+;; Q092: timeマクロの変種で、何回もの実行結果を後で集めやすいようにしたbenchというマクロを書け。
+;; ;; (bench (str "a" "b"))
+;; {:result "ab", :elapsed 53026}
+;; ;; は次のとおり展開される
+;; (let [start (System/nanoTime)
+;;       result (str "a" "b")]
+;;   {:result result :elapsed (- (System/nanoTime) start)})
+(defmacro bench
+  [expr]
   `(let [start# (System/nanoTime)
          result# ~expr]
-     {:result result# :elapsed (- (System/nanoTime) start#)}))
+     {:result result#, :elapsed (- (System/nanoTime) start#)}))
 
-                                        ; Q093: Write a function which returns the total number of elements in a sequence.(p22)
-                                        ; Special Restrictions
-                                        ; count
-                                        ; (= (__ '(1 2 3 3 1)) 5)
-                                        ; (= (__ "Hello World") 11)
-                                        ; (= (__ [[1 2] [3 4] [5 6]]) 3)
-                                        ; (= (__ '(13)) 1)
-                                        ; (= (__ '(:a :b :c)) 3)
-(defn p22 [coll]
-  (reduce (fn [x _] (inc x)) 0 coll))
+;; Q093: Write a function whose name is p22 which returns the total number of elements in a sequence.(p22)
+;; Special Restrictions
+;; don't use count function and use reduce function.
+;; (= (__ '(1 2 3 3 1)) 5)
+;; (= (__ "Hello World") 11)
+;; (= (__ [[1 2] [3 4] [5 6]]) 3)
+;; (= (__ '(13)) 1)
+;; (= (__ '(:a :b :c)) 3)
+(defn p22
+  [coll]
+  (reduce (fn [acc _] (inc acc)) 0 coll))
 
-                                        ; Q094: Write a function which reverses a sequence.(p23)
-                                        ; Special Restrictions
-                                        ; reverse
-                                        ; rseq
-                                        ; (= (__ [1 2 3 4 5]) [5 4 3 2 1])
-                                        ; (= (__ (sorted-set 5 7 2 7)) '(7 5 2))
-                                        ; (= (__ [[1 2][3 4][5 6]]) [[5 6][3 4][1 2]])
-                                        ; my answer 20161106
-                                        ;(defn p23 [xs]
-                                        ;  (if (not (seq xs))
-                                        ;    []
-                                        ;    (conj (p23 (vec (rest xs))) (first xs))))
-(defn p23 [coll]
+;; Q094: Write a function which reverses a sequence.(p23)
+;; Special Restrictions
+;; 1. Don't use these function below.
+;;    - reverse
+;;    - rseq
+;; 2. Use reduce function.
+;; (= (__ [1 2 3 4 5]) [5 4 3 2 1])
+;; (= (__ (sorted-set 5 7 2 7)) '(7 5 2))
+;; (= (__ [[1 2][3 4][5 6]]) [[5 6][3 4][1 2]])
+(defn p23
+  [coll]
   (reduce conj '() coll))
 
-                                        ; Q095: Write a function which returns the first X fibonacci numbers.(p26)
-                                        ; (= (__ 3) '(1 1 2))
-                                        ; (= (__ 6) '(1 1 2 3 5 8))
-                                        ; (= (__ 8) '(1 1 2 3 5 8 13 21))
-                                        ; A:
-(defn p26 [n]
+;; Q095: Write a function which returns the first X fibonacci numbers.(p26)
+;;       Use: iterate -> map first -> take
+;; (= (__ 3) '(1 1 2))
+;; (= (__ 6) '(1 1 2 3 5 8))
+;; (= (__ 8) '(1 1 2 3 5 8 13 21))
+;; A:
+(defn p26
+  [n]
   (take n (map first (iterate (fn [[n m]] [m (+ n m)]) [1 1]))))
 
-                                        ; Q096: Write a function which returns true if the given sequence is a palindrome.(p27)
-                                        ; Hint: "racecar" does not equal '(\r \a \c \e \c \a \r)
-                                        ; (false? (__ '(1 2 3 4 5)))
-                                        ; (true? (__ "racecar"))
-                                        ; (true? (__ [:foo :bar :foo]))
-                                        ; (true? (__ '(1 1 3 3 1 1)))
-                                        ; (false? (__ '(:a :b :c)))
+;; Q096: Write a function which returns true if the given sequence is a palindrome.(p27)
+;; Hint: "racecar" does not equal '(\r \a \c \e \c \a \r)
+;; (false? (__ '(1 2 3 4 5)))
+;; (true? (__ "racecar"))
+;; (true? (__ [:foo :bar :foo]))
+;; (true? (__ '(1 1 3 3 1 1)))
+;; (false? (__ '(:a :b :c)))
 (defn p27 [coll]
   (= (seq coll) (reverse coll)))
 
-                                        ; Q097: Write a function which flattens a sequence.(p28)
-                                        ; Special Restrictions
-                                        ; flatten
-                                        ; (= (__ '((1 2) 3 [4 [5 6]])) '(1 2 3 4 5 6))
-                                        ; (= (__ ["a" ["b"] "c"]) '("a" "b" "c"))
-                                        ; (= (__ '((((:a))))) '(:a))
-                                        ; A:
-(defn p28 [coll]
-  (when (seq coll)
-    (let [x (first coll)
-          coll' (rest coll)]
+;; Q097: Write a function which flattens a sequence.(p28)
+;; Special Restrictions
+;; flatten
+;; (= (__ '((1 2) 3 [4 [5 6]])) '(1 2 3 4 5 6))
+;; (= (__ ["a" ["b"] "c"]) '("a" "b" "c"))
+;; (= (__ '((((:a))))) '(:a))
+;; A:
+(defn p28
+  [xs]
+  (when (seq xs)
+    (let [x (first xs)
+          xs' (rest xs)]
       (if (coll? x)
-        (concat (p28 x) (p28 coll'))
-        (cons x (p28 coll'))))))
+        (concat (p28 x) (p28 xs'))
+        (cons x (p28 xs'))))))
 
-                                        ; Q098: Write a function which removes consecutive duplicates from a sequence.(p30)
-                                        ; (= (apply str (__ "Leeeeeerrroyyy")) "Leroy")
-                                        ; (= (__ [1 1 2 3 3 2 2 3]) '(1 2 3 2 3))
-                                        ; (= (__ [[1 2] [1 2] [3 4] [1 2]]) '([1 2] [3 4] [1 2]))
-                                        ; A:
-(defn p30 [coll]
-  (reduce (fn [acc x] (if (= (last acc) x) acc (conj acc x))) [] coll))
+;; Q098: Write a function which removes consecutive duplicates from a sequence.(p30)
+;;       一つは再帰、一つは reduce を用いて解いてみること
+;; (= (apply str (__ "Leeeeeerrroyyy")) "Leroy")
+;; (= (__ [1 1 2 3 3 2 2 3]) '(1 2 3 2 3))
+;; (= (__ [[1 2] [1 2] [3 4] [1 2]]) '([1 2] [3 4] [1 2]))
+;; A:
+(defn p30
+  [xs]
+  (when (seq xs)
+    (let [x (first xs)
+          xs' (rest xs)]
+      (cons x (p30 (drop-while #(= x %) xs'))))))
 
-                                        ; Q099: Write a function which packs consecutive duplicates into sub-lists.(p31)
-                                        ; (= (__ [1 1 2 1 1 1 3 3]) '((1 1) (2) (1 1 1) (3 3)))
-                                        ; (= (__ [:a :a :b :b :c]) '((:a :a) (:b :b) (:c)))
-                                        ; (= (__ [[1 2] [1 2] [3 4]]) '(([1 2] [1 2]) ([3 4])))
-                                        ; A:
-                                        ;(defn p31 [coll]
-                                        ;  (partition-by identity coll))
+#_(defn p30
+  [coll]
+  (reduce
+   (fn [acc x]
+     (if (= (last acc) x)
+       acc
+       (conj acc x)))
+   [] coll))
+
+;; Q099: Write a function which packs consecutive duplicates into sub-lists.(p31)
+;;       一つは再帰、一つはパーティション関数を使って
+;; (= (__ [1 1 2 1 1 1 3 3]) '((1 1) (2) (1 1 1) (3 3)))
+;; (= (__ [:a :a :b :b :c]) '((:a :a) (:b :b) (:c)))
+;; (= (__ [[1 2] [1 2] [3 4]]) '(([1 2] [1 2]) ([3 4])))
+;; A:
 (defn p31 [coll]
   (when (seq coll)
     (let [x (first coll)]
       (cons (take-while #(= x %) coll) (p31 (drop-while #(= x %) coll))))))
+#_(defn p31 [coll]
+ (partition-by identity coll))
 
-                                        ; Q100: Write a function which duplicates each element of a sequence.(p32)
-                                        ; (= (__ [1 2 3]) '(1 1 2 2 3 3))
-                                        ; (= (__ [:a :a :b :b]) '(:a :a :a :a :b :b :b :b))
-                                        ; (= (__ [[1 2] [3 4]]) '([1 2] [1 2] [3 4] [3 4]))
-                                        ; (= (__ [[1 2] [3 4]]) '([1 2] [1 2] [3 4] [3 4]))
-(defn p32 [coll]
+;; Q100: Write a function which duplicates each element of a sequence.(p32)
+;;       一つは再帰、一つは mapcat 関数を使って
+;; (= (__ [1 2 3]) '(1 1 2 2 3 3))
+;; (= (__ [:a :a :b :b]) '(:a :a :a :a :b :b :b :b))
+;; (= (__ [[1 2] [3 4]]) '([1 2] [1 2] [3 4] [3 4]))
+;; (= (__ [[1 2] [3 4]]) '([1 2] [1 2] [3 4] [3 4]))
+(defn p32
+  [xs]
+  (when (seq xs)
+    (let [x (first xs)]
+      (concat [x x] (p32 (rest xs))))))
+
+#_(defn p32 [coll]
   (mapcat #(list % %) coll))
 
-                                        ; Q101: Write a function which replicates each element of a sequence a variable number of times.(p33)
-                                        ; (= (__ [1 2 3] 2) '(1 1 2 2 3 3))
-                                        ; (= (__ [:a :b] 4) '(:a :a :a :a :b :b :b :b))
-                                        ; (= (__ [4 5 6] 1) '(4 5 6))
-                                        ; (= (__ [[1 2] [3 4]] 2) '([1 2] [1 2] [3 4] [3 4]))
-                                        ; (= (__ [44 33] 2) [44 44 33 33])
-(defn p33 [coll n]
-  (mapcat #(replicate n %) coll))
+;; Q101: Write a function which replicates each element of a sequence a variable number of times.(p33)
+;; (= (__ [1 2 3] 2) '(1 1 2 2 3 3))
+;; (= (__ [:a :b] 4) '(:a :a :a :a :b :b :b :b))
+;; (= (__ [4 5 6] 1) '(4 5 6))
+;; (= (__ [[1 2] [3 4]] 2) '([1 2] [1 2] [3 4] [3 4]))
+;; (= (__ [44 33] 2) [44 44 33 33])
+(defn p33
+  [coll n]
+  (mapcat #(repeat n %) coll))
 
-                                        ; Q102: Write a function which creates a list of all integers in a given range.(p34)
-                                        ; Special Restrictions
-                                        ; range
-                                        ; (= (__ 1 4) '(1 2 3))
-                                        ; (= (__ -2 2) '(-2 -1 0 1))
-                                        ; (= (__ 5 8) '(5 6 7))
+;; Q102: Write a function which creates a list of all integers in a given range.(p34)
+;; Special Restrictions
+;; range
+;; (= (__ 1 4) '(1 2 3))
+;; (= (__ -2 2) '(-2 -1 0 1))
+;; (= (__ 5 8) '(5 6 7))
 (defn p34 [n m]
   (when (< n m)
     (cons n (p34 (inc n) m))))
 
-                                        ; Q103: Write a function which takes a variable number of parameters and returns the maximum value.(p38)
-                                        ; (= (__ 1 8 3 4) 8)
-                                        ; (= (__ 30 20) 30)
-                                        ; (= (__ 45 67 11) 67)
+;; Q103: Write a function which takes a variable number of parameters and returns the maximum value.(p38)
+;; (= (__ 1 8 3 4) 8)
+;; (= (__ 30 20) 30)
+;; (= (__ 45 67 11) 67)
 (defn p38 [& coll]
   (reduce (fn [n m] (if (< n m) m n)) coll))
 
-                                        ; Q104: Write a function which takes two sequences and returns the first item from each, then the second item from each, then the third, etc.(p39)
-                                        ; Special Restrictions
-                                        ; interleave
-                                        ; (= (__ [1 2 3] [:a :b :c]) '(1 :a 2 :b 3 :c))
-                                        ; (= (__ [1 2] [3 4 5 6]) '(1 3 2 4))
-                                        ; (= (__ [1 2 3 4] [5]) [1 5])
-                                        ; (= (__ [30 20] [25 15]) [30 25 20 15])
-(defn p39 [xs ys]
+;; Q104: Write a function which takes two sequences and returns the first item from each, then the second item from each, then the third, etc.(p39)
+;;       一つは再帰、一つは mapcat を使って
+;; Special Restrictions
+;; interleave
+;; (= (__ [1 2 3] [:a :b :c]) '(1 :a 2 :b 3 :c))
+;; (= (__ [1 2] [3 4 5 6]) '(1 3 2 4))
+;; (= (__ [1 2 3 4] [5]) [1 5])
+;; (= (__ [30 20] [25 15]) [30 25 20 15])
+(defn p39
+  [xs ys]
+  (when (and (seq xs) (seq ys))
+    (concat [(first xs) (first ys)]
+            (p39 (rest xs) (rest ys)))))
+
+#_(defn p39 [xs ys]
   (mapcat list xs ys))
 
-                                        ; Q105: Write a function which separates the items of a sequence by an arbitrary value.(p40)
-                                        ; Special Restrictions
-                                        ; interpose
-                                        ; (= (__ 0 [1 2 3]) [1 0 2 0 3])
-                                        ; (= (apply str (__ ", " ["one" "two" "three"])) "one, two, three")
-                                        ; (= (__ :z [:a :b :c :d]) [:a :z :b :z :c :z :d])
-(defn p40 [x coll]
-  (if-not (seq (rest coll))
-    [(first coll)]
-    (cons (first coll) (cons x (p40 x (rest coll))))))
-                                        ; or
-                                        ; (defn p40 [x coll]
-                                        ;   (rest (interleave (repeat x) coll)))
-                                        ; or
-                                        ; (defn p40 [x coll]
-                                        ;   (drop-last (reduce #(concat % [%2 x]) [] coll)))
+;; Q105: Write a function which separates the items of a sequence by an arbitrary value.(p40)
+;;       一つは再帰、一つは mapcat を使う
+;; Special Restrictions
+;; interpose
+;; (= (__ 0 [1 2 3]) [1 0 2 0 3])
+;; (= (apply str (__ ", " ["one" "two" "three"])) "one, two, three")
+;; (= (__ :z [:a :b :c :d]) [:a :z :b :z :c :z :d])
+(defn p40
+  [c xs]
+    (rest (mapcat #(list c %) xs)))
 
-                                        ; Q106: Write a function which drops every Nth item from a sequence.(p41)
-                                        ; (= (__ [1 2 3 4 5 6 7 8] 3) [1 2 4 5 7 8])
-                                        ; (= (__ [:a :b :c :d :e :f] 2) [:a :c :e])
-                                        ; (= (__ [1 2 3 4 5 6] 4) [1 2 3 5 6])
+#_(defn p40
+  [c coll]
+  (if-not (seq (rest coll))
+    coll
+    (cons (first coll) (cons c (p40 c (rest coll))))))
+
+;; Q106: Write a function which drops every Nth item from a sequence.(p41)
+;; (= (__ [1 2 3 4 5 6 7 8] 3) [1 2 4 5 7 8])
+;; (= (__ [:a :b :c :d :e :f] 2) [:a :c :e])
+;; (= (__ [1 2 3 4 5 6] 4) [1 2 3 5 6])
 (defn p41 [coll n]
   (when (seq coll)
     (concat (take (dec n) coll) (p41 (drop n coll) n))))
 
-                                        ; Q107: Write a function which calculates factorials.(p42)
-                                        ; (= (__ 1) 1)
-                                        ; (= (__ 3) 6)
-                                        ; (= (__ 5) 120)
-                                        ; (= (__ 8) 40320)
-(defn p42 [n]
+;; Q107: Write a function which calculates factorials.(p42)
+;; (= (__ 1) 1)
+;; (= (__ 3) 6)
+;; (= (__ 5) 120)
+;; (= (__ 8) 40320)
+(defn p42
+  [n]
   (if (= n 1)
     1
     (* n (p42 (dec n)))))
 
-                                        ; Q108: Write a function which reverses the interleave process into x number of subsequences.(p43)
-                                        ; (= (__ [1 2 3 4 5 6] 2) '((1 3 5) (2 4 6)))
-                                        ; (= (__ (range 9) 3) '((0 3 6) (1 4 7) (2 5 8)))
-                                        ; (= (__ (range 10) 5) '((0 5) (1 6) (2 7) (3 8) (4 9)))
-                                        ;(defn p43 [coll n]
-                                        ;  (apply (partial map list) (partition n coll)))
-(defn p43 [xs n]
-  (apply (partial map list) (partition n xs)))
+;; Q108: Write a function which reverses the interleave process into x number of subsequences.(p43)
+;; (= (__ [1 2 3 4 5 6] 2) '((1 3 5) (2 4 6)))
+;; (= (__ (range 9) 3) '((0 3 6) (1 4 7) (2 5 8)))
+;; (= (__ (range 10) 5) '((0 5) (1 6) (2 7) (3 8) (4 9)))
+(defn p43
+  [xs n]
+  (apply map list (partition n xs)))
 
-
-                                        ; Q109: Write a function which can rotate a sequence in either direction.(p44)
-                                        ; (= (__ 2 [1 2 3 4 5]) '(3 4 5 1 2))
-                                        ; (= (__ -2 [1 2 3 4 5]) '(4 5 1 2 3))
-                                        ; (= (__ 6 [1 2 3 4 5]) '(2 3 4 5 1))
-                                        ; (= (__ 1 '(:a :b :c)) '(:b :c :a))
-                                        ; (= (__ -4 '(:a :b :c)) '(:c :a :b))
+;; Q109: Write a function which can rotate a sequence in either direction.(p44)
+;; (= (__ 2 [1 2 3 4 5]) '(3 4 5 1 2))
+;; (= (__ -2 [1 2 3 4 5]) '(4 5 1 2 3))
+;; (= (__ 6 [1 2 3 4 5]) '(2 3 4 5 1))
+;; (= (__ 1 '(:a :b :c)) '(:b :c :a))
+;; (= (__ -4 '(:a :b :c)) '(:c :a :b))
 (defn p44 [n coll]
   (let [n' (mod n (count coll))]
     (concat (drop n' coll) (take n' coll))))
+;; my naive answer
+;; (defn p44 [n coll]
+;;   (cond
+;;     (= n 0) coll
+;;     (< n 0) (p44 (inc n) (cons (last coll) (drop-last coll)))
+;;     :else   (p44 (dec n) (conj (vec (rest coll)) (first coll)))))
 
-                                        ; my naive answer
-                                        ; (defn p44 [n coll]
-                                        ;   (cond
-                                        ;     (= n 0) coll
-                                        ;     (< n 0) (p44 (inc n) (cons (last coll) (drop-last coll)))
-                                        ;     :else   (p44 (dec n) (conj (vec (rest coll)) (first coll)))))
-
-                                        ; Q110: Write a function which takes a sequence consisting of items with different types
-                                        ;    and splits them up into a set of homogeneous sub-sequences.
-                                        ;    The internal order of each sub-sequence should be maintained,
-                                        ;    but the sub-sequences themselves can be returned in any order
-                                        ;    (this is why 'set' is used in the test cases).(p50)
-                                        ; (= (set (__ [1 :a 2 :b 3 :c])) #{[1 2 3] [:a :b :c]})
-                                        ; (= (set (__ [:a "foo"  "bar" :b])) #{[:a :b] ["foo" "bar"]})
-                                        ; (= (set (__ [[1 2] :a [3 4] 5 6 :b])) #{[[1 2] [3 4]] [:a :b] [5 6]})
+;; Q110: Write a function which takes a sequence consisting of items with different types
+;;       and splits them up into a set of homogeneous sub-sequences.
+;;       The internal order of each sub-sequence should be maintained,
+;;       but the sub-sequences themselves can be returned in any order
+;;       (this is why 'set' is used in the test cases).(p50)
+;; (= (set (__ [1 :a 2 :b 3 :c])) #{[1 2 3] [:a :b :c]})
+;; (= (set (__ [:a "foo"  "bar" :b])) #{[:a :b] ["foo" "bar"]})
+;; (= (set (__ [[1 2] :a [3 4] 5 6 :b])) #{[[1 2] [3 4]] [:a :b] [5 6]})
 (defn p50 [coll]
   (vals (group-by type coll)))
 
-                                        ; Q111: Given a vector of integers, find the longest consecutive sub-sequence of increasing numbers.(p53)
-                                        ;    If two sub-sequences have the same length, use the one that occurs first.
-                                        ;    An increasing sub-sequence must have a length of 2 or greater to qualify.
-                                        ; (= (__ [1 0 1 2 3 0 4 5]) [0 1 2 3])
-                                        ; (= (__ [5 6 1 3 2 7]) [5 6])
-                                        ; (= (__ [2 3 3 4 5]) [3 4 5])
-                                        ; (= (__ [7 6 5 4]) [])
-                                        ; Rewrite using funcitons "continuous?" and "take-while".
+;; Q111: Given a vector of integers, find the longest consecutive sub-sequence of increasing numbers.(p53)
+;;       If two sub-sequences have the same length, use the one that occurs first.
+;;       An increasing sub-sequence must have a length of 2 or greater to qualify.
+;; (= (__ [1 0 1 2 3 0 4 5]) [0 1 2 3])
+;; (= (__ [5 6 1 3 2 7]) [5 6])
+;; (= (__ [2 3 3 4 5]) [3 4 5])
+;; (= (__ [7 6 5 4]) [])
+;; Rewrite using funcitons "continuous?" and "take-while".
 (defn p53 [coll]
   (letfn [(continuous? [[n m]] (= (inc n) m))]
     (loop [coll coll result []]
@@ -1375,99 +1416,111 @@
         (let [ps (partition 2 1 coll)
               result' (vec (set (apply concat (take-while continuous? ps))))]
           (recur (rest coll) (if (< (count result) (count result')) result' result)))))))
-                                        ; my answer 2016/12/24
-                                        ;(defn p53 [xs]
-                                        ;  (letfn [(continuous? [[n m]] (= (inc n) m))
-                                        ;          (concat-linked-pairs [ps]
-                                        ;            (if-not (seq (next ps))
-                                        ;              (first ps)
-                                        ;              (cons (first (first ps)) (concat-linked-pairs (rest ps)))))
-                                        ;          (p53' [xs]
-                                        ;            (if-not (seq xs)
-                                        ;              []
-                                        ;              (let [ps' (partition 2 1 xs)
-                                        ;                    ps'' (drop-while (complement continuous?) ps')]
-                                        ;                (letfn [(continuous? [[n m]] (= (inc n) m))]
-                                        ;                  (cons (concat-linked-pairs (take-while continuous? ps'')) (p53' (concat-linked-pairs (drop-while continuous? ps''))))))))]
-                                        ;    (reduce (fn [xs ys] (if (>= (count xs) (count ys)) xs ys)) '() (p53' xs))))
+;; my answer 2016/12/24
+;;(defn p53 [xs]
+;;  (letfn [(continuous? [[n m]] (= (inc n) m))
+;;          (concat-linked-pairs [ps]
+;;            (if-not (seq (next ps))
+;;              (first ps)
+;;              (cons (first (first ps)) (concat-linked-pairs (rest ps)))))
+;;          (p53' [xs]
+;;            (if-not (seq xs)
+;;              []
+;;              (let [ps' (partition 2 1 xs)
+;;                    ps'' (drop-while (complement continuous?) ps')]
+;;                (letfn [(continuous? [[n m]] (= (inc n) m))]
+;;                  (cons (concat-linked-pairs (take-while continuous? ps'')) (p53' (concat-linked-pairs (drop-while continuous? ps''))))))))]
+;;    (reduce (fn [xs ys] (if (>= (count xs) (count ys)) xs ys)) '() (p53' xs))))
 
-                                        ; Q112: Write a function which returns a sequence of lists of x items each. Lists of less than x items should not be returned.(p54)
-                                        ; Special Restrictions
-                                        ; partition
-                                        ; partition-all
-                                        ; (= (__ 3 (range 9)) '((0 1 2) (3 4 5) (6 7 8)))
-                                        ; (= (__ 2 (range 8)) '((0 1) (2 3) (4 5) (6 7)))
-                                        ; (= (__ 3 (range 8)) '((0 1 2) (3 4 5)))
+;; Q112: Write a function which returns a sequence of lists of x items each. Lists of less than x items should not be returned.(p54)
+;; Special Restrictions
+;; partition
+;; partition-all
+;; (= (__ 3 (range 9)) '((0 1 2) (3 4 5) (6 7 8)))
+;; (= (__ 2 (range 8)) '((0 1) (2 3) (4 5) (6 7)))
+;; (= (__ 3 (range 8)) '((0 1 2) (3 4 5)))
 (defn p54 [n coll]
   (if (< (count coll) n)
     []
     (cons (take n coll) (p54 n (drop n coll)))))
 
-                                        ; Q113: Write a function which returns a map containing the number of occurences of each distinct item in a sequence.(p55)
-                                        ; Special Restrictions
-                                        ; frequencies
-                                        ; (= (__ [1 1 2 3 2 1 1]) {1 4, 2 2, 3 1})
-                                        ; (= (__ [:b :a :b :a :b]) {:a 2, :b 3})
-                                        ; (= (__ '([1 2] [1 3] [1 3])) {[1 2] 1, [1 3] 2})
-(defn p55 [coll]
+;; Q113: Write a function which returns a map containing the number of occurences of each distinct item in a sequence.(p55)
+;; Special Restrictions
+;; frequencies
+;; (= (__ [1 1 2 3 2 1 1]) {1 4, 2 2, 3 1})
+;; (= (__ [:b :a :b :a :b]) {:a 2, :b 3})
+;; (= (__ '([1 2] [1 3] [1 3])) {[1 2] 1, [1 3] 2})
+;; my answer 2019/05/02
+(defn p55
+  [xs]
+  (reduce (fn [acc [k vs]] (assoc acc k (count vs)))
+          {}
+          (group-by identity xs)))
+#_(defn p55 [coll]
   (let [coll' (group-by identity coll)]
     (zipmap (keys coll') (map count (vals coll')))))
-                                        ; my naive solution 2014/12/26
-                                        ; (defn p55 [coll]
-                                        ;   (let [coll' (group-by identity coll)
-                                        ;         ks (keys coll')]
-                                        ;     (reduce merge (map (fn [n] (hash-map n (count (coll' n)))) ks))))
+;; my naive solution 2014/12/26
+;; (defn p55 [coll]
+;;   (let [coll' (group-by identity coll)
+;;         ks (keys coll')]
+;;     (reduce merge (map (fn [n] (hash-map n (count (coll' n)))) ks))))
 
-                                        ; Q114: Write a function which removes the duplicates from a sequence. Order of the items must be maintained.(p56)
-                                        ; (= (__ [1 2 1 3 1 2 4]) [1 2 3 4])
-                                        ; (= (__ [:a :a :b :b :c :c]) [:a :b :c])
-                                        ; (= (__ '([2 4] [1 2] [1 3] [1 3])) '([2 4] [1 2] [1 3]))
-                                        ; (= (__ (range 50)) (range 50))
-                                        ; Special Restrictions
-                                        ; distinct
-(defn p56 [coll]
-  (reduce (fn [acc x] (if (some #(= x %) acc) acc (conj acc x))) [] coll))
-                                        ; my answer 2016/12/30
-                                        ;(defn p56 [xs]
-                                        ;  (if-not (seq xs)
-                                        ;    []
-                                        ;    (let [x (first xs)]
-                                        ;      (cons x (p56 (filter #(not (= x %)) (rest xs)))))))
+;; Q114: Write a function which removes the duplicates from a sequence. Order of the items must be maintained.(p56)
+;;       1. Use recursion.
+;;       2. Use reduce function.
+;; (= (__ [1 2 1 3 1 2 4]) [1 2 3 4])
+;; (= (__ [:a :a :b :b :c :c]) [:a :b :c])
+;; (= (__ '([2 4] [1 2] [1 3] [1 3])) '([2 4] [1 2] [1 3]))
+;; (= (__ (range 50)) (range 50))
+;; Special Restrictions
+;; distinct
+;; A.1
+(defn p56
+  [xs]
+  (when (seq xs)
+    (let [x (first xs)]
+      (cons x (p56 (filter #(not (= x %)) xs))))))
+;; A.2
+#_(defn p56
+  [xs]
+  (reduce (fn [acc x] (if (some #{x} acc) acc (conj acc x))) [] xs))
 
-                                        ; Q115: Write a function which allows you to create function compositions.
-                                        ;    The parameter list should take a variable number of functions,
-                                        ;    and create a function applies them from right-to-left.(p58)
-                                        ; Special Restrictions
-                                        ; comp
-                                        ; (= [3 2 1] ((__ rest reverse) [1 2 3 4]))
-                                        ; (= 5 ((__ (partial + 3) second) [1 2 3 4]))
-                                        ; (= true ((__ zero? #(mod % 8) +) 3 5 7 9))
-                                        ; (= "HELLO" ((__ #(.toUpperCase %) #(apply str %) take) 5 "hello world"))
+;; Q115: Write a function which allows you to create function compositions.
+;;       The parameter list should take a variable number of functions,
+;;       and create a function applies them from right-to-left.(p58)
+;; Special Restrictions
+;; comp
+;; (= [3 2 1] ((__ rest reverse) [1 2 3 4]))
+;; (= 5 ((__ (partial + 3) second) [1 2 3 4]))
+;; (= true ((__ zero? #(mod % 8) +) 3 5 7 9))
+;; (= "HELLO" ((__ #(.toUpperCase %) #(apply str %) take) 5 "hello world"))
 (defn p58 [& fs]
   (let [[f & fs] (reverse fs)]
     (fn [& xs]
       (reduce (fn [acc f] (f acc)) (apply f xs) fs))))
 
-                                        ; Q116: Take a set of functions and return a new function that takes a variable number of arguments
-                                        ; and returns a sequence containing the result of applying
-                                        ; each function left-to-right to the argument list.(p59)
-                                        ; Special Restrictions
-                                        ; juxt
-                                        ; (= [21 6 1] ((__ + max min) 2 3 5 1 6 4))
-                                        ; (= ["HELLO" 5] ((__ #(.toUpperCase %) count) "hello"))
-                                        ; (= [2 6 4] ((__ :a :c :b) {:a 2, :b 4, :c 6, :d 8 :e 10}))
-(defn p59 [& fs]
-  (fn [& args] (for [f fs] (apply f args))))
+;; Q116: Take a set of functions and return a new function that takes a variable number of arguments
+;;       and returns a sequence containing the result of applying
+;;       each function left-to-right to the argument list.(p59)
+;; Special Restrictions
+;; juxt
+;; (= [21 6 1] ((__ + max min) 2 3 5 1 6 4))
+;; (= ["HELLO" 5] ((__ #(.toUpperCase %) count) "hello"))
+;; (= [2 6 4] ((__ :a :c :b) {:a 2, :b 4, :c 6, :d 8 :e 10}))
+(defn p59
+  [& fs]
+  (fn [& xs]
+    (map #(apply % xs) fs)))
 
-                                        ; Q117: Write a function which behaves like reduce,
-                                        ; but returns each intermediate value of the reduction.
-                                        ; Your function must accept either two or three arguments,
-                                        ; and the return sequence must be lazy.(p60)
-                                        ; Special Restrictions
-                                        ; reductions
-                                        ; (= (take 5 (__ + (range))) [0 1 3 6 10])
-                                        ; (= (__ conj [1] [2 3 4]) [[1] [1 2] [1 2 3] [1 2 3 4]])
-                                        ; (= (last (__ * 2 [3 4 5])) (reduce * 2 [3 4 5]) 120)
+;; Q117: Write a function which behaves like reduce,
+;;       but returns each intermediate value of the reduction.
+;;       Your function must accept either two or three arguments,
+;;       and the return sequence must be lazy.(p60)
+;; Special Restrictions
+;; reductions
+;; (= (take 5 (__ + (range))) [0 1 3 6 10])
+;; (= (__ conj [1] [2 3 4]) [[1] [1 2] [1 2 3] [1 2 3 4]])
+;; (= (last (__ * 2 [3 4 5])) (reduce * 2 [3 4 5]) 120)
 (defn p60
   ([f init args]
    (if-not (seq args)
@@ -1475,54 +1528,53 @@
      (lazy-seq (cons init (p60 f (f init (first args)) (rest args))))))
   ([f args] (p60 f (first args) (rest args))))
 
-                                        ; Q118: Write a function which returns the first x number of prime numbers.(p67)
-                                        ; (= (__ 2) [2 3])
-                                        ; (= (__ 5) [2 3 5 7 11])
-                                        ; (= (last (__ 100)) 541)
-(defn p67 [n]
-  (letfn [(factors [n]
-            (filter (fn [m] (= 0 (mod n m))) (range 1 (inc n))))
-          (prime? [n]
-            (= [1 n] (factors n)))
-          (primes []
-            (filter prime? (drop 2 (range))))]
+;; Q118: Write a function which returns the first x number of prime numbers.(p67)
+;; (= (__ 2) [2 3])
+;; (= (__ 5) [2 3 5 7 11])
+;; (= (last (__ 100))
+(defn p67
+  [n]
+  (letfn [(factors [n] (filter #(= 0 (mod n %)) (range 1 (inc n))))
+          (prime? [n] (= [1 n] (factors n)))
+          (primes [] (filter prime? (iterate inc 2)))]
     (take n (primes))))
 
+;; Q119: Write a function which takes a function f and a variable number of maps.
+;;       Your function should return a map that consists of the rest of the maps conj-ed onto the first.
+;;       If a key occurs in more than one map,
+;;       the mapping(s) from the latter (left-to-right) should be combined with the mapping in the result by calling
+;;       (f val-in-result val-in-latter)(p69)
+;; Special Restrictions
+;; merge-with
+;;
+;; (= (__ * {:a 2, :b 3, :c 4} {:a 2} {:b 2} {:c 5})
+;;    {:a 4, :b 6, :c 20})
+;; (= (__ - {1 10, 2 20} {1 3, 2 10, 3 15})
+;;    {1 7, 2 10, 3 15})
+;; (= (__ concat {:a [3], :b [6]} {:a [4 5], :c [8 9]} {:b [7]})
+;;    {:a [3 4 5], :b [6 7], :c [8 9]})
+(defn p69
+  [f m & ms]
+  (reduce (fn [acc [k v]]
+            (assoc acc k (if-let [v' (acc k)]
+                           (f v' v)
+                           v)))
+          m
+          (apply merge {} ms)))
+;; my answer 2017/02/18
+;; (defn p69 [f & ms]
+;;   (letfn [(merge-by-key [m1 m2 k]
+;;                         {k (f (k m1) (k m2))})
+;;           (merge-m [m1 m2]
+;;                   (let [ks (clojure.set/union (keys m1) (kyes m2))]
+;;                         (map (partial merge-by-key m1 m2) ks)))]
+;;     (reduce merge-m (first ms) (rest ms))))
 
-                                        ; Q119: Write a function which takes a function f and a variable number of maps.
-                                        ; Your function should return a map that consists of the rest of the maps conj-ed onto the first.
-                                        ; If a key occurs in more than one map,
-                                        ; the mapping(s) from the latter (left-to-right) should be combined with the mapping in the result by calling
-                                        ; (f val-in-result val-in-latter)(p69)
-                                        ; Special Restrictions
-                                        ; merge-with
-                                        ; (= (__ * {:a 2, :b 3, :c 4} {:a 2} {:b 2} {:c 5})
-                                        ;    {:a 4, :b 6, :c 20})
-                                        ; (= (__ - {1 10, 2 20} {1 3, 2 10, 3 15})
-                                        ;    {1 7, 2 10, 3 15})
-                                        ; (= (__ concat {:a [3], :b [6]} {:a [4 5], :c [8 9]} {:b [7]})
-                                        ;    {:a [3 4 5], :b [6 7], :c [8 9]})
-(defn p69 [f init & args]
-  (if-not (seq args)
-    init
-    (letfn [(merge' [m1 m2]
-              (reduce (fn [acc [k v]] (assoc acc k (if-let [v' (acc k)] (f v' v) v))) m1 m2))]
-      (apply p69 f (merge' init (first args)) (rest args)))))
-                                        ; my answer 2017/02/18
-                                        ; (defn p69 [f & ms]
-                                        ;   (letfn [(merge-by-key [m1 m2 k]
-                                        ;                         {k (f (k m1) (k m2))})
-                                        ;           (merge-m [m1 m2]
-                                        ;                   (let [ks (clojure.set/union (keys m1) (kyes m2))]
-                                        ;                         (map (partial merge-by-key m1 m2) ks)))]
-                                        ;     (reduce merge-m (first ms) (rest ms))))
-
-
-                                        ; Q120: Given a string of comma separated integers,
-                                        ; write a function which returns a new comma separated string that
-                                        ; only contains the numbers which are perfect squares.(p74)
-                                        ; (= (__ "4,5,6,7,8,9") "4,9")
-                                        ; (= (__ "15,16,25,36,37") "16,25,36")
+;; Q120: Given a string of comma separated integers,
+;;       write a function which returns a new comma separated string that
+;;       only contains the numbers which are perfect squares.(p74)
+;; (= (__ "4,5,6,7,8,9") "4,9")
+;; (= (__ "15,16,25,36,37") "16,25,36")
 (defn p74 [s]
   (->> s
        (re-seq #"\d+")
@@ -1530,130 +1582,141 @@
        (interpose ",")
        (apply str)))
 
-                                        ; Q121: Two numbers are coprime if their greatest common divisor equals 1.
-                                        ; Euler's totient function f(x) is defined as the number of positive integers less than x which are coprime to x.
-                                        ; The special case f(1) equals 1. Write a function which calculates Euler's totient function.(p75)
-                                        ; (= (__ 1) 1)
-                                        ; (= (__ 10) (count '(1 3 7 9)) 4)
-                                        ; (= (__ 40) 16)
-                                        ; (= (__ 99) 60)
-                                        ; refer: http://en.wikipedia.org/wiki/Greatest_common_divisor#Using_Euclid.27s_algorithm
-(defn p75 [n]
+;; Q121: Two numbers are coprime if their greatest common divisor equals 1.
+;;       Euler's totient function f(x) is defined as the number of positive integers less than x which are coprime to x.
+;;       The special case f(1) equals 1. Write a function which calculates Euler's totient function.(p75)
+;;       * ふつうに解いたら、 factors を使って解く方法も試してみる
+;; (= (__ 1) 1)
+;; (= (__ 10) (count '(1 3 7 9)) 4)
+;; (= (__ 40) 16)
+;; (= (__ 99) 60)
+;; refer:
+;;   [Euler's totient function](https://ja.wikipedia.org/wiki/%E3%82%AA%E3%82%A4%E3%83%A9%E3%83%BC%E3%81%AE%CF%86%E9%96%A2%E6%95%B0)
+;;   [GCD](http://en.wikipedia.org/wiki/Greatest_common_divisor#Using_Euclid.27s_algorithm)
+(defn p75
+  [n]
   (if (= n 1)
     1
     (letfn [(gcd [n m]
-              (if (zero? m)
-                n
-                (gcd m (mod n m))))
+              (match [n m]
+                     [n 0] n
+                     :else (gcd m (mod n m))))
             (coprime? [n m] (= 1 (gcd n m)))]
-      (count (filter (fn [m] (coprime? n m)) (range 1 n))))))
-                                        ; my answer 2017/03/12
-                                        ; (defn p75 [n]
-                                        ;   (letfn [(gcd [n m]
-                                        ;               (clojure.set/intersection (set (factors n)) (set (factors m))))
-                                        ;           (coprime? [n m]
-                                        ;               (= #{1} (gcd n m)))]
-                                        ;     (count (filter (fn [m] ((partial coprime? n) m)) (range 1 (inc n))))))
+      (count (filter (partial coprime? n) (range 1 n))))))
+;; (defn p75 [n]
+;;   (letfn [(gcd [n m]
+;;               (clojure.set/intersection (set (factors n)) (set (factors m))))
+;;           (coprime? [n m]
+;;               (= #{1} (gcd n m)))]
+;;     (count (filter (fn [m] ((partial coprime? n) m)) (range 1 (inc n))))))
 
-                                        ; Q122: Write a function which finds all the anagrams in a vector of words.
-                                        ; A word x is an anagram of word y if all the letters in x can be rearranged in a different order to form y.
-                                        ; Your function should return a set of sets, where each sub-set is a group of words which are anagrams of each other.
-                                        ; Each sub-set should have at least two words. Words without any anagrams should not be included in the result.(p77)
-                                        ; (= (__ ["meat" "mat" "team" "mate" "eat"])
-                                        ;    #{#{"meat" "team" "mate"}})
-                                        ; (= (__ ["veer" "lake" "item" "kale" "mite" "ever"])
-                                        ;    #{#{"veer" "ever"} #{"lake" "kale"} #{"mite" "item"}})
-(defn p77 [coll]
-  (->> coll
-       (group-by sort)
-       (filter (fn [[k v]] (< 1 (count v))))
+;; Q122: Write a function which finds all the anagrams in a vector of words.
+;;       A word x is an anagram of word y if all the letters in x can be rearranged in a different order to form y.
+;;       Your function should return a set of sets, where each sub-set is a group of words which are anagrams of each other.
+;;       Each sub-set should have at least two words. Words without any anagrams should not be included in the result.(p77)
+;; (= (__ ["meat" "mat" "team" "mate" "eat"])
+;;    #{#{"meat" "team" "mate"}})
+;; (= (__ ["veer" "lake" "item" "kale" "mite" "ever"])
+;;    #{#{"veer" "ever"} #{"lake" "kale"} #{"mite" "item"}})
+(defn p77
+  [xs]
+  (->> (group-by sort xs)
        vals
+       (filter #(< 1 (count %)))
        (map set)
        set))
 
-                                        ; Q123: Reimplement the function described in "Intro to Trampoline".(p78)
-                                        ; Special Restrictions
-                                        ; trampoline
-                                        ; (= (letfn [(triple [x] #(sub-two (* 3 x)))
-                                        ;           (sub-two [x] #(stop? (- x 2)))
-                                        ;           (stop? [x] (if (> x 50) x #(triple x)))]
-                                        ;     (__ triple 2))
-                                        ;   82)
-                                        ; (= (letfn [(my-even? [x] (if (zero? x) true #(my-odd? (dec x))))
-                                        ;           (my-odd? [x] (if (zero? x) false #(my-even? (dec x))))]
-                                        ;     (map (partial __ my-even?) (range 6)))
-                                        ;   [true false true false true false])
+;; Q123: Reimplement the function described in "Intro to Trampoline".(p78)
+;; Special Restrictions
+;; trampoline
+;; (= (letfn [(triple [x] #(sub-two (* 3 x)))
+;;           (sub-two [x] #(stop? (- x 2)))
+;;           (stop? [x] (if (> x 50) x #(triple x)))]
+;;     (__ triple 2))
+;;   82)
+;; (= (letfn [(my-even? [x] (if (zero? x) true #(my-odd? (dec x))))
+;;           (my-odd? [x] (if (zero? x) false #(my-even? (dec x))))]
+;;     (map (partial __ my-even?) (range 6)))
+;;   [true false true false true false])
 (defn p78 [f & args]
   (let [f' (apply f args)]
     (if-not (fn? f')
       f'
       (p78 f'))))
 
-
-                                        ; Q124: A number is "perfect" if the sum of its divisors equal the number itself.
-                                        ; 6 is a perfect number because 1+2+3=6.
-                                        ; Write a function which returns true for perfect numbers and false otherwise.(p80)
-                                        ; (= (__ 6) true)
-                                        ; (= (__ 7) false)
-                                        ; (= (__ 496) true)
-                                        ; (= (__ 500) false)
-                                        ; (= (__ 8128) true)
+;; Q124: A number is "perfect" if the sum of its divisors equal the number itself.
+;;       6 is a perfect number because 1+2+3=6.
+;;       Write a function which returns true for perfect numbers and false otherwise.(p80)
+;; (= (__ 6) true)
+;; (= (__ 7) false)
+;; (= (__ 496) true)
+;; (= (__ 500) false)
+;; (= (__ 8128) true)
 (defn p80 [n]
   (let [factors (for [n' (range 1 n) :when (zero? (mod n n'))] n')]
     (= n (reduce + factors))))
-                                        ; my answer 2017/04/07
-                                        ; (defn p80 [n]
-                                        ;   (= n (reduce + (drop-last (factors n)))))
+;; my answer 2017/04/07
+;; (defn p80 [n]
+;;   (= n (reduce + (drop-last (factors n)))))
 
-                                        ; Q125: Happy numbers are positive integers that follow a particular formula:
-                                        ;    take each individual digit, square it, and then sum the squares to get a new number.
-                                        ;    Repeat with the new number and eventually, you might get to a number whose squared sum is 1.
-                                        ;    This is a happy number. An unhappy number (or sad number) is one that loops endlessly.
-                                        ;    Write a function that determines if a number is happy or not.(p86)
-                                        ; (= (__ 7) true)
-                                        ; (= (__ 986543210) true)
-                                        ; (= (__ 2) false)
-                                        ; (= (__ 3) false)
-                                        ; my answer 2017/04/15
-                                        ; (defn p86 [n]
-                                        ;   (letfn [(convert-digits [n]
-                                        ;                           (map #(Character/digit % 10) (str n)))
-                                        ;           (sum-sq [ns]
-                                        ;                   (reduce + (map #(* % %) ns)))
-                                        ;           (is-happy [ns n]
-                                        ;             (let [n (sum-sq (convert-digits n))]
-                                        ;               (or (= n 1)
-                                        ;                   (and (not (contains? ns n)) (is-happy (conj ns n) n)))))]
-                                        ;     (is-happy #{} n)))
+;; Q125: Happy numbers are positive integers that follow a particular formula:
+;;       take each individual digit, square it, and then sum the squares to get a new number.
+;;       Repeat with the new number and eventually, you might get to a number whose squared sum is 1.
+;;       This is a happy number. An unhappy number (or sad number) is one that loops endlessly.
+;;       Write a function that determines if a number is happy or not.(p86)
+;;       この記事のプログラム例を参考にする(https://en.wikipedia.org/wiki/Happy_number)
+;; (= (__ 7) true)
+;; (= (__ 986543210) true)
+;; (= (__ 2) false)
+;; (= (__ 3) false)
 (defn p86 [n]
-  (letfn [(_ [acc n]
-            (let [ns (map #(Integer/parseInt (str %)) (str n))
-                  n (reduce + (map #(* % %) ns))]
-              (if (= 1 n)
-                true
-                (if (some #(= n %) acc)
-                  false
-                  (_ (cons n acc) n)))))]
-    (_ [] n)))
+ (letfn [(_ [acc n]
+           (let [ns (map #(Integer/parseInt (str %)) (str n))
+                 n (reduce + (map #(* % %) ns))]
+             (if (= 1 n)
+               true
+               (if (some #(= n %) acc)
+                 false
+                 (_ (cons n acc) n)))))]
+   (_ [] n)))
+;; my answer 2017/04/15
+;; (defn p86 [n]
+;;   (letfn [(convert-digits [n]
+;;                           (map #(Character/digit % 10) (str n)))
+;;           (sum-sq [ns]
+;;                   (reduce + (map #(* % %) ns)))
+;;           (is-happy [ns n]
+;;             (let [n (sum-sq (convert-digits n))]
+;;               (or (= n 1)
+;;                   (and (not (contains? ns n)) (is-happy (conj ns n) n)))))]
+;;     (is-happy #{} n)))
 
-                                        ; Q126: Write a predicate which checks whether or not a given sequence represents a binary tree.
-                                        ;       (Bottom leaf node's value is always nil or false)
-                                        ;       Each node in the tree must have a value, a left child, and a right child.(p95)
-                                        ; (= (__ '(:a (:b nil nil) nil))
-                                        ;    true)
-                                        ; (= (__ '(:a (:b nil nil)))
-                                        ;    false)
-                                        ; (= (__ [1 nil [2 [3 nil nil] [4 nil nil]]])
-                                        ;    true)
-                                        ; (= (__ [1 [2 nil nil] [3 nil nil] [4 nil nil]])
-                                        ;    false)
-                                        ; (= (__ [1 [2 [3 [4 nil nil] nil] nil] nil])
-                                        ;    true)
-                                        ; (= (__ [1 [2 [3 [4 false nil] nil] nil] nil])
-                                        ;    false)
-                                        ; (= (__ '(:a nil ()))
-                                        ;    false)
-(defn p95 [n]
+;; Q126: Write a predicate which checks whether or not a given sequence represents a binary tree.
+;;       (Bottom leaf node's value is always nil)
+;;       Each node in the tree must have a value, a left child, and a right child.(p95)
+;; (= (__ '(:a (:b nil nil) nil))
+;;    true)
+;; (= (__ '(:a (:b nil nil)))
+;;    false)
+;; (= (__ [1 nil [2 [3 nil nil] [4 nil nil]]])
+;;    true)
+;; (= (__ [1 [2 nil nil] [3 nil nil] [4 nil nil]])
+;;    false)
+;; (= (__ [1 [2 [3 [4 nil nil] nil] nil] nil])
+;;    true)
+;; (= (__ [1 [2 [3 [4 false nil] nil] nil] nil])
+;;    false)
+;; (= (__ '(:a nil ()))
+;;    false)
+(defn p95
+  ([] false)
+  ([t]
+   (if (and (coll? t) (= (count t) 3))
+     (let [[v l r] t]
+       (and (or (nil? l) (p95 l)) (or (nil? r) (p95 r))))
+     false))
+  ([a b & rest] false))
+#_(defn p95 [n]
   (or (nil? n)
       (and (coll? n)
            (= 3 (count n))
@@ -1662,89 +1725,82 @@
               (p95 n1)
               (p95 n2))))))
 
-                                        ; Q127: Let us define a binary tree as "symmetric" if the left half of the tree is the mirror image of the right half of the tree.
-                                        ;    Write a predicate to determine whether or not a given binary tree is symmetric.
-                                        ;    (see To Tree, or not to Tree for a reminder on the tree representation we're using).(p96)
-                                        ; (= (__ '(:a (:b nil nil) (:b nil nil))) true)
-                                        ; (= (__ '(:a (:b nil nil) nil)) false)
-                                        ; (= (__ '(:a (:b nil nil) (:c nil nil))) false)
-                                        ; (= (__ [1 [2 nil [3 [4 [5 nil nil] [6 nil nil]] nil]]
-                                        ;           [2 [3 nil [4 [6 nil nil] [5 nil nil]]] nil]])
-                                        ;    true)
-                                        ; (= (__ [1 [2 nil [3 [4 [5 nil nil] [6 nil nil]] nil]]
-                                        ;           [2 [3 nil [4 [5 nil nil] [6 nil nil]]] nil]])
-                                        ;    false)
-                                        ; (= (__ [1 [2 nil [3 [4 [5 nil nil] [6 nil nil]] nil]]
-                                        ;           [2 [3 nil [4 [6 nil nil] nil]] nil]])
-                                        ;    false)
-(defn p96 [tr]
-  (letfn [(rev-tr [[p l r]]
-            [p (when r (rev-tr r))
-             (when l (rev-tr l))])]
-    (= tr (rev-tr tr))))
+;; Q127: Let us define a binary tree as "symmetric" if the left half of the tree is the mirror image of the right half of the tree.
+;;       Write a predicate to determine whether or not a given binary tree is symmetric.
+;;       (see To Tree, or not to Tree for a reminder on the tree representation we're using).(p96)
+;; (= (__ '(:a (:b nil nil) (:b nil nil))) true)
+;; (= (__ '(:a (:b nil nil) nil)) false)
+;; (= (__ '(:a (:b nil nil) (:c nil nil))) false)
+;; (= (__ [1 [2 nil [3 [4 [5 nil nil] [6 nil nil]] nil]]
+;;           [2 [3 nil [4 [6 nil nil] [5 nil nil]]] nil]])
+;;    true)
+;; (= (__ [1 [2 nil [3 [4 [5 nil nil] [6 nil nil]] nil]]
+;;           [2 [3 nil [4 [5 nil nil] [6 nil nil]]] nil]])
+;;    false)
+;; (= (__ [1 [2 nil [3 [4 [5 nil nil] [6 nil nil]] nil]]
+;;           [2 [3 nil [4 [6 nil nil] nil]] nil]])
+;;    false)
+(defn p96
+  [tr]
+  (letfn [(reverse-tree [[p l r]]
+            [p
+             (when r (reverse-tree r))
+             (when l (reverse-tree l))])]
+    (= tr (reverse-tree tr))))
 
-                                        ; Q128: Pascal's triangle is a triangle of numbers computed using the following rules:
-                                        ; - The first row is 1.
-                                        ; - Each successive row is computed by adding together adjacent numbers in the row above, and adding a 1 to the beginning and end of the row.
-                                        ; Write a function which returns the nth row of Pascal's Triangle.(p97)
-                                        ; (= (__ 1) [1])
-                                        ; (= (map __ (range 1 6))
-                                        ;    [     [1]
-                                        ;         [1 1]
-                                        ;        [1 2 1]
-                                        ;       [1 3 3 1]
-                                        ;      [1 4 6 4 1]])
-                                        ; (= (__ 11)
-                                        ;    [1 10 45 120 210 252 210 120 45 10 1])
-                                        ; (fn [n]
-                                        ;   (letfn [(combination [n m] (/ (reduce * (take m (iterate dec n))) (reduce * (take m (iterate dec m)))))]
-                                        ;                        (map (partial combination (dec n)) (range n))))
+;; Q128: Pascal's triangle is a triangle of numbers computed using the following rules:
+;;       - The first row is 1.
+;;       - Each successive row is computed by adding together adjacent numbers in the row above, and adding a 1 to the beginning and end of the row.
+;;       Write a function which returns the nth row of Pascal's Triangle.(p97)
+;; (= (__ 1) [1])
+;; (= (map __ (range 1 6))
+;;    [     [1]
+;;         [1 1]
+;;        [1 2 1]
+;;       [1 3 3 1]
+;;      [1 4 6 4 1]])
+;; (= (__ 11)
+;;    [1 10 45 120 210 252 210 120 45 10 1])
 (defn p97 [n]
   (letfn [(p-triangle [coll]
             (lazy-seq (cons coll (p-triangle (concat [1] (map (partial reduce +) (partition 2 1 coll)) [1])))))]
     (nth (p-triangle [1]) (dec n))))
-                                        ; my answer 2017/05/06
-                                        ; (defn p97 [n]
-                                        ;   (letfn [(factorial [n m]
-                                        ;                     (if (zero? m)
-                                        ;                         1
-                                        ;                         (* n (factorial (dec n) (dec m)))))
-                                        ;           (combination [n k]
-                                        ;                       (let [n' (factorial n k)
-                                        ;                             k' (factorial k k)]
-                                        ;                           (if (zero? k')
-                                        ;                               1
-                                        ;                               (/ n' k'))))]
-                                        ;     (map #(combination (dec n) %) (range 0 n))))
-                                        ;
-                                        ; my answer 2017/05/14
-                                        ; (defn p97 [n]
-                                        ;   (case n
-                                        ;         1 [1]
-                                        ;         2 [1 1]
-                                        ;         (concat [1] (map (fn [[n m]] (+ n m)) (partition 2 1 (p97 (dec n)))) [1])))
+;; my answer 2017/05/14
+;; (defn p97 [n]
+;;   (case n
+;;         1 [1]
+;;         2 [1 1]
+;;         (concat [1] (map (fn [[n m]] (+ n m)) (partition 2 1 (p97 (dec n)))) [1])))
+;;
+;; my answer 2019/07/03
+;; (defn p97
+;;   [n]
+;;   (letfn [(combination [n k]
+;;             (/ (reduce * (range (inc (- n k)) (inc n)))
+;;                (reduce * (range 1 (inc k)))))]
+;;     (map (partial combination (dec n)) (range n))))
 
-                                        ; Q129: A function f defined on a domain D induces an equivalence relation on D,as follows:
-                                        ;    a is equivalent to b with respect to f if and only if (f a) is equal to (f b).
-                                        ;    Write a function with arguments f and D that computes the equivalence classes of D with respect to f.(p98)
-                                        ; (= (__ #(* % %) #{-2 -1 0 1 2})
-                                        ;    #{#{0} #{1 -1} #{2 -2}})
-                                        ; (= (__ #(rem % 3) #{0 1 2 3 4 5 })
-                                        ;    #{#{0 3} #{1 4} #{2 5}})
-                                        ; (= (__ identity #{0 1 2 3 4})
-                                        ;    #{#{0} #{1} #{2} #{3} #{4}})
-                                        ; (= (__ (constantly true) #{0 1 2 3 4})
-                                        ;    #{#{0 1 2 3 4}})
+;; Q129: A function f defined on a domain D induces an equivalence relation on D,as follows:
+;;       a is equivalent to b with respect to f if and only if (f a) is equal to (f b).
+;;       Write a function with arguments f and D that computes the equivalence classes of D with respect to f.(p98)
+;; (= (__ #(* % %) #{-2 -1 0 1 2})
+;;    #{#{0} #{1 -1} #{2 -2}})
+;; (= (__ #(rem % 3) #{0 1 2 3 4 5 })
+;;    #{#{0 3} #{1 4} #{2 5}})
+;; (= (__ identity #{0 1 2 3 4})
+;;    #{#{0} #{1} #{2} #{3} #{4}})
+;; (= (__ (constantly true) #{0 1 2 3 4})
+;;    #{#{0 1 2 3 4}})
 (defn p98 [f coll]
   (set (map set (vals (group-by f coll)))))
 
-                                        ; Q130: Write a function which calculates the least common multiple.
-                                        ;    Your function should accept a variable number of positive integers or ratios.(p100)
-                                        ; (== (__ 2 3) 6)
-                                        ; (== (__ 5 3 7) 105)
-                                        ; (== (__ 1/3 2/5) 2)
-                                        ; (== (__ 3/4 1/6) 3/2)
-                                        ; (== (__ 7 5/7 2 3/5) 210)
+;; Q130: Write a function which calculates the least common multiple.
+;;       Your function should accept a variable number of positive integers or ratios.(p100)
+;; (== (__ 2 3) 6)
+;; (== (__ 5 3 7) 105)
+;; (== (__ 1/3 2/5) 2)
+;; (== (__ 3/4 1/6) 3/2)
+;; (== (__ 7 5/7 2 3/5) 210)
 (defn p100 [& rs]
   (letfn [(gcd [n m]
             (if (= n m)
@@ -1756,47 +1812,39 @@
             (/ (* n m) (gcd n m)))]
     (reduce lcm rs)))
 
-                                        ; Q131: When working with java, you often need to create an object with fieldsLikeThis,
-                                        ;    but you'd rather work with a hashmap that has :keys-like-this until it's time to convert.
-                                        ;    Write a function which takes lower-case hyphen-separated strings and converts them to camel-case strings.(p101)
-                                        ; (= (__ "something") "something")
-                                        ; (= (__ "multi-word-key") "multiWordKey")
-                                        ; (= (__ "leaveMeAlone") "leaveMeAlone")
-(defn p102 [s]
+;; Q131: When working with java, you often need to create an object with fieldsLikeThis,
+;;       but you'd rather work with a hashmap that has :keys-like-this until it's time to convert.
+;;       Write a function which takes lower-case hyphen-separated strings and converts them to camel-case strings.(p102)
+;;       * Multi-arityを用いたものも書くこと
+;; (= (__ "something") "something")
+;; (= (__ "multi-word-key") "multiWordKey")
+;; (= (__ "leaveMeAlone") "leaveMeAlone")
+(defn p102
+  [s]
   (letfn [(_p102
             ([c] [c])
             ([c c' & cs] (if (= \- c)
-                           (cons (Character/toUpperCase c') (apply _p102 cs))
+                           (apply _p102 (cons (Character/toUpperCase c') cs))
                            (cons c (apply _p102 (cons c' cs))))))]
-    (->> (map identity s)
-         (apply _p102)
+    (->> (apply _p102 s)
          (apply str))))
-                                        ; my answer 2017/06/14
-                                        ; (defn p102 [s]
-                                        ;   (letfn [(p102'
-                                        ;             ([] nil)
-                                        ;             ([c] c)
-                                        ;             ([c1 c2 & rest] (if (= c1 \-)
-                                        ;                                 (str (Character/toUpperCase c2) (apply p102' rest))
-                                        ;                                 (str c1 (apply p102' (cons c2 rest))))))]
-                                        ;           (apply p102' (map identity s))))
-                                        ; my answer 2017/06/10
-                                        ; (defn p102 [s]
-                                        ;   (clojure.string/replace s #"-([a-z])" #(clojure.string/upper-case (%1 1))))
-                                        ; (defn p102 [s]
-                                        ;   (clojure.string/replace s #"-[a-z]" (comp clojure.string/upper-case last)))
+;; my answer 2017/06/10
+;; (defn p102 [s]
+;;   (clojure.string/replace s #"-([a-z])" #(clojure.string/upper-case (%1 1))))
+;; (defn p102 [s]
+;;   (clojure.string/replace s #"-[a-z]" (comp clojure.string/upper-case last)))
 
-                                        ; Q132: A balanced number is one whose component digits have the same sum on the left and right halves of the number.
-                                        ;    Write a function which accepts an integer n, and returns true iff n is balanced.(p115)
-                                        ; (= true (__ 11))
-                                        ; (= true (__ 121))
-                                        ; (= false (__ 123))
-                                        ; (= true (__ 0))
-                                        ; (= false (__ 88099))
-                                        ; (= true (__ 89098))
-                                        ; (= true (__ 89089))
-                                        ; (= (take 20 (filter __ (range)))
-                                        ;    [0 1 2 3 4 5 6 7 8 9 11 22 33 44 55 66 77 88 99 101])
+;; Q132: A balanced number is one whose component digits have the same sum on the left and right halves of the number.
+;;       Write a function which accepts an integer n, and returns true iff n is balanced.(p115)
+;; (= true (__ 11))
+;; (= true (__ 121))
+;; (= false (__ 123))
+;; (= true (__ 0))
+;; (= false (__ 88099))
+;; (= true (__ 89098))
+;; (= true (__ 89089))
+;; (= (take 20 (filter __ (range)))
+;;    [0 1 2 3 4 5 6 7 8 9 11 22 33 44 55 66 77 88 99 101])
 (defn p115 [n]
   (let [ns (str n)
         m (Math/ceil (/ (count ns) 2))]
@@ -1830,58 +1878,52 @@
             (filter-sum m ns)))
         (cons (filter-sum m n) (filter-sum m ns))))))
 
-                                        ; Q133: Your friend Joe is always whining about Lisps using the prefix notation for math.
-                                        ;    Show him how you could easily write a function that does math using the infix notation.
-                                        ;    Is your favorite language that flexible, Joe?
-                                        ;    Write a function that accepts a variable length mathematical expression consisting of numbers and the operations +, -, *, and /.
-                                        ;    Assume a simple calculator that does not do precedence and instead just calculates left to right.(p135)
-                                        ; (= 7  (__ 2 + 5))
-                                        ; (= 42 (__ 38 + 48 - 2 / 2))
-                                        ; (= 8  (__ 10 / 2 - 1 * 2))
-                                        ; (= 72 (__ 20 / 2 + 2 + 4 + 8 - 6 - 10 * 9))
-                                        ; (defn p135 [& coll]
-                                        ;   (let [ns (take-nth 2 coll)
-                                        ;         fs (take-nth 2 (rest coll))]
-                                        ;     (letfn [(_ [fs ns acc]
-                                        ;                (if (not (seq fs))
-                                        ;                  acc
-                                        ;                  (_ (rest fs) (rest ns) ((first fs) acc (first ns)))))]
-                                        ;       (_ fs (rest ns) (first ns)))))
-(defn p135 [n & coll]
-  (reduce (fn [n [f m]] (if f (f n m) n))
+;; Q133: Your friend Joe is always whining about Lisps using the prefix notation for math.
+;;       Show him how you could easily write a function that does math using the infix notation.
+;;       Is your favorite language that flexible, Joe?
+;;       Write a function that accepts a variable length mathematical expression consisting of numbers and the operations +, -, *, and /.
+;;       Assume a simple calculator that does not do precedence and instead just calculates left to right.(p135)
+;; (= 7  (__ 2 + 5))
+;; (= 42 (__ 38 + 48 - 2 / 2))
+;; (= 8  (__ 10 / 2 - 1 * 2))
+;; (= 72 (__ 20 / 2 + 2 + 4 + 8 - 6 - 10 * 9))
+(defn p135
+  [n & coll]
+  (reduce (fn [acc [f n]]
+            (f acc n))
           n
           (partition 2 coll)))
 
-                                        ; Q134: Because Clojure's for macro allows you to "walk" over multiple sequences in a nested fashion,
-                                        ;    it is excellent for transforming all sorts of sequences.
-                                        ;    If you don't want a sequence as your final output (say you want a map),
-                                        ;    you are often still best-off using for, because you can produce a sequence and feed it into a map, for example.
-                                        ;    For this problem, your goal is to "flatten" a map of hashmaps.
-                                        ;    Each key in your output map should be the "path"1 that you would have to take in the original map to get to a value,
-                                        ;    so for example {1 {2 3}} should result in {[1 2] 3}. You only need to flatten one level of maps: if one of the values is a map,
-                                        ;    just leave it alone.
-                                        ;    1 That is, (get-in original [k1 k2]) should be the same as (get result [k1 k2])(p146)
-                                        ; (= (__ '{a {p 1, q 2}
-                                        ;          b {m 3, n 4}})
-                                        ;    '{[a p] 1, [a q] 2
-                                        ;      [b m] 3, [b n] 4})
-                                        ; (= (__ '{[1] {a b c d}
-                                        ;          [2] {q r s t u v w x}})
-                                        ;    '{[[1] a] b, [[1] c] d,
-                                        ;      [[2] q] r, [[2] s] t,
-                                        ;      [[2] u] v, [[2] w] x})
-                                        ; (= (__ '{m {1 [a b c] 3 nil}})
-                                        ;    '{[m 1] [a b c], [m 3] nil})
-                                        ; (defn p146 [coll]
-                                        ;   (apply hash-map
-                                        ;     (mapcat
-                                        ;       (fn [k coll']
-                                        ;         (mapcat
-                                        ;           (fn [[k' v]]
-                                        ;             (cons (vector k k') [v]))
-                                        ;           coll'))
-                                        ;       (keys coll)
-                                        ;       (vals coll))))
+;; Q134: Because Clojure's for macro allows you to "walk" over multiple sequences in a nested fashion,
+;;    it is excellent for transforming all sorts of sequences.
+;;    If you don't want a sequence as your final output (say you want a map),
+;;    you are often still best-off using for, because you can produce a sequence and feed it into a map, for example.
+;;    For this problem, your goal is to "flatten" a map of hashmaps.
+;;    Each key in your output map should be the "path"1 that you would have to take in the original map to get to a value,
+;;    so for example {1 {2 3}} should result in {[1 2] 3}. You only need to flatten one level of maps: if one of the values is a map,
+;;    just leave it alone.
+;;    1 That is, (get-in original [k1 k2]) should be the same as (get result [k1 k2])(p146)
+;; (= (__ '{a {p 1, q 2}
+;;          b {m 3, n 4}})
+;;    '{[a p] 1, [a q] 2
+;;      [b m] 3, [b n] 4})
+;; (= (__ '{[1] {a b c d}
+;;          [2] {q r s t u v w x}})
+;;    '{[[1] a] b, [[1] c] d,
+;;      [[2] q] r, [[2] s] t,
+;;      [[2] u] v, [[2] w] x})
+;; (= (__ '{m {1 [a b c] 3 nil}})
+;;    '{[m 1] [a b c], [m 3] nil})
+;; (defn p146 [coll]
+;;   (apply hash-map
+;;     (mapcat
+;;       (fn [k coll']
+;;         (mapcat
+;;           (fn [[k' v]]
+;;             (cons (vector k k') [v]))
+;;           coll'))
+;;       (keys coll)
+;;       (vals coll))))
 (defn p146 [coll]
   (into {}
         (for [[k v] coll
@@ -2339,9 +2381,9 @@
     (spit "./resources/compare-result.txt" (apply str (for [[n s1 s2] ss] (str n "\t" (if (empty? (clojure.set/intersection s1 s2)) "FALSE" "TRUE") "\n"))))))
 
 ;; Q153: resources ディレクトリ配下の config.edn から都市名(city)を抽出する関数 configured-city を書け
-(defn configured-city
+#_(defn configured-city
   []
-  (-> (clojure.java.io/resource "config.edn")
+  (-> (clojufre.java.io/resource "config.edn")
       slurp
       load-string
       :addr
