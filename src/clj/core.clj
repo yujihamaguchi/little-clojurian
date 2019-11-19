@@ -1895,25 +1895,30 @@
           (partition 2 coll)))
 
 ;; Q134: Because Clojure's for macro allows you to "walk" over multiple sequences in a nested fashion,
-;;    it is excellent for transforming all sorts of sequences.
-;;    If you don't want a sequence as your final output (say you want a map),
-;;    you are often still best-off using for, because you can produce a sequence and feed it into a map, for example.
-;;    For this problem, your goal is to "flatten" a map of hashmaps.
-;;    Each key in your output map should be the "path"1 that you would have to take in the original map to get to a value,
-;;    so for example {1 {2 3}} should result in {[1 2] 3}. You only need to flatten one level of maps: if one of the values is a map,
-;;    just leave it alone.
-;;    1 That is, (get-in original [k1 k2]) should be the same as (get result [k1 k2])(p146)
-;; (= (__ '{a {p 1, q 2}
-;;          b {m 3, n 4}})
-;;    '{[a p] 1, [a q] 2
-;;      [b m] 3, [b n] 4})
-;; (= (__ '{[1] {a b c d}
-;;          [2] {q r s t u v w x}})
-;;    '{[[1] a] b, [[1] c] d,
-;;      [[2] q] r, [[2] s] t,
-;;      [[2] u] v, [[2] w] x})
-;; (= (__ '{m {1 [a b c] 3 nil}})
-;;    '{[m 1] [a b c], [m 3] nil})
+;;       it is excellent for transforming all sorts of sequences.
+;;       If you don't want a sequence as your final output (say you want a map),
+;;       you are often still best-off using for, because you can produce a sequence and feed it into a map, for example.
+;;       For this problem, your goal is to "flatten" a map of hashmaps.
+;;       Each key in your output map should be the "path"1 that you would have to take in the original map to get to a value,
+;;       so for example {1 {2 3}} should result in {[1 2] 3}. You only need to flatten one level of maps: if one of the values is a map,
+;;       just leave it alone.
+;;       1 That is, (get-in original [k1 k2]) should be the same as (get result [k1 k2])(p146)
+;;       (= (__ '{a {p 1, q 2}
+;;                b {m 3, n 4}})
+;;          '{[a p] 1, [a q] 2
+;;            [b m] 3, [b n] 4})
+;;       (= (__ '{[1] {a b c d}
+;;                [2] {q r s t u v w x}})
+;;          '{[[1] a] b, [[1] c] d,
+;;            [[2] q] r, [[2] s] t,
+;;            [[2] u] v, [[2] w] x})
+;;       (= (__ '{m {1 [a b c] 3 nil}})
+;;          '{[m 1] [a b c], [m 3] nil})
+(defn p146 [coll]
+  (into {}
+        (for [[k v] coll
+              [k' v] v]
+          [[k k'] v])))
 ;; (defn p146 [coll]
 ;;   (apply hash-map
 ;;     (mapcat
@@ -1924,22 +1929,18 @@
 ;;           coll'))
 ;;       (keys coll)
 ;;       (vals coll))))
-(defn p146 [coll]
-  (into {}
-        (for [[k v] coll
-              [k' v] v]
-          [[k k'] v])))
 
-                                        ; Q135: Write a function that, for any given input vector of numbers, returns an infinite lazy sequence of vectors,
-                                        ;    where each next one is constructed from the previous following the rules used in Pascal's Triangle. For example,
-                                        ;    for [3 1 2], the next row is [3 4 3 2].
-                                        ;    Beware of arithmetic overflow! In clojure (since version 1.3 in 2011),
-                                        ;    if you use an arithmetic operator like + and the result is too large to fit into a 64-bit integer,
-                                        ;    an exception is thrown. You can use +' to indicate that you would rather overflow into Clojure's slower, arbitrary-precision bigint.(p147)
-                                        ; (= (second (__ [2 3 2])) [2 5 5 2])
-                                        ; (= (take 5 (__ [1])) [[1] [1 1] [1 2 1] [1 3 3 1] [1 4 6 4 1]])
-                                        ; (= (take 2 (__ [3 1 2])) [[3 1 2] [3 4 3 2]])
-                                        ; (= (take 100 (__ [2 4 2])) (rest (take 101 (__ [2 2]))))
+;; Q135: Write a function that, for any given input vector of numbers, returns an infinite lazy sequence of vectors,
+;;       where each next one is constructed from the previous following the rules used in Pascal's Triangle. For example,
+;;       for [3 1 2], the next row is [3 4 3 2].
+;;       Beware of arithmetic overflow! In clojure (since version 1.3 in 2011),
+;;       if you use an arithmetic operator like + and the result is too large to fit into a 64-bit integer,
+;;       an exception is thrown. You can use +' to indicate that you would rather overflow into Clojure's slower, arbitrary-precision bigint.(p147)
+;;
+;;      (= (second (__ [2 3 2])) [2 5 5 2])
+;;      (= (take 5 (__ [1])) [[1] [1 1] [1 2 1] [1 3 3 1] [1 4 6 4 1]])
+;;      (= (take 2 (__ [3 1 2])) [[3 1 2] [3 4 3 2]])
+;;      (= (take 100 (__ [2 4 2])) (rest (take 101 (__ [2 2]))))
 (defn p147 [coll]
   (lazy-seq
    (cons coll
@@ -1947,18 +1948,22 @@
                        (map (fn [[n m]] (+' n m)) (partition 2 1 coll))
                        [(last coll)])))))
 
-                                        ; Q136: Write a function which generates the power set of a given set.
-                                        ;    The power set of a set x is the set of all subsets of x, including the empty set and x itself.(p85)
-                                        ; (= (__ #{1 :a}) #{#{1 :a} #{:a} #{} #{1}})
-                                        ; (= (__ #{}) #{#{}})
-                                        ; (= (__ #{1 2 3})
-                                        ;    #{#{} #{1} #{2} #{3} #{1 2} #{1 3} #{2 3} #{1 2 3}})
-                                        ; (= (count (__ (intbo #{} (range 10)))) 1024)
-(defn p85 [coll]
+;; Q136: Write a function which generates the power set of a given set.
+;;       The power set of a set x is the set of all subsets of x, including the empty set and x itself.(p85)
+;;       hint: 母集合の全ての要素に所与の集合の要素を一つずつ付け加えると Power Set になる。
+;;             #{#{}} に 1を付け加えると、 #{#{} #{1}} となり、それに2を付け加えると、 #{#{} #{1} #{2} #{1 2}} となり、それに3を付け加えると、 #{#{} #{1} #{2} #{1 2} #{3} #{1 3} #{2 3} #{1 2 3}} ...
+;;             
+;;
+;;       (= (__ #{1 :a}) #{#{1 :a} #{:a} #{} #{1}})
+;;       (= (__ #{}) #{#{}})
+;;       (= (__ #{1 2 3})
+;;         #{#{} #{1} #{2} #{3} #{1 2} #{1 3} #{2 3} #{1 2 3}})
+;;       (= (count (__ (into #{} (range 10)))) 1024)
+(defn p85
+  [xs]
   (reduce (fn [acc x]
-            (into acc
-                  (map (fn [xs] (conj xs x)) acc)))
-          #{#{}} coll))
+            (into acc (map #(conj % x) acc)))
+          #{#{}} xs))
 
                                         ; Q137: Given an input sequence of keywords and numbers, create a map such that each key in the map is a keyword,
                                         ;    and the value is a sequence of all the numbers (if any) between it and the next keyword in the sequence.(p105)
@@ -2388,3 +2393,15 @@
       load-string
       :addr
       :city))
+
+(defprotocol Shape
+  (area [this]))
+
+(deftype Rectangle [width height]
+  Shape
+  (area [this] (* width height)))
+
+(deftype Circle [radius]
+  Shape
+  (area [this] (* radius radius Math/PI)))
+
