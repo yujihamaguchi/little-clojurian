@@ -3,7 +3,7 @@
 
 (def table [8.2 1.5 2.8 4.3 12.7 2.2 2.0 6.1 7.0 0.2 0.8 4.0 2.4 6.7 7.5 1.9 0.1 6.0 6.3 9.1 2.8 1.0 2.4 0.2 2.0 0.1])
 
-;; Q001: haskellのzipと同様の機能の関数を書け
+;; Q001: haskell の zip と同様の機能の関数 my-zip を書け （パラメータの数は可変であること）
 ;; zip :: [a] -> [b] -> [(a, b)]
 (defn my-zip [& colls]
   (when (seq colls)
@@ -259,10 +259,10 @@
 ;;    ex) >replicate 3 True
 ;;        [True, True, True]
 (defn my-replicate [n x]
-;; 直接の再帰
- (if (zero? n)
-   []
-   (cons x (my-replicate (dec n) x))))
+  ;; 直接の再帰
+  (if (zero? n)
+    []
+    (cons x (my-replicate (dec n) x))))
 ;; 直接の再帰ではない
 ;; (defn my-replicate [n x]
 ;;   (letfn [(my-replicate' [n acc]
@@ -386,11 +386,11 @@
 
 ;; 遅延評価関数版
 #_(defn my-init
-  [xs]
-  (-> xs
-       reverse
-       rest
-       reverse))
+    [xs]
+    (-> xs
+        reverse
+        rest
+        reverse))
 
 ;; Q045: elemを再帰を用いて自作せよ。
 ;;       elem :: Eq a => a -> [a] -> Bool
@@ -477,12 +477,12 @@
 
 ;; recurを用いたパターン
 #_(defn my-map-recur
-  [f xs]
-  (letfn [(my-map-recur' [f xs acc]
-            (if-not (seq xs)
-              acc
-              (my-map-recur' f (rest xs) (conj acc (f (first xs))))))]
-    (my-map-recur' f xs [])))
+    [f xs]
+    (letfn [(my-map-recur' [f xs acc]
+              (if-not (seq xs)
+                acc
+                (my-map-recur' f (rest xs) (conj acc (f (first xs))))))]
+      (my-map-recur' f xs [])))
 
 ;; Q054: リストの先頭から述語を満たす連続した要素を取り除く関数drop-whileを自作せよ。
 ;; A:
@@ -505,24 +505,24 @@
         (my-filter-recur p xs')))))
 ;; 末尾再帰
 #_(defn my-filter-recur
-  [f xs]
-  (letfn [(my-filter-recur'
-            [xs acc]
-            (if-not (seq xs)
-              acc
-              (let [x (first xs)
-                    xs' (rest xs)]
-                (my-filter-recur' xs' (if (f x) (conj acc x) acc)))))]
-    (my-filter-recur' xs [])))
+    [f xs]
+    (letfn [(my-filter-recur'
+              [xs acc]
+              (if-not (seq xs)
+                acc
+                (let [x (first xs)
+                      xs' (rest xs)]
+                  (my-filter-recur' xs' (if (f x) (conj acc x) acc)))))]
+      (my-filter-recur' xs [])))
 ;; recurを用いた末尾再帰
 #_(defn my-filter-recur
-  [f xs]
-  (loop [xs' xs acc []]
-    (if-not (seq xs')
-      acc
-      (let [x (first xs')
-            xs'' (rest xs')]
-        (recur xs'' (if (f x) (conj acc x) acc))))))
+    [f xs]
+    (loop [xs' xs acc []]
+      (if-not (seq xs')
+        acc
+        (let [x (first xs')
+              xs'' (rest xs')]
+          (recur xs'' (if (f x) (conj acc x) acc))))))
 
 ;; Q056: リストの先頭から述語を満たす連続した要素を取り出す関数takeWhileを自作せよ。(my-take-while)
 ;; A:
@@ -588,12 +588,12 @@
 (defn decode [bs]
   (apply str (map (comp char bit2int) (chop8 bs))))
 #_(defn decode
-  [bs]
-  (-> bs
-      chop8
-      ((partial map bit2int))
-      ((partial map char))
-      ((partial apply str))))
+    [bs]
+    (-> bs
+        chop8
+        ((partial map bit2int))
+        ((partial map char))
+        ((partial apply str))))
 
 ;; Q062: 文字列をビット列に符号化する関数encodeを書け。
 ;;    それぞれの文字列をunicodeのコードポイント（整数）に変換し、さらに8ビットの二進表記に直して、全体を連結することで、ビットのリストを作る。高階関数mapと関数合成を用いて実装せよ。
@@ -954,15 +954,15 @@
     (reduce + (for [f' (file-seq f) :when (is-clj-file? f')] (row-count f')))))
 ;; [readerを使う]
 #_(defn clojure-loc
-  [f]
-  (letfn [(is-clj-file?
-            [f]
-            (re-seq #"\.clj$" (.getName f)))
-          (row-count
-            [f]
-            (with-open [rdr (clojure.java.io/reader (.getAbsolutePath f))]
-              (count (filter #(not (empty? %)) (line-seq rdr)))))]
-    (reduce + (for [f' (file-seq f) :when (is-clj-file? f')] (row-count f')))))
+    [f]
+    (letfn [(is-clj-file?
+              [f]
+              (re-seq #"\.clj$" (.getName f)))
+            (row-count
+              [f]
+              (with-open [rdr (clojure.java.io/reader (.getAbsolutePath f))]
+                (count (filter #(not (empty? %)) (line-seq rdr)))))]
+      (reduce + (for [f' (file-seq f) :when (is-clj-file? f')] (row-count f')))))
 
 ;; Q082: 文字列中の文字で、探すべき文字のセットにマッチするもののインデックスを得る関数index-filterを書け。
 ;; ([pred coll])
@@ -1097,8 +1097,8 @@
 (defmacro my-with-out-str
   [& exprs]
   `(binding [*out* (java.io.StringWriter.)]
-    (do ~@exprs)
-    (str *out*)))
+     (do ~@exprs)
+     (str *out*)))
 
 ;; Q087: 任意のファイルの空行を除いた行数を表示する関数count-not-empty-lineを書け。
 ;; ex) (= (count-not-empty-line (java.io.File. "./resources/ut-count-not-empty-line/01.txt")) 3)
@@ -1158,8 +1158,8 @@
   (every? #(Character/isWhitespace %) cs))
 ;; my answer 2019-01-31
 #_(defn blank?
-  [cs]
-  (empty? (re-seq #"\w" cs)))
+    [cs]
+    (empty? (re-seq #"\w" cs)))
 
 ;; Q092: timeマクロの変種で、何回もの実行結果を後で集めやすいようにしたbenchというマクロを書け。
 ;; ;; (bench (str "a" "b"))
@@ -1249,13 +1249,13 @@
       (cons x (p30 (drop-while #(= x %) xs'))))))
 
 #_(defn p30
-  [coll]
-  (reduce
-   (fn [acc x]
-     (if (= (last acc) x)
-       acc
-       (conj acc x)))
-   [] coll))
+    [coll]
+    (reduce
+     (fn [acc x]
+       (if (= (last acc) x)
+         acc
+         (conj acc x)))
+     [] coll))
 
 ;; Q099: Write a function which packs consecutive duplicates into sub-lists.(p31)
 ;;       一つは再帰、一つはパーティション関数を使って
@@ -1268,7 +1268,7 @@
     (let [x (first coll)]
       (cons (take-while #(= x %) coll) (p31 (drop-while #(= x %) coll))))))
 #_(defn p31 [coll]
- (partition-by identity coll))
+    (partition-by identity coll))
 
 ;; Q100: Write a function which duplicates each element of a sequence.(p32)
 ;;       一つは再帰、一つは mapcat 関数を使って
@@ -1283,7 +1283,7 @@
       (concat [x x] (p32 (rest xs))))))
 
 #_(defn p32 [coll]
-  (mapcat #(list % %) coll))
+    (mapcat #(list % %) coll))
 
 ;; Q101: Write a function which replicates each element of a sequence a variable number of times.(p33)
 ;; (= (__ [1 2 3] 2) '(1 1 2 2 3 3))
@@ -1327,7 +1327,7 @@
             (p39 (rest xs) (rest ys)))))
 
 #_(defn p39 [xs ys]
-  (mapcat list xs ys))
+    (mapcat list xs ys))
 
 ;; Q105: Write a function which separates the items of a sequence by an arbitrary value.(p40)
 ;;       一つは再帰、一つは mapcat を使う
@@ -1338,13 +1338,13 @@
 ;; (= (__ :z [:a :b :c :d]) [:a :z :b :z :c :z :d])
 (defn p40
   [c xs]
-    (rest (mapcat #(list c %) xs)))
+  (rest (mapcat #(list c %) xs)))
 
 #_(defn p40
-  [c coll]
-  (if-not (seq (rest coll))
-    coll
-    (cons (first coll) (cons c (p40 c (rest coll))))))
+    [c coll]
+    (if-not (seq (rest coll))
+      coll
+      (cons (first coll) (cons c (p40 c (rest coll))))))
 
 ;; Q106: Write a function which drops every Nth item from a sequence.(p41)
 ;; (= (__ [1 2 3 4 5 6 7 8] 3) [1 2 4 5 7 8])
@@ -1457,8 +1457,8 @@
           {}
           (group-by identity xs)))
 #_(defn p55 [coll]
-  (let [coll' (group-by identity coll)]
-    (zipmap (keys coll') (map count (vals coll')))))
+    (let [coll' (group-by identity coll)]
+      (zipmap (keys coll') (map count (vals coll')))))
 ;; my naive solution 2014/12/26
 ;; (defn p55 [coll]
 ;;   (let [coll' (group-by identity coll)
@@ -1482,8 +1482,8 @@
       (cons x (p56 (filter #(not (= x %)) xs))))))
 ;; A.2
 #_(defn p56
-  [xs]
-  (reduce (fn [acc x] (if (some #{x} acc) acc (conj acc x))) [] xs))
+    [xs]
+    (reduce (fn [acc x] (if (some #{x} acc) acc (conj acc x))) [] xs))
 
 ;; Q115: Write a function which allows you to create function compositions.
 ;;       The parameter list should take a variable number of functions,
@@ -1670,15 +1670,15 @@
 ;; (= (__ 2) false)
 ;; (= (__ 3) false)
 (defn p86 [n]
- (letfn [(_ [acc n]
-           (let [ns (map #(Integer/parseInt (str %)) (str n))
-                 n (reduce + (map #(* % %) ns))]
-             (if (= 1 n)
-               true
-               (if (some #(= n %) acc)
-                 false
-                 (_ (cons n acc) n)))))]
-   (_ [] n)))
+  (letfn [(_ [acc n]
+            (let [ns (map #(Integer/parseInt (str %)) (str n))
+                  n (reduce + (map #(* % %) ns))]
+              (if (= 1 n)
+                true
+                (if (some #(= n %) acc)
+                  false
+                  (_ (cons n acc) n)))))]
+    (_ [] n)))
 ;; my answer 2017/04/15
 ;; (defn p86 [n]
 ;;   (letfn [(convert-digits [n]
@@ -1717,13 +1717,13 @@
      false))
   ([a b & rest] false))
 #_(defn p95 [n]
-  (or (nil? n)
-      (and (coll? n)
-           (= 3 (count n))
-           (let [[n' n1 n2] n]
-             (and
-              (p95 n1)
-              (p95 n2))))))
+    (or (nil? n)
+        (and (coll? n)
+             (= 3 (count n))
+             (let [[n' n1 n2] n]
+               (and
+                (p95 n1)
+                (p95 n2))))))
 
 ;; Q127: Let us define a binary tree as "symmetric" if the left half of the tree is the mirror image of the right half of the tree.
 ;;       Write a predicate to determine whether or not a given binary tree is symmetric.
@@ -1965,31 +1965,41 @@
             (into acc (map #(conj % x) acc)))
           #{#{}} xs))
 
-                                        ; Q137: Given an input sequence of keywords and numbers, create a map such that each key in the map is a keyword,
-                                        ;    and the value is a sequence of all the numbers (if any) between it and the next keyword in the sequence.(p105)
-                                        ; (= {} (__ []))
-                                        ; (= {:a [1]} (__ [:a 1]))
-                                        ; (= {:a [1], :b [2]} (__ [:a 1, :b 2]))
-                                        ; (= {:a [1 2 3], :b [], :c [4]} (__ [:a 1 2 3 :b :c 4]))
+;; Q137: Given an input sequence of keywords and numbers, create a map such that each key in the map is a keyword,
+;;       and the value is a sequence of all the numbers (if any) between it and the next keyword in the sequence.(p105)
+;; (= {} (__ []))
+;; (= {:a [1]} (__ [:a 1]))
+;; (= {:a [1], :b [2]} (__ [:a 1, :b 2]))
+;; (= {:a [1 2 3], :b [], :c [4]} (__ [:a 1 2 3 :b :c 4]))
+;;
+;; ※ reduce を使ったパターンと 再帰 を使ったパターン両方書くこと。
 (defn p105
-  [[x & xs]]
-  (if-not (keyword? x)
-    {}
-    (assoc
-     (p105 (drop-while (complement keyword?) xs))
-     x (take-while (complement keyword?) xs))))
+  [xs]
+  (reduce (fn [acc x]
+            (if (keyword? x)
+              (assoc acc x [])
+              (let [[k _] (last acc)]
+                (merge-with conj acc {k x}))))
+          {}
+          xs))
 
-                                        ; Q138: Write a function which returns a sequence of digits of a non-negative number (first argument) in numerical system
-                                        ;    with an arbitrary base (second argument). Digits should be represented with their integer values,
-                                        ;    e.g. 15 would be [1 5] in base 10, [1 1 1 1] in base 2 and [15] in base 16. (p137)
-                                        ;    ref: https://ameblo.jp/taku-spi/entry-10539939101.html
-                                        ; (= [1 2 3 4 5 0 1] (__ 1234501 10))
-                                        ; (= [0] (__ 0 11))
-                                        ; (= [1 0 0 1] (__ 9 2))
-                                        ; (= [1 0] (let [n (rand-int 100000)](__ n n)))
-                                        ; (= [16 18 5 24 15 1] (__ Integer/MAX_VALUE 42))
+#_(defn p105
+    [[x & xs]]
+    (if-not (keyword? x)
+      {}
+      (assoc
+       (p105 (drop-while (complement keyword?) xs))
+       x (take-while (complement keyword?) xs))))
 
-                                        ;my answer 2017/09/26
+;; Q138: Write a function which returns a sequence of digits of a non-negative number (first argument) in numerical system
+;;       with an arbitrary base (second argument). Digits should be represented with their integer values,
+;;       e.g. 15 would be [1 5] in base 10, [1 1 1 1] in base 2 and [15] in base 16. (p137)
+;;       ref: https://ameblo.jp/taku-spi/entry-10539939101.html
+;; (= [1 2 3 4 5 0 1] (__ 1234501 10))
+;; (= [0] (__ 0 11))
+;; (= [1 0 0 1] (__ 9 2))
+;; (= [1 0] (let [n (rand-int 100000)](__ n n)))
+;; (= [16 18 5 24 15 1] (__ Integer/MAX_VALUE 42))
 (defn p137
   [n base]
   (let [result (rem n base)
@@ -1998,27 +2008,26 @@
       [result]
       (conj (p137 n' base) result))))
 
-                                        ;(defn p137 [n m]
-                                        ;  (if (zero? n)
-                                        ;    [0]
-                                        ;    (let [ns (reverse (take-while (fn [k] (<= k n)) (map (fn [l] (Math/pow m l)) (range))))]
-                                        ;      (letfn [(_ [ns n]
-                                        ;                (if-not (seq ns)
-                                        ;                  []
-                                        ;                  (cons (int (quot n (first ns)))
-                                        ;                        (_ (rest ns) (rem n (first ns))))))]
-                                        ;        (_ ns n)))))
+;;(defn p137 [n m]
+;;  (if (zero? n)
+;;    [0]
+;;    (let [ns (reverse (take-while (fn [k] (<= k n)) (map (fn [l] (Math/pow m l)) (range))))]
+;;      (letfn [(_ [ns n]
+;;                (if-not (seq ns)
+;;                  []
+;;                  (cons (int (quot n (first ns)))
+;;                        (_ (rest ns) (rem n (first ns))))))]
+;;        (_ ns n)))))
 
-                                        ; Q139: Write a function that returns a lazy sequence of "pronunciations" of a sequence of numbers.
-                                        ;    A pronunciation of each element in the sequence consists of the number of repeating identical numbers and the number itself.
-                                        ;    For example, [1 1] is pronounced as [2 1] ("two ones"), which in turn is pronounced as [1 2 1 1] ("one two, one one").
-                                        ;    Your function should accept an initial sequence of numbers, and return an infinite lazy sequence of pronunciations,
-                                        ;    each element being a pronunciation of the previous element.(p110)
-                                        ; (= [[1 1] [2 1] [1 2 1 1]] (take 3 (__ [1])))
-                                        ; (= [3 1 2 4] (first (__ [1 1 1 4 4])))
-                                        ; (= [1 1 1 3 2 1 3 2 1 1] (nth (__ [1]) 6))
-                                        ; (= 338 (count (nth (__ [3 2]) 15)))
-                                        ; my answer 2017/09/27
+;; Q139: Write a function that returns a lazy sequence of "pronunciations" of a sequence of numbers.
+;;       A pronunciation of each element in the sequence consists of the number of repeating identical numbers and the number itself.
+;;       For example, [1 1] is pronounced as [2 1] ("two ones"), which in turn is pronounced as [1 2 1 1] ("one two, one one").
+;;       Your function should accept an initial sequence of numbers, and return an infinite lazy sequence of pronunciations,
+;;       each element being a pronunciation of the previous element.(p110)
+;; (= [[1 1] [2 1] [1 2 1 1]] (take 3 (__ [1])))
+;; (= [3 1 2 4] (first (__ [1 1 1 4 4])))
+;; (= [1 1 1 3 2 1 3 2 1 1] (nth (__ [1]) 6))
+;; (= 338 (count (nth (__ [3 2]) 15)))
 (defn p110
   [coll]
   (let [e (->> coll
@@ -2026,115 +2035,101 @@
                (mapcat (fn [coll] [(count coll) (first coll)])))]
     (lazy-seq (cons e (p110 e)))))
 
-                                        ;(defn p110 [coll]
-                                        ;  (let [result (mapcat (fn [coll'] [(count coll') (first coll')]) (partition-by identity coll))]
-                                        ;    (lazy-seq (cons result (p110 result)))))
-
-                                        ; Q140: Write an oscillating iterate: a function that takes an initial value and a variable number of functions.
-                                        ;    It should return a lazy sequence of the functions applied to the value in order,
-                                        ;    restarting from the first function after it hits the end.(p144)
-                                        ; (= (take 3 (__ 3.14 int double)) [3.14 3 3.0])
-                                        ; (= (take 5 (__ 3 #(- % 3) #(+ 5 %))) [3 0 5 2 7])
-                                        ; (= (take 12 (__ 0 inc dec inc dec inc)) [0 1 0 1 0 1 2 1 2 1 2 3])
+;; Q140: Write an oscillating iterate: a function that takes an initial value and a variable number of functions.
+;;       It should return a lazy sequence of the functions applied to the value in order,
+;;       restarting from the first function after it hits the end.(p144)
+;; (= (take 3 (__ 3.14 int double)) [3.14 3 3.0])
+;; (= (take 5 (__ 3 #(- % 3) #(+ 5 %))) [3 0 5 2 7])
+;; (= (take 12 (__ 0 inc dec inc dec inc)) [0 1 0 1 0 1 2 1 2 1 2 3])
 (defn p144
   [n & fs]
   (reductions (fn [n f] (f n)) n (cycle fs)))
-                                        ; (defn p144 [n & fs]
-                                        ;   (letfn [(_ [n fs]
-                                        ;             (lazy-seq (cons n (_ ((first fs) n) (rest fs)))))]
-                                        ;     (_ n (cycle fs))))
 
-                                        ; Q141: Given any number of sequences, each sorted from smallest to largest, find the smallest single number which appears in all of the sequences.
-                                        ;    The sequences may be infinite, so be careful to search lazily.(p108)
-                                        ; (= 3 (__ [3 4 5]))
-                                        ; (= 4 (__ [1 2 3 4 5 6 7] [0.5 3/2 4 19]))
-                                        ; (= 7 (__ (range) (range 0 100 7/6) [2 3 5 7 11 13]))
-                                        ; (= 64 (__ (map #(* % % %) (range)) ;; perfect cubes
-                                        ;           (filter #(zero? (bit-and % (dec %))) (range)) ;; powers of 2
-                                        ;           (iterate inc 20))) ;; at least as large as 20
-(defn p108 [& coll]
-  (let [vs (map first coll)]
-    (if (= (apply min vs) (apply max vs))
-      (first vs)
-      (let [v (apply max vs)]
-        (apply p108 (map (fn [coll] (if (> v (first coll))
-                                      (rest coll)
-                                      coll))
-                         coll))))))
+#_(defn p144
+    [n & fs]
+    (letfn [(p144' [n fs]
+              (let [f (first fs)
+                    fs' (rest fs)]
+                (lazy-seq (cons n (p144' (f n) fs')))))]
+      (p144' n (cycle fs))))
 
-                                        ; my answer 2017/10/19
-                                        ;(defn p108
-                                        ;  [& nss]
-                                        ;  (letfn [(single-number?
-                                        ;            [n]
-                                        ;            (= Long (type n)))]
-                                        ;    (let [nss' (map (fn [ns] (drop-while (complement single-number?) ns)) nss)]
-                                        ;      (if (apply = (map first nss'))
-                                        ;        (first (first nss'))
-                                        ;        (let [max-n (apply max (map first nss'))]
-                                        ;          (apply p108 (map (fn [ns] (if (= (first ns) max-n) ns (rest ns))) nss')))))))
+;; Q141: Given any number of sequences, each sorted from smallest to largest, find the smallest single number which appears in all of the sequences.
+;;       The sequences may be infinite, so be careful to search lazily.(p108)
+;; (= 3 (__ [3 4 5]))
+;; (= 4 (__ [1 2 3 4 5 6 7] [0.5 3/2 4 19]))
+;; (= 7 (__ (range) (range 0 100 7/6) [2 3 5 7 11 13]))
+;; (= 64 (__ (map #(* % % %) (range)) ;;;; perfect cubes
+;;           (filter #(zero? (bit-and % (dec %))) (range)) ;;;; powers of 2
+;;           (iterate inc 20))) ;;;; at least as large as 20
+(defn p108
+  [& nss]
+  (let [ns (map first nss)
+        n (apply min ns)]
+    (if (= n (apply max ns))
+      n
+      (apply p108 (map (fn [ns] (drop-while #(<= % n) ns)) nss)))))
 
-
-                                        ; Q142: Write a function which flattens any nested combination of sequential things (lists, vectors, etc.),
-                                        ;    but maintains the lowest level sequential items. The result should be a sequence of sequences with only one level of nesting.(p93)
-                                        ; (= (__ [["Do"] ["Nothing"]])
-                                        ;    [["Do"] ["Nothing"]])
-                                        ; (= (__ [[[[:a :b]]] [[:c :d]] [:e :f]])
-                                        ;    [[:a :b] [:c :d] [:e :f]])
-                                        ; (= (__ '((1 2)((3 4)((((5 6)))))))
-                                        ;    '((1 2)(3 4)(5 6)))
-(defn p93 [coll]
+;; Q142: Write a function which flattens any nested combination of sequential things (lists, vectors, etc.),
+;;       but maintains the lowest level sequential items. The result should be a sequence of sequences with only one level of nesting.(p93)
+;; (= (__ [["Do"] ["Nothing"]])
+;;    [["Do"] ["Nothing"]])
+;; (= (__ [[[[:a :b]]] [[:c :d]] [:e :f]])
+;;    [[:a :b] [:c :d] [:e :f]])
+;; (= (__ '((1 2)((3 4)((((5 6)))))))
+;;    '((1 2)(3 4)(5 6)))
+(defn p93
+  [coll]
   (when (seq coll)
-    (letfn [(lowest-seq? [coll] (and (seq coll) (not (coll? (first coll)))))]
+    (letfn [(nested-coll? [coll]
+              (coll? (first coll)))]
       (let [x (first coll)
             xs (rest coll)]
-        (if (lowest-seq? x)
-          (cons x (p93 xs))
-          (concat (p93 x) (p93 xs)))))))
-                                        ; my answer 2017/10/22
-#_(defn p93
-    [colls]
-    (letfn [(flatten
-              [coll]
-              (if (sequential? (first coll))
-                (flatten (first coll))
-                coll))]
-      (map flatten colls)))
+        (if (nested-coll? x)
+          (concat (p93 x) (p93 xs))
+          (cons x (p93 xs)))))))
 
-                                        ; Q143: Write a function that accepts a curried function of unknown arity n. Return an equivalent function of n arguments.
-                                        ;    You may wish to read this.(p158)
-                                        ; (= 10 ((__ (fn [a]
-                                        ;              (fn [b]
-                                        ;                (fn [c]
-                                        ;                  (fn [d]
-                                        ;                    (+ a b c d))))))
-                                        ;        1 2 3 4))
-                                        ; (= 24 ((__ (fn [a]
-                                        ;              (fn [b]
-                                        ;                (fn [c]
-                                        ;                  (fn [d]
-                                        ;                    (* a b c d))))))
-                                        ;        1 2 3 4))
-                                        ; (= 25 ((__ (fn [a]
-                                        ;              (fn [b]
-                                        ;                (* a b))))
-                                        ;        5 5))
-                                        ; (defn p158 [f]
-                                        ;   (fn [& coll]
-                                        ;     (letfn [(_ [f coll]
-                                        ;               (if-not (seq (rest coll))
-                                        ;                 (f (first coll))
-                                        ;                 (_ (f (first coll)) (rest coll))))]
-                                        ;       (_ f coll))))
+;; Q143: Write a function that accepts a curried function of unknown arity n. Return an equivalent function of n arguments.
+;;       You may wish to read this.(p158)
+;;       再帰を用いるパターンと、reduceを用いるパターン両方書くこと
+;; (= 10 ((__ (fn [a]
+;;              (fn [b]
+;;                (fn [c]
+;;                  (fn [d]
+;;                    (+ a b c d))))))
+;;        1 2 3 4))
+;; (= 24 ((__ (fn [a]
+;;              (fn [b]
+;;                (fn [c]
+;;                  (fn [d]
+;;                    (* a b c d))))))
+;;        1 2 3 4))
+;; (= 25 ((__ (fn [a]
+;;              (fn [b]
+;;                (* a b))))
+;;        5 5))
 (defn p158
   [f]
   (fn [& xs]
     (reduce (fn [f x] (f x)) f xs)))
+;; (defn p158 [f]
+;;   (fn [& coll]
+;;     (letfn [(_ [f coll]
+;;               (if-not (seq (rest coll))
+;;                 (f (first coll))
+;;                 (_ (f (first coll)) (rest coll))))]
+;;       (_ f coll))))
+;; (defn p158
+;;   [f]
+;;   (partial (fn p158' [f' & xs]
+;;              (if-not (seq xs)
+;;                f'
+;;                (apply p158' (f' (first xs)) (rest xs)))) f))
 
 ;; Q144: take-while is great for filtering sequences, but it limited: you can only examine a single item of the sequence at a time.
-;;    What if you need to keep track of some state as you go over the sequence?
-;;    Write a function which accepts an integer n, a predicate p, and a sequence.
-;;    It should return a lazy sequence of items in the list up to, but not including, the nth item that satisfies the predicate.(p114)
+;;       What if you need to keep track of some state as you go over the sequence?
+;;       Write a function which accepts an integer n, a predicate p, and a sequence.
+;;       It should return a lazy sequence of items in the list up to, but not including, the nth item that satisfies the predicate.(p114)
+;;
 ;; (= [2 3 5 7 11 13]
 ;;    (__ 4 #(= 2 (mod % 3))
 ;;          [2 3 5 7 11 13 17 19 23]))
@@ -2154,7 +2149,6 @@
                    (if (p x) (dec n) n)
                    xs))))]
     (_ [] n coll)))
-
 ;; my answer 2017/10/30
 #_(defn p114
     [n p coll]
@@ -2184,6 +2178,15 @@
 ;;                  (__ (fn [a b] ;; both even or both odd
 ;;                        (= (mod a 2) (mod b 2)))
 ;;                      :same))))
+#_(defn p132
+  [p a coll]
+  (if-not (seq (rest coll))
+    coll
+    (let [coll' (map (fn [[x y]] (if (p x y) [x a y] [x y])) (partition 2 1 coll))
+          x' (first coll')
+          xs' (map rest (rest coll'))]
+      (reduce concat x' xs'))))
+;;; 上記では integer overflow を起こすので、明示的遅延評価を使えるように再帰で書き直す
 (defn p132 [p v coll]
   (when (seq coll)
     (let [[x y] (take 2 coll)]
@@ -2404,4 +2407,3 @@
 (deftype Circle [radius]
   Shape
   (area [this] (* radius radius Math/PI)))
-
