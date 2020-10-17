@@ -9,26 +9,30 @@
   (when (seq colls)
     (apply (partial map vector) colls)))
 
-;; Q002: haskellのsumと同様の機能の関数を書け。(reduceを用いるパターン、applyを用いるパターン、再帰を用いるパターン)
+;; Q002: haskellのsumと同様の機能の関数を書け。(再帰を用いるパターン,reduceを用いるパターン、applyを用いるパターン)
 ;; sum :: (Num a) => [a] -> a
 ;; sum ns
 ;;     数値のリスト ns の総和を返す。
 ;;     see also: product, foldl
 ;;         sum [1, 2, 3]  = 6
 ;;         sum []         = 0
-;; A: Using reduce.
-;; (defn sum [ns]
-;;   (reduce + ns))
-(defn sum [ns]
-  (reduce + ns))
-;; A: Using apply.
-;; (defn sum [ns]
-;;   (apply + ns))
+(defn sum
+  [ns]
+  (if-not (seq ns)
+    0
+    (+ (first ns) (sum (rest ns)))))
 ;; A: Using recursion.
 ;;(defn sum [ns]
 ;;  (if-not (seq ns)
 ;;    0
 ;;    (+ (first ns) (sum (rest ns)))))
+;; A: Using reduce.
+;; (defn sum [ns]
+;;   (reduce + ns))
+;; A: Using apply.
+;; (defn sum [ns]
+;;   (apply + ns))
+
 
 ;; Q003: クイックソート関数qsort01を書け
 (defn qsort01
