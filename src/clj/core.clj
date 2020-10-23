@@ -34,7 +34,7 @@
 ;;   (apply + ns))
 
 
-;; Q003: クイックソート関数qsort01を書け
+;; Q003: クイックソート関数qsort01を書け（リスト内包表記を使うこと）
 (defn qsort01
   [xs]
   (if-not (seq xs)
