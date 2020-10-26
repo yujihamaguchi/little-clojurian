@@ -34,35 +34,35 @@
 ;;   (apply + ns))
 
 
-;; Q003: クイックソート関数qsort01を書け（リスト内包表記を使うこと）
+;; Q003: クイックソート関数 qsort01 を書け（リスト内包表記を使うこと）
 (defn qsort01
   [xs]
   (if-not (seq xs)
     []
-    (let [x  (first xs)
+    (let [x (first xs)
           lt (for [x' xs :when (< (int x') (int x))] x')
           gt (for [x' xs :when (> (int x') (int x))] x')]
       (concat (qsort01 lt) [x] (qsort01 gt)))))
 
-;; Q004: haskellのproductと同様の機能の関数を書け(reduceを用いるパターン、applyを用いるパターン、再帰を用いるパターン)
+;; Q004: Haskell の product と同様の機能の関数を書け(再帰を用いるパターン、 reduce を用いるパターン、 apply を用いるパターン)
 ;; product :: (Num a) => [a] -> a
 ;; product ns
 ;;     数値のリスト ns の全要素の積を返す。
-;;     see also: sum, foldl
 ;;         product [2, 3, 4]   = 24
 ;;         product [4, 5, 0]   = 0
 ;;         product []          = 1
+;; =================================
+;; A: Using recursion.
+(defn product [ns]
+  (if-not (seq ns)
+    1
+    (* (first ns) (product (rest ns)))))
 ;; A: Using reduce.
 ;; (defn product [ns]
 ;;   (reduce * ns))
 ;; A: Using apply.
 ;; (defn product [ns]
 ;;   (apply * ns))
-;; A: Using recursion.
-(defn product [ns]
-  (if-not (seq ns)
-    1
-    (* (first ns) (product (rest ns)))))
 
 ;; Q005: リストを逆順に整列する関数rqsortを書け
 (defn rqsort [xs]
