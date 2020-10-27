@@ -64,15 +64,15 @@
 ;; (defn product [ns]
 ;;   (apply * ns))
 
-;; Q005: リストを逆順に整列する関数rqsortを書け
-(defn rqsort [xs]
+;; Q005: リストを逆順に整列する関数 rqsort を書け
+(defn rqsort
+  [xs]
   (if-not (seq xs)
     []
     (let [x (first xs)
-          xs' (rest xs)
-          lt (for [x' xs' :when (< (int x') (int x))] x')
-          ge (for [x' xs' :when (>= (int x') (int x))] x')]
-      (concat (rqsort ge) [x] (rqsort lt)))))
+          lt (for [x' xs :when (< (int x') (int x))] x')
+          gt (for [x' xs :when (> (int x') (int x))] x')]
+      (concat (rqsort gt) [x] (rqsort lt)))))
 
 ;; Q006: haskellのinitと同様の機能の関数my-initを書け(再帰を用いるバージョンも書くこと)
 ;; init :: [a] -> [a]
