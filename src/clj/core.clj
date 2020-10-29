@@ -74,7 +74,7 @@
           gt (for [x' xs :when (> (int x') (int x))] x')]
       (concat (rqsort gt) [x] (rqsort lt)))))
 
-;; Q006: haskellのinitと同様の機能の関数my-initを書け(再帰を用いるバージョンも書くこと)
+;; Q006: Haskell の init と同様の機能の関数 my-init を書け(再帰を用いるバージョンも書くこと)
 ;; init :: [a] -> [a]
 ;; リスト xs の最後の要素を除いたリストを返す。
 ;;     init [1,2,3]   = [1,2]
