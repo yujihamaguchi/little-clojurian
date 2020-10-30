@@ -87,18 +87,26 @@
 ;;    []
 ;;    (cons (first xs) (my-init (rest xs)))))
 
-;; Q007: haskellのlastと同様の機能の関数を書け(再帰を用いるバージョンも書くこと)
+;; Q007: Haskell の last と同様の機能の関数 my-last を書け(再帰を用いるバージョンも書くこと)
 ;; last :: [a] -> a
 ;;     リストの最後の要素を返す。
 ;;         last [1,2,3]   = 3
 ;;         last []        = エラー
-(defn my-last [xs]
-  ((comp first reverse) xs))
+#_(defn my-last
+  [xs]
+  (if-not (seq xs)
+    (throw (java.util.NoSuchElementException.))
+    ((comp first reverse) xs)))
 ;; A: Using recursion.
-;;(defn my-last [xs]
-;;  (if-not (seq (rest xs))
-;;    (first xs)
-;;    (my-last (rest xs))))
+(defn my-last
+  [xs]
+  (if-not (seq xs)
+    (throw (java.util.NoSuchElementException.))
+    (letfn [(my-last' [xs]
+              (if-not (seq (next xs))
+                (first xs)
+                (my-last' (rest xs))))]
+      (my-last' xs))))
 
 ;; Q008: 偶数の長さを持つリストを半分ずつに分割する関数halveを書け。
 (defn halve [xs]
