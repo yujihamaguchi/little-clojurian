@@ -108,7 +108,7 @@
                 (my-last' (rest xs))))]
       (my-last' xs))))
 
-;; Q008: 偶数の長さを持つリストを半分ずつに分割する関数halveを書け。
+;; Q008: 偶数の長さを持つリストを半分ずつに分割する関数 halve を書け。
 (defn halve [xs]
   (when (seq xs)
     (let [n (quot (count xs) 2)]
