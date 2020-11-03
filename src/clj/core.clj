@@ -109,10 +109,13 @@
       (my-last' xs))))
 
 ;; Q008: 偶数の長さを持つリストを半分ずつに分割する関数 halve を書け。
-(defn halve [xs]
-  (when (seq xs)
-    (let [n (quot (count xs) 2)]
-      [(take n xs) (drop n xs)])))
+(defn halve
+  [xs]
+  (let [n (count xs)]
+    (if (or (zero? n) (not (zero? (rem n 2))))
+      (throw (java.lang.IllegalArgumentException.))
+      (let [n' (quot n 2)]
+        [(take n' xs) (drop n' xs)]))))
 
 ;; Q009: concatをリスト内包表記で実装したmy-concatを書け。
 ;; concat :: [[a]] -> [a]
@@ -440,14 +443,18 @@
 
 ;; Q048: 関数my-mergeを用いてマージソートを実行する関数msortを再帰を用いて書け。
 ;;       マージソートは、引数のリストを二つに分割し、それぞれを整列した後、再び一つに戻す事で、整列を実現する。
-;;       最初に、リストを半分に分割する関数halveを書け。
+;;       最初に、リストを半分に分割する関数 simple-halve を書け。
 ;; A
+(defn simple-halve
+  [xs]
+  (let [n (quot (count xs) 2)]
+    [(take n xs) (drop n xs)]))
 (defn msort
   [xs]
   (cond
     (not (seq xs)) []
     (not (next xs)) xs
-    :else (let [[xs1 xs2] (halve xs)]
+    :else (let [[xs1 xs2] (simple-halve xs)]
             (my-merge (msort xs1) (msort xs2)))))
 
 ;; Q049: replicateを再帰を用いて自作せよ。(my-replicate-rec [n x])
