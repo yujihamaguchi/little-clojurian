@@ -117,7 +117,7 @@
       (let [n' (quot n 2)]
         [(take n' xs) (drop n' xs)]))))
 
-;; Q009: concatをリスト内包表記で実装したmy-concatを書け。
+;; Q009: concat をリスト内包表記で実装した my-concat を書け。
 ;; concat :: [[a]] -> [a]
 ;; concat xs
 ;;     リストのリスト xs を一つのリストに連結する。
@@ -127,7 +127,7 @@
 ;;         concat []                       = []
 (defn my-concat
   [xss]
-  (for [xs xss x xs] x))
+  (for [xs xss, x xs] x))
 
 ;; Q010: 正の整数に対し、すべての約数を計算する関数factorsを書け
 (defn factors
