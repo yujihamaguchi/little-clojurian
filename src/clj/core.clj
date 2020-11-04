@@ -129,7 +129,7 @@
   [xss]
   (for [xs xss, x xs] x))
 
-;; Q010: 正の整数に対し、すべての約数を計算する関数factorsを書け
+;; Q010: 正の整数に対し、すべての約数を計算する関数 factors を書け
 (defn factors
   [n]
   (for [n' (range 1 (inc n)) :when (zero? (rem n n'))] n'))
