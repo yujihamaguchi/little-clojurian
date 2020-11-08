@@ -139,11 +139,12 @@
   [k ps]
   (for [[k' v] ps :when (= k k')] v))
 
-;; Q012: 対のリストから、対の先頭の要素を取り出してリストを生成するfirstsをリスト内包表記と分配束縛を用いて書け。
-(defn firsts [ps]
+;; Q012: 対のリストから、対の先頭の要素を取り出してリストを生成する firsts をリスト内包表記と分配束縛を用いて書け。
+(defn firsts
+  [ps]
   (for [[k _] ps] k))
 
-;; Q013: haskellのlengthを、sumとリスト内包表記で書け。
+;; Q013: haskell の length を、 sum とリスト内包表記で書け。
 ;; length :: [a] -> Int
 ;; length xs
 ;;     リスト xs の長さを返す。
@@ -151,17 +152,19 @@
 ;;         length "abcde"   = 5
 ;;         length []        = 0
 ;;         length ""        = 0
-(defn length [coll]
-  (sum (for [_ coll] 1)))
+(defn length
+  [xs]
+  (sum (for [_ xs] 1)))
 
-;; Q014: factorsを用いて、整数が素数か判定する関数primeを書け。
-(defn prime [n]
+;; Q014: factors を用いて、整数が素数か判定する関数 prime を書け。
+(defn prime?
+  [n]
   (= [1 n] (factors n)))
 
-;; Q015: primeを用いて与えられた上限数までの全ての素数を生成する関数primesを書け。
+;; Q015: prime を用いて与えられた上限数までの全ての素数を生成する関数 primes を書け。
 (defn primes
   [n]
-  (for [n' (range 1 (inc n)) :when (prime n')] n'))
+  (for [n' (range 2 (inc n)) :when (prime? n')] n'))
 
 ;; Q016: リストから隣り合う要素をマップにして返す関数pairsをzipmapを用いて書け。
 ;; ex)
