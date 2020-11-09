@@ -166,14 +166,14 @@
   [n]
   (for [n' (range 2 (inc n)) :when (prime? n')] n'))
 
-;; Q016: リストから隣り合う要素をマップにして返す関数pairsをzipmapを用いて書け。
+;; Q016: リストから隣り合う要素をマップにして返す関数 pairs を zipmap を用いて書け。
 ;; ex)
 ;;   [1 2] => {1 2}
 ;;   [1 2 3] => {1 2, 2 3}
 ;;   [1 2 3 4] => {1 2, 2 3, 3 4}
 (defn pairs
-  [coll]
-  (zipmap coll (rest coll)))
+  [xs]
+  (zipmap xs (rest xs)))
 
 ;; Q017: 順序クラスに属する任意の型の要素を持つリストが、整列されているか調べる関数sortedをpairs関数を用いて書け。
 ;;    （本来、pairsのような処理を行いたい場合、Clojureではシーケンスライブラリのpartitionを使用する。）
