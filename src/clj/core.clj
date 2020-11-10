@@ -156,7 +156,7 @@
   [xs]
   (sum (for [_ xs] 1)))
 
-;; Q014: factors を用いて、整数が素数か判定する関数 prime を書け。
+;; Q014: factors を用いて、整数が素数か判定する関数 prime? を書け。
 (defn prime?
   [n]
   (= [1 n] (factors n)))
@@ -175,10 +175,11 @@
   [xs]
   (zipmap xs (rest xs)))
 
-;; Q017: 順序クラスに属する任意の型の要素を持つリストが、整列されているか調べる関数sortedをpairs関数を用いて書け。
-;;    （本来、pairsのような処理を行いたい場合、Clojureではシーケンスライブラリのpartitionを使用する。）
-(defn sorted [coll]
-  (every? (fn [[n m]] (< n m)) (pairs coll)))
+;; Q017: 順序クラスに属する任意の型の要素を持つリストが、整列されているか調べる関数 sorted? を pairs 関数を用いて書け。
+;;       （本来、 pairs のような処理を行いたい場合、 Clojure ではシーケンスライブラリの partition を使用する。）
+(defn sorted?
+  [xs]
+  (every? (fn [[x y]] (<= x y)) (pairs xs)))
 
 ;; Q018: 目的とする値がリストのどの位置にあるかを調べて、その位置全てをリストとして返す関数positionsを書け。(indexは0から開始される事)
 (defn positions

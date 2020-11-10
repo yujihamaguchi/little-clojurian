@@ -170,10 +170,10 @@
 
 (deftest sorted-test
   (testing
-    (is (sorted [1 2]))
-    (is (not (sorted [2 1])))
-    (is (sorted [1]))
-    (is (sorted []))
+    (is (sorted? [1 2]))
+    (is (not (sorted? [2 1])))
+    (is (sorted? [1]))
+    (is (sorted? []))
   )
 )
 
