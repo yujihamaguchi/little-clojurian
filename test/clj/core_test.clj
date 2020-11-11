@@ -180,6 +180,9 @@
 (deftest positions-test
   (testing
     (is (= (positions 1 [1 2]) [0]))
+    (is (= (positions 1 [1 2 1]) [0 2]))
+    (is (= (positions 1 [0 1 1 2]) [1 2]))
+    (is (= (positions 1 [2 3]) []))
   )
 )
 

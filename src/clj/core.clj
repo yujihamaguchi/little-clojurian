@@ -179,9 +179,11 @@
 ;;       （本来、 pairs のような処理を行いたい場合、 Clojure ではシーケンスライブラリの partition を使用する。）
 (defn sorted?
   [xs]
-  (every? (fn [[x y]] (<= x y)) (pairs xs)))
+  (every?
+   (fn [[x y]] (<= x y))
+   (pairs xs)))
 
-;; Q018: 目的とする値がリストのどの位置にあるかを調べて、その位置全てをリストとして返す関数positionsを書け。(indexは0から開始される事)
+;; Q018: 目的とする値がリストのどの位置にあるかを調べて、その位置全てをリストとして返す関数 positions を書け。( index は 0 から開始される事)
 (defn positions
   [x xs]
   (for [[i x'] (zipmap (range) xs) :when (= x x')] i))
