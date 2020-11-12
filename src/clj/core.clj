@@ -183,20 +183,23 @@
    (fn [[x y]] (<= x y))
    (pairs xs)))
 
-;; Q018: 目的とする値がリストのどの位置にあるかを調べて、その位置全てをリストとして返す関数 positions を書け。( index は 0 から開始される事)
+;; Q018: 目的とする値がリストのどの位置にあるかを調べて、その位置全てをリストとして返す関数 positions を書け。(index は 0 から開始される事)
 (defn positions
   [x xs]
-  (for [[i x'] (zipmap (range) xs) :when (= x x')] i))
+  (for [[i x'] (zipmap (range) xs) :when (= x' x)] i))
 
-;; Q019: 指定した特定の文字がいくつ含まれているか数える関数char-countを書け。
+;; Q019: 指定した特定の文字がいくつ含まれているか数える関数 char-count を書け。
 (defn char-count [c cs]
   (count (filter #(= c %) cs)))
+#_(defn char-count
+  [c cs]
+    (sum (for [c' cs :when (= c' c)] 1)))
 
-;; Q020: 文字列から小文字を数える関数lowersを書け。
-#_(defn lowers [cs]
-    (count (filter #(Character/isLowerCase %) cs)))
+;; Q020: 文字列から小文字を数える関数 lowers を書け。（正規表現を用いたパターンも）
 (defn lowers [s]
   (count (re-seq #"[a-z]" s)))
+#_(defn lowers [cs]
+    (count (filter #(Character/isLowerCase %) cs)))
 
 ;; Q021: Unicodeコードポイント（整数、'a'が0）を文字に変換する関数int2letを書け。
 (defn int2let [n]
