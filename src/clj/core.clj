@@ -196,31 +196,36 @@
     (sum (for [c' cs :when (= c' c)] 1)))
 
 ;; Q020: 文字列から小文字を数える関数 lowers を書け。（正規表現を用いたパターンも）
-(defn lowers [s]
-  (count (re-seq #"[a-z]" s)))
-#_(defn lowers [cs]
-    (count (filter #(Character/isLowerCase %) cs)))
+(defn lowers
+  [cs]
+  (count (filter #(Character/isLowerCase %) cs)))
+#_(defn lowers
+  [cs]
+  (count (re-seq #"[a-z]" cs)))
 
-;; Q021: Unicodeコードポイント（整数、'a'が0）を文字に変換する関数int2letを書け。
-(defn int2let [n]
+;; Q021: Unicode コードポイント（整数、 'a' を 0 とする）を文字に変換する関数 int2let を書け。
+(defn int2let
+  [n]
   (char (+ n (int \a))))
 
-;; Q022: 文字をUnicodeのコードポイント（整数）に変換する関数let2intを書け。（'a'が0番とする）
-(defn let2int [c]
+;; Q022: 文字を Unicode のコードポイント（整数）に変換する関数 let2int を書け。（ 'a' を 0 とする）
+(defn let2int
+  [c]
   (- (int c) (int \a)))
 
-;; Q023: 小文字をシフト数だけずらすshiftを書け。
-;;    (循環すること。)
-;;     ex) 'z'に対し、1ならば'a'となる）（小文字のみ対象とすること）
-(defn shift [n c]
-  (let [alph-cnt (range (int \a) (inc (int \z)))
-        m (let2int c)]
-    (int2let (rem (+ n m) alph-cnt))))
+;; Q023: 小文字をシフト数だけずらすshiftを書け。 (循環すること。 'z' に対し、 1 ならば 'a' となる）
+(defn my-shift
+  [n c]
+  (if-not (re-seq #"[a-z]" (str c))
+    c
+    (let [a2z-letter-count (count (range (int \a) (inc (int \z))))
+          n' (rem (+ n (let2int c)) a2z-letter-count)]
+      (int2let n'))))
 
 ;; Q024: 与えられたシフト数で文字列を暗号化する関数my-encodeを書け。
 (defn my-encode
   [n cs]
-  (apply str (map (partial shift n) cs)))
+  (apply str (map (partial my-shift n) cs)))
 
 ;; Q025: 百分率を計算し、浮動小数点数として返す関数percentを書け。
 (defn percent
@@ -707,13 +712,8 @@
 (def alpha-low-case
   (map char (range (int \a) (inc (int \z)))))
 
-(defn shift [n c]
-  (if-not ((set alpha-low-case) c)
-    c
-    (char (+ (rem (+ (- (int c) (int \a)) n) 26) (int \a)))))
-
 (defn shift-string [s n]
-  (apply str (map #(shift n %) s)))
+  (apply str (map #(my-shift n %) s)))
 
 (defn round-shift-string [s]
   (map #(shift-string s %) (range 0 26)))

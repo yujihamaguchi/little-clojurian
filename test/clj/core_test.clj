@@ -224,8 +224,9 @@
 
 (deftest shift-test
   (testing
-    (is (= (shift 1 \a) \b))
-    (is (= (shift 1 \z) \a))
+    (is (= (my-shift 1 \a) \b))
+    (is (= (my-shift 1 \z) \a))
+    (is (= (my-shift 1 \A) \A))
   )
 )
 
