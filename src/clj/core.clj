@@ -213,16 +213,16 @@
   [c]
   (- (int c) (int \a)))
 
-;; Q023: 小文字をシフト数だけずらすshiftを書け。 (循環すること。 'z' に対し、 1 ならば 'a' となる）
+;; Q023: 小文字をシフト数だけずらす my-shift を書け。 (循環すること。 'z' に対し、 1 ならば 'a' となる）
 (defn my-shift
   [n c]
   (if-not (re-seq #"[a-z]" (str c))
     c
-    (let [a2z-letter-count (count (range (int \a) (inc (int \z))))
+    (let [a2z-letter-count (count (range (let2int \a) (inc (let2int \z))))
           n' (rem (+ n (let2int c)) a2z-letter-count)]
       (int2let n'))))
 
-;; Q024: 与えられたシフト数で文字列を暗号化する関数my-encodeを書け。
+;; Q024: 与えられたシフト数で文字列を暗号化する関数 my-encode を書け。
 (defn my-encode
   [n cs]
   (apply str (map (partial my-shift n) cs)))
