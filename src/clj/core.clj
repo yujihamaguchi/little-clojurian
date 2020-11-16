@@ -227,12 +227,11 @@
   [n cs]
   (apply str (map (partial my-shift n) cs)))
 
-;; Q025: 百分率を計算し、浮動小数点数として返す関数percentを書け。
+;; Q026: 百分率を返す percent を書き、任意の文字列に対して文字の出現頻度表を返す関数 freqs を書け。（ lowers と char-count と percent を用いる）
 (defn percent
   [n m]
   (* (/ n m) 100))
 
-;; Q026: 任意の文字列に対して文字の出現頻度表を返す関数freqsを書け。（lowersとchar-countとpercentを用いる）
 (defn freqs
   [cs]
   (let [table (map int2let (range (let2int \a) (let2int \z)))
