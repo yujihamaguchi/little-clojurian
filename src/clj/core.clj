@@ -232,12 +232,10 @@
   [n m]
   (* (/ n m) 100))
 
-(defn freqs
-  [cs]
-  (let [table (map int2let (range (let2int \a) (let2int \z)))
-        n (count table)
-        cs' (lowers cs)]
-    (for [c table] (percent (char-count c cs') n))))
+(defn freqs [cs]
+  (for [c (map int2let (range 26))
+        :when (Character/isLowerCase c)]
+    (percent (char-count c cs) (count cs))))
 
 ;; Q027: カイ二乗検定を行う関数chisqrを書け。
 (defn chisqr
