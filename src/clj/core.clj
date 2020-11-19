@@ -232,7 +232,8 @@
   [n m]
   (* (/ n m) 100))
 
-(defn freqs [cs]
+(defn freqs
+  [cs]
   (for [c (map int2let (range 26))
         :when (Character/isLowerCase c)]
     (percent (char-count c cs) (count cs))))
