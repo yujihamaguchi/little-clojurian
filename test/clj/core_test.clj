@@ -199,10 +199,10 @@
 
 (deftest lowers-test
   (testing
-    (is (= (lowers "abcあ亜ア") 3))
-    (is (= (lowers "あ亜アAbc") 2))
-    (is (= (lowers "aBcあ亜ア") 2))
-    (is (= (lowers "あ亜アabC") 2))
+    (is (= (lower-count "abcあ亜ア") 3))
+    (is (= (lower-count "あ亜アAbc") 2))
+    (is (= (lower-count "aBcあ亜ア") 2))
+    (is (= (lower-count "あ亜アabC") 2))
   )
 )
 
@@ -234,6 +234,14 @@
   (testing
     (is (= (my-encode 1 "abc") "bcd"))
     (is (= (my-encode 1 "xyz") "yza"))
+  )
+)
+
+(deftest percent-test
+  (testing
+    (is (= (percent 1 1) 100))
+    (is (= (percent 1 2) 50N))
+    (is (= (percent 1 3) 100/3))
   )
 )
 

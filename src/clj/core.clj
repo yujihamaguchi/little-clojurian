@@ -195,11 +195,11 @@
   [c cs]
     (sum (for [c' cs :when (= c' c)] 1)))
 
-;; Q020: 文字列から小文字を数える関数 lowers を書け。（正規表現を用いたパターンも）
-(defn lowers
+;; Q020: 文字列から小文字を数える関数 lower-count を書け。（正規表現を用いたパターンも）
+(defn lower-count
   [cs]
   (count (filter #(Character/isLowerCase %) cs)))
-#_(defn lowers
+#_(defn lower-count
   [cs]
   (count (re-seq #"[a-z]" cs)))
 
@@ -227,16 +227,18 @@
   [n cs]
   (apply str (map (partial my-shift n) cs)))
 
-;; Q026: 百分率を返す percent を書き、任意の文字列に対して文字の出現頻度表を返す関数 freqs を書け。（ lowers と char-count と percent を用いる）
+;; Q025: 百分率を算出する関数 percent を書け。
 (defn percent
   [n m]
   (* (/ n m) 100))
 
+;; Q026: 任意の文字列に対して小文字アルファベットの出現頻度表を返す関数 freqs を書け。（ lower-count と char-count を用いる）
 (defn freqs
   [cs]
-  (for [c (map int2let (range 26))
-        :when (Character/isLowerCase c)]
-    (percent (char-count c cs) (count cs))))
+  (let [tbl (map int2let (range (let2int \a) (inc (let2int \z))))
+        cnt (lower-count cs)]
+    (for [c tbl]
+      (percent (char-count c cs) cnt))))
 
 ;; Q027: カイ二乗検定を行う関数chisqrを書け。
 (defn chisqr
