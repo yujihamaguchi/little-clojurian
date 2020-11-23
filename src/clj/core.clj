@@ -240,13 +240,15 @@
     (for [c tbl]
       (percent (char-count c cs) cnt))))
 
-;; Q027: カイ二乗検定を行う関数chisqrを書け。
+;; Q027: カイ二乗検定を行う関数 chisqr （期待値のリストが第一引数）を書け。
 (defn chisqr
-  [obs exs]
-  (letfn [(square
-            [n]
-            (* n n))]
-    (sum (map (fn [ob ex] (float (/ (square (- ob ex)) ex))) obs exs))))
+  [observeds expecteds]
+  (sum (map (fn [expected observed]
+              (float (/ (Math/pow (- observed expected)
+                                  2)
+                        expected)))
+            expecteds
+            observeds)))
 
 ;; Q028: 文字リストの要素をnだけ左に回転させる関数rotateを書け。（リストの先頭は末尾に接続していると考える）
 (defn rotate
