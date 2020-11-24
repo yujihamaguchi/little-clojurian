@@ -250,10 +250,11 @@
             expecteds
             observeds)))
 
-;; Q028: 文字リストの要素をnだけ左に回転させる関数rotateを書け。（リストの先頭は末尾に接続していると考える）
+;; Q028: 文字列を任意の数 n だけ左に回転させる関数 rotate を書け。（先頭の文字は末尾に接続していると考える）
 (defn rotate
-  [n cs]
-  (apply str (concat (drop n cs) (take n cs))))
+  [n s]
+  (let [n' (rem n (count s))]
+    (apply str (concat (drop n' s) (take n' s)))))
 
 ;; Q029: 1から100までの二乗の和を計算する式をリスト内包表記を用いて書け。
 (reduce + (for [n (range 1 (inc 100))] (Math/pow n 2)))
