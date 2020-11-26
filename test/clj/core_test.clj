@@ -269,6 +269,11 @@
   )
 )
 
+(deftest sum-square-1-to-100-test
+  (testing
+    (is (sum-square-1-to-100) 338350)
+  )
+)
 
 (deftest perfects-test
   (testing

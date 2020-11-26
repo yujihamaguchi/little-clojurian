@@ -256,8 +256,10 @@
   (let [n' (rem n (count s))]
     (apply str (concat (drop n' s) (take n' s)))))
 
-;; Q029: 1から100までの二乗の和を計算する式をリスト内包表記を用いて書け。
-(reduce + (for [n (range 1 (inc 100))] (Math/pow n 2)))
+;; Q029: 1 から 100 までの二乗の和を計算する関数 sum-square-1-to-100 をリスト内包表記を用いて書け。
+(defn sum-square-1-to-100
+  []
+  (reduce + (for [n (range 1 101)] (* n n))))
 
 ;; Q030: 2つの生成器を持つリスト内包表記 [(x,y) | x <- [1,2,3], y <- [4,5,6]] は(*)、
 ;;       1つの生成器を持つリスト内包表記2つでも表現出来る事を示せ。
