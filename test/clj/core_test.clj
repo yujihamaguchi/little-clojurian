@@ -284,7 +284,8 @@
 
 (deftest pyths-test
   (testing
-      (is (= (set (map set (pyths 10))) #{#{3 4 5} #{6 8 10}}))
+      (is (= (pyths 10)
+             [[3 4 5] [6 8 10]]))
   )
 )
 

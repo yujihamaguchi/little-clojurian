@@ -266,27 +266,26 @@
 (=  (for [x [1 2 3] y [4 5 6]] [x y])
     (apply concat (for [x [1 2 3]] (for [y [4 5 6]] [x y]))))
 
-;; Q031: 与えられた上限までに含まれる完全数全てを算出する関数perfectsをリスト内包表記と関数factorsを使って定義せよ。
+;; Q031: 与えられた上限の数値までに含まれる完全数全てを算出する関数 perfects をリスト内包表記と関数 factors および sum を使って定義せよ。
 ;;       完全数：自分自身をのぞく約数の和が自分自身と等しい整数
 (defn perfects
   [n]
   (for [n' (range 1 n) :when (= n' (- (sum (factors n')) n'))] n'))
 
-;; Q032: ピタゴラス数のリスト(組み合わせ)を生成する関数pythsをリスト内包表記を使って定義せよ。ただし、ピタゴラス数の要素は与えられた上限n以下であるとする。
-;; (defn pyths [n]
-;;   (letfn [(range-closed [n] (range 1 (inc n)))]
-;;     (for [
-;;       x (range-closed n)
-;;       y (range-closed n)
-;;       z (range-closed n)
-;;       :when
-;;         (and
-;;           (= (Math/pow x 2) (+ (Math/pow y 2) (Math/pow z 2)))
-;;           (< y z))]
-;;       [x y z])))
-(defn pyths [n]
-  (let [ns (range 1 (inc n))]
-    (for [x ns y ns z ns :when (and (< x y) (= (+ (Math/pow x 2) (Math/pow y 2)) (Math/pow z 2)))] [x y z])))
+;; Q032: ピタゴラス数のリストを生成する関数 pyths をリスト内包表記を使って定義せよ。
+;;       ただし、ピタゴラス数の要素は与えられた上限 n 以下であるとする。
+(defn pyths
+  [n]
+  (letfn [(pyth? [a b c]
+            (= (+ (Math/pow a 2) (Math/pow b 2))
+               (Math/pow c 2)))]
+    (let [ns (range 1 (inc n))]
+      (for [a ns
+            b ns
+            c ns
+            :when (and (< a b)
+                       (pyth? a b c))]
+        [a b c]))))
 
 ;; Q033: ある要素のみからなるリストを生成する関数my-replicateを書け。(直接の再帰、それを使わないバージョンをそれぞれ書け)
 ;;    ex) >replicate 3 True
