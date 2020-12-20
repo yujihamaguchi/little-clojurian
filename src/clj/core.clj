@@ -287,11 +287,11 @@
                        (pyth? a b c))]
         [a b c]))))
 
-;; Q033: ある要素のみからなるリストを生成する関数my-replicateを書け。(直接の再帰、それを使わないバージョンをそれぞれ書け)
+;; Q033: ある要素のみからなるリストを生成する関数 my-replicate を書け。(直接の再帰、それを使わないバージョンをそれぞれ書け)
 ;;    ex) >replicate 3 True
 ;;        [True, True, True]
+;; 直接の再帰
 (defn my-replicate [n x]
-  ;; 直接の再帰
   (if (zero? n)
     []
     (cons x (my-replicate (dec n) x))))
