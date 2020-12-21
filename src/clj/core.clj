@@ -303,10 +303,11 @@
 ;;               (my-replicate' (dec n) (cons x acc))))]
 ;;     (my-replicate' n [])))
 
-;; Q034: 二つの整数のリストの内積を求める関数scalarproductをリスト内包表記を用いて書け。
+;; Q034: 二つの整数のリストの内積を求める関数　scalarproduct　を書け。
 ;; A
-(defn scalarproduct [ns ms]
-  (reduce + (for [[n m] (map vector ns ms)] (* n m))))
+(defn scalarproduct
+  [ns ms]
+  (reduce + (map #(* %1 %2) ns ms)))
 
 ;; Q035: 要素を逆転する関数myreverseを書け。
 ;; A
