@@ -309,7 +309,7 @@
   [ns ms]
   (reduce + (map #(* %1 %2) ns ms)))
 
-;; Q035: 要素を逆転する関数myreverseを書け。
+;; Q035: 要素を逆転する関数 myreverse を直接の再帰を用いて書け。
 ;; A
 (defn myreverse [coll]
   (if-not (seq coll)
