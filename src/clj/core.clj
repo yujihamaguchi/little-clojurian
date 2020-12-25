@@ -310,22 +310,22 @@
   (reduce + (map #(* %1 %2) ns ms)))
 
 ;; Q035: 要素を逆転する関数 myreverse を直接の再帰を用いて書け。
-;; A
-(defn myreverse [coll]
-  (if-not (seq coll)
+;;       [hint]
+;;       vector: indexed なデータ型
+;;       list: 連結リスト
+(defn myreverse
+  [xs]
+  (if-not (seq xs)
     []
-    (conj (myreverse (rest coll)) (first coll))))
+    (conj (myreverse (rest xs)) (first xs))))
 
-;; Q036: 整列された要素を持つリストに要素を挿入する関数myinsertを書け。
-;; A
-(defn myinsert [x xs]
-  (if (not (seq xs))
-    [x]
-    (let [x' (first xs)
-          xs' (rest xs)]
-      (if (<= x x')
-        (cons x xs)
-        (cons x' (myinsert x xs'))))))
+;; Q036: ある要素を、整列されたリストに挿入する関数 myinsert を書け。
+(defn myinsert
+  [x xs]
+  (if (or (not (seq xs))
+          (<= x (first xs)))
+    (cons x xs)
+    (cons (first xs) (myinsert x (rest xs)))))
 
 ;; Q037: 関数myinsertを用いてリストのソートを行う"挿入ソート"を行う関数isortを書け。
 ;; A
