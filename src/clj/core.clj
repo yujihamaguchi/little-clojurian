@@ -309,8 +309,8 @@
   [ns ms]
   (reduce + (map #(* %1 %2) ns ms)))
 
-;; Q035: 要素を逆転する関数 myreverse を直接の再帰を用いて書け。
-;;       [hint]
+;; Q035: リストの順番を逆転する関数 myreverse を直接の再帰を用いて書け。
+;;       *hint*
 ;;       vector: indexed なデータ型
 ;;       list: 連結リスト
 (defn myreverse
@@ -327,13 +327,13 @@
     (cons x xs)
     (cons (first xs) (myinsert x (rest xs)))))
 
-;; Q037: 関数myinsertを用いてリストのソートを行う"挿入ソート"を行う関数isortを書け。
-;; A
+;; Q037: 関数 myinsert を用いてリストのソートを"挿入ソート"で行う関数　isort　を書け。
 (defn isort
   [xs]
   (if-not (seq xs)
-    []
-    (myinsert (first xs) (isort (rest xs)))))
+    xs
+    (myinsert (first xs)
+              (isort (rest xs)))))
 
 ;; Q038: dropを再帰を用いて自作(mydrop)せよ。
 ;; A
