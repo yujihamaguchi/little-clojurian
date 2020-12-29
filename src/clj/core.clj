@@ -335,16 +335,15 @@
     (myinsert (first xs)
               (isort (rest xs)))))
 
-;; Q038: dropを再帰を用いて自作(mydrop)せよ。
-;; A
+;; Q038: drop を再帰を用いて自作(mydrop)せよ。
 (defn mydrop
-  [n coll]
-  (if (zero? n)
-    coll
-    (mydrop (dec n) (rest coll))))
+  [n xs]
+  (if (or (zero? n)
+          (not (seq xs)))
+    xs
+    (mydrop (dec n) (rest xs))))
 
-;; Q039: zipを再帰を用いて自作(myzip)せよ。
-;; A
+;; Q039: zip を再帰を用いて自作(myzip)せよ。
 (defn myzip
   [xs ys]
   (cond
