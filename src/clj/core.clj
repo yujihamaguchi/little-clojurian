@@ -335,7 +335,7 @@
     (myinsert (first xs)
               (isort (rest xs)))))
 
-;; Q038: drop を再帰を用いて自作(mydrop)せよ。
+;; Q038: drop を再帰を用いて自作( mydrop )せよ。
 (defn mydrop
   [n xs]
   (if (or (zero? n)
@@ -343,21 +343,11 @@
     xs
     (mydrop (dec n) (rest xs))))
 
-;; Q039: zip を再帰を用いて自作(myzip)せよ。
+;; Q039: zip を直接の再帰を用いて自作( myzip )せよ。
 (defn myzip
   [xs ys]
-  (cond
-    (not (seq xs)) []
-    (not (seq ys)) []
-    :else (cons [(first xs) (first ys)] (myzip (rest xs) (rest ys)))))
-;; (defn myzip [xs ys]
-;;   (if (or (empty? xs) (empty? ys))
-;;     []
-;;     (cons (vector (first xs) (first ys)) (myzip (rest xs) (rest ys)))))
-;;(defn myzip [xs ys]
-;;  (if (and (seq xs) (seq ys))
-;;    (cons (vector (first xs) (first ys)) (myzip (rest xs) (rest ys)))
-;;    []))
+  (when (and (seq xs) (seq ys))
+    (cons [(first xs) (first ys)] (myzip (rest xs) (rest ys)))))
 
 ;; Q040: evenとoddを相互再帰を用いて自作せよ。(declareを自作して(mydeclare)それを用いよ。)
 ;;       ヒント：0は偶数、-3は奇数
