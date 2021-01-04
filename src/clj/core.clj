@@ -349,9 +349,8 @@
   (when (and (seq xs) (seq ys))
     (cons [(first xs) (first ys)] (myzip (rest xs) (rest ys)))))
 
-;; Q040: evenとoddを相互再帰を用いて自作せよ。(declareを自作して(mydeclare)それを用いよ。)
+;; Q040: even と odd を相互再帰を用いて自作( myodd?, myeven? )せよ。( declare を自作( mydeclare )してそれを用いること。)
 ;;       ヒント：0は偶数、-3は奇数
-;; A
 (defmacro mydeclare [& expr]
   `(do ~@(map #(list 'def %) expr)))
 (mydeclare myeven? myodd?)
