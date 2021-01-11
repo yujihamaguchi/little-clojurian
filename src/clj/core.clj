@@ -361,13 +361,14 @@
   (and (not (zero? n))
        (myeven? (dec (Math/abs n)))))
 
-;; Q041: 0以上の整数nに対し、n番目のフィボナッチ数を求める関数fibonacciを書け。
-;; A
-(defn fibonacci [n]
+;; Q041: 0 以上の整数 n に対し、 n 番目のフィボナッチ数を求める関数 fibonacci を書け。
+(defn fibonacci
+  [n]
   (case n
     0 0
     1 1
-    (+ (fibonacci (- n 1)) (fibonacci (- n 2)))))
+    (+ (fibonacci (- n 1))
+       (fibonacci (- n 2)))))
 
 ;; Q042: qsortを再帰を用いて書け。
 ;; A
