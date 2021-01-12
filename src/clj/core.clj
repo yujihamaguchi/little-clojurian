@@ -361,7 +361,7 @@
   (and (not (zero? n))
        (myeven? (dec (Math/abs n)))))
 
-;; Q041: 0 以上の整数 n に対し、 n 番目のフィボナッチ数を求める関数 fibonacci を書け。
+;; Q041: 0 以上の整数 n に対し、 n 番目のフィボナッチ数を求める関数 fibonacci を書け。（直接の再帰を用いて良い）
 (defn fibonacci
   [n]
   (case n
@@ -370,8 +370,7 @@
     (+ (fibonacci (- n 1))
        (fibonacci (- n 2)))))
 
-;; Q042: qsortを再帰を用いて書け。
-;; A
+;; Q042: qsort を再帰を用いて書け。（直接の再帰を用いて良い）
 (defn qsort
   [xs]
   (if-not (seq xs)
@@ -379,8 +378,8 @@
     (let [x (first xs)
           xs' (rest xs)
           lt (for [x' xs' :when (< x' x)] x')
-          ge (for [x' xs' :when (>= x' x)] x')]
-      (concat (qsort lt) [x] (qsort ge)))))
+          gt (for [x' xs' :when (> x' x)] x')]
+      (concat (qsort lt) [x] (qsort gt)))))
 
 ;; Q043: リストから偶数の位置の要素を取り出す関数evensと、奇数の位置の要素を取り出す関数oddsを相互再帰を用いて書け。
 ;; A
