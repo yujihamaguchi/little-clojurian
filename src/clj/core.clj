@@ -376,21 +376,17 @@
   (if-not (seq xs)
     []
     (let [x (first xs)
-          xs' (rest xs)
-          lt (for [x' xs' :when (< x' x)] x')
-          gt (for [x' xs' :when (> x' x)] x')]
+          lt (for [x' xs :when (< x' x)] x')
+          gt (for [x' xs :when (> x' x)] x')]
       (concat (qsort lt) [x] (qsort gt)))))
 
-;; Q043: リストから偶数の位置の要素を取り出す関数evensと、奇数の位置の要素を取り出す関数oddsを相互再帰を用いて書け。
-;; A
+;; Q043: リストから偶数の位置の要素を取り出す関数 evens と、奇数の位置の要素を取り出す関数 odds を相互再帰を用いて書け。
 (declare evens odds)
-
 (defn evens
   [xs]
   (if-not (seq xs)
     []
     (odds (rest xs))))
-
 (defn odds
   [xs]
   (if-not (seq xs)
