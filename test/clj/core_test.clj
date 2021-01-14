@@ -60,11 +60,11 @@
   )
 )
 
-(deftest my-init-test
+(deftest myinit-test
   (testing
-    (is (= (my-init [1 2 3]) [1 2]))
-    (is (= (my-init [1 2]) [1]))
-    (is (= (my-init [1]) []))
+    (is (= (myinit [1 2 3]) [1 2]))
+    (is (= (myinit [1 2]) [1]))
+    (is (= (myinit [1]) []))
   )
 )
 
@@ -403,10 +403,10 @@
 
 (deftest my-init-test
   (testing
-    (is (= (my-init []) []))
-    (is (= (my-init [1]) []))
-    (is (= (my-init [1 2]) [1]))
-    (is (= (my-init [1 2 3]) [1 2]))
+    (is (= (myinit []) []))
+    (is (= (myinit [1]) []))
+    (is (= (myinit [1 2]) [1]))
+    (is (= (myinit [1 2 3]) [1 2]))
   )
 )
 
