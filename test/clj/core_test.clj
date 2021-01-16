@@ -2,7 +2,7 @@
   (:require [clojure.test :refer :all]
     [clj.core :refer :all]))
 
-(deftest zip-test
+(deftest my-zip-test
   (testing
     (is (= (my-zip [1 2] "xy" "ab") '((1 \x \a) (2 \y \b)) ))
     (is (= (my-zip [1 2] "x") '((1 \x)) ))
@@ -60,11 +60,11 @@
   )
 )
 
-(deftest myinit-test
+(deftest my-init-test
   (testing
-    (is (= (myinit [1 2 3]) [1 2]))
-    (is (= (myinit [1 2]) [1]))
-    (is (= (myinit [1]) []))
+    (is (= (my-init [1 2 3]) [1 2]))
+    (is (= (my-init [1 2]) [1]))
+    (is (= (my-init [1]) []))
   )
 )
 
@@ -301,15 +301,15 @@
   )
 )
 
-(deftest myreverse-test
+(deftest my-reverse-test
   (testing
-    (is (= (myreverse [1 2 3]) [3 2 1]))
+    (is (= (my-reverse [1 2 3]) [3 2 1]))
   )
 )
 
 (deftest insert-test
   (testing
-    (is (= (myinsert 3 [1 2 4 5]) [1 2 3 4 5]))
+    (is (= (my-insert 3 [1 2 4 5]) [1 2 3 4 5]))
   )
 )
 
@@ -321,45 +321,45 @@
   )
 )
 
-(deftest mydrop-test
+(deftest my-drop-test
   (testing
-    (is (= (mydrop 2 [1 2 3 4 5]) [3 4 5]))
-    (is (= (mydrop 0 [1 2 3 4 5]) [1 2 3 4 5]))
-    (is (= (mydrop 5 [1 2 3 4 5]) []))
-    (is (= (mydrop 100 [1 2 3 4 5]) []))
-    (is (= (mydrop 1 []) []))
+    (is (= (my-drop 2 [1 2 3 4 5]) [3 4 5]))
+    (is (= (my-drop 0 [1 2 3 4 5]) [1 2 3 4 5]))
+    (is (= (my-drop 5 [1 2 3 4 5]) []))
+    (is (= (my-drop 100 [1 2 3 4 5]) []))
+    (is (= (my-drop 1 []) []))
   )
 )
 
-(deftest myzip-test
+(deftest my-zip2-test
   (testing
-    (is (= (myzip [1 2 3 4 5] "abcde") [[1 \a] [2 \b] [3 \c] [4 \d] [5 \e]]))
-    (is (= (myzip [1 2 3] "abcde") [[1 \a] [2 \b] [3 \c]]))
-    (is (= (myzip [1 2 3 4 5] "abc") [[1 \a] [2 \b] [3 \c]]))
+    (is (= (my-zip2 [1 2 3 4 5] "abcde") [[1 \a] [2 \b] [3 \c] [4 \d] [5 \e]]))
+    (is (= (my-zip2 [1 2 3] "abcde") [[1 \a] [2 \b] [3 \c]]))
+    (is (= (my-zip2 [1 2 3 4 5] "abc") [[1 \a] [2 \b] [3 \c]]))
   )
 )
 
-(deftest myeven?-test
+(deftest my-even?-test
   (testing
-    (is (= (myeven? -1) false))
-    (is (= (myeven? -2) true))
-    (is (= (myeven? -3) false))
-    (is (= (myeven? 0) true))
-    (is (= (myeven? 1) false))
-    (is (= (myeven? 2) true))
-    (is (= (myeven? 3) false))
+    (is (= (my-even? -1) false))
+    (is (= (my-even? -2) true))
+    (is (= (my-even? -3) false))
+    (is (= (my-even? 0) true))
+    (is (= (my-even? 1) false))
+    (is (= (my-even? 2) true))
+    (is (= (my-even? 3) false))
   )
 )
 
-(deftest myodd?-test
+(deftest my-odd?-test
   (testing
-    (is (= (myodd? -1) true))
-    (is (= (myodd? -2) false))
-    (is (= (myodd? -3) true))
-    (is (= (myodd? 0) false))
-    (is (= (myodd? 1) true))
-    (is (= (myodd? 2) false))
-    (is (= (myodd? 3) true))
+    (is (= (my-odd? -1) true))
+    (is (= (my-odd? -2) false))
+    (is (= (my-odd? -3) true))
+    (is (= (my-odd? 0) false))
+    (is (= (my-odd? 1) true))
+    (is (= (my-odd? 2) false))
+    (is (= (my-odd? 3) true))
   )
 )
 
@@ -403,23 +403,23 @@
 
 (deftest my-init-test
   (testing
-    (is (= (myinit []) []))
-    (is (= (myinit [1]) []))
-    (is (= (myinit [1 2]) [1]))
-    (is (= (myinit [1 2 3]) [1 2]))
+    (is (= (my-init []) []))
+    (is (= (my-init [1]) []))
+    (is (= (my-init [1 2]) [1]))
+    (is (= (my-init [1 2 3]) [1 2]))
   )
 )
 
-(deftest elem-test
+(deftest my-elem-test
   (testing
-    (is (not (elem 1 [])))
-    (is (elem 1 [1]))
-    (is (not (elem 3 [1 2])))
-    (is (elem 3 [1 2 3]))
+    (is (not (my-elem 1 [])))
+    (is (my-elem 1 [1]))
+    (is (not (my-elem 3 [1 2])))
+    (is (my-elem 3 [1 2 3]))
   )
 )
 
-(deftest index-test
+(deftest my-index-test
   (testing
     (is (= (my-index [] 0) nil))
     (is (= (my-index [] 1) nil))

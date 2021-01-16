@@ -79,7 +79,7 @@
 ;; リスト xs の最後の要素を除いたリストを返す。
 ;;     init [1,2,3]   = [1,2]
 ;;     init [1]       = []
-(defn myinit [xs]
+(defn my-init [xs]
   ((comp reverse rest reverse) xs))
 ;; A: Using recursion.
 ;;(defn my-init [xs]
@@ -309,57 +309,60 @@
   [ns ms]
   (reduce + (map #(* %1 %2) ns ms)))
 
-;; Q035: リストの順番を逆転する関数 myreverse を直接の再帰を用いて書け。
+;; Q035: リストの順番を逆転する関数 my-reverse を直接の再帰を用いて書け。
 ;;       *hint*
 ;;       vector: indexed なデータ型
 ;;       list: 連結リスト
-(defn myreverse
+(defn my-reverse
   [xs]
   (if-not (seq xs)
     []
-    (conj (myreverse (rest xs)) (first xs))))
+    (conj (my-reverse (rest xs)) (first xs))))
 
-;; Q036: ある要素を、整列されたリストに挿入する関数 myinsert を書け。
-(defn myinsert
+;; Q036: ある要素を、整列されたリストに挿入する関数 my-insert を書け。
+(defn my-insert
   [x xs]
   (if (or (not (seq xs))
           (<= x (first xs)))
     (cons x xs)
-    (cons (first xs) (myinsert x (rest xs)))))
+    (cons (first xs) (my-insert x (rest xs)))))
 
 ;; Q037: 関数 myinsert を用いてリストのソートを"挿入ソート"で行う関数　isort　を書け。
 (defn isort
   [xs]
   (if-not (seq xs)
     xs
-    (myinsert (first xs)
+    (my-insert (first xs)
               (isort (rest xs)))))
 
-;; Q038: drop を再帰を用いて自作( mydrop )せよ。
-(defn mydrop
+;; Q038: drop を再帰を用いて自作( my-drop )せよ。
+(defn my-drop
   [n xs]
   (if (or (zero? n)
           (not (seq xs)))
     xs
-    (mydrop (dec n) (rest xs))))
+    (my-drop (dec n) (rest xs))))
 
-;; Q039: zip を直接の再帰を用いて自作( myzip )せよ。
-(defn myzip
+;; Q039: zip を直接の再帰を用いて自作( my-zip )せよ。
+(defn my-zip2
   [xs ys]
   (when (and (seq xs) (seq ys))
-    (cons [(first xs) (first ys)] (myzip (rest xs) (rest ys)))))
+    (cons [(first xs) (first ys)] (my-zip2 (rest xs) (rest ys)))))
 
-;; Q040: even と odd を相互再帰を用いて自作( myeven?, myodd? )せよ。( declare を自作( mydeclare )してそれを用いること。 if を使わないこと)
+;; Q040: even と odd を相互再帰を用いて自作( my-even?, my-odd? )せよ。( declare を自作( my-declare )してそれを用いること。 if を使わないこと)
 ;;       ヒント： 0 は偶数、 -3 は奇数
-(defmacro mydeclare [& expr]
+(defmacro my-declare [& expr]
   `(do ~@(map #(list 'def %) expr)))
-(mydeclare myeven? myodd?)
-(defn myeven? [n]
+
+(my-declare my-even? my-odd?)
+
+(defn my-even? [n]
   (or (zero? n)
-      (myodd? (dec (Math/abs n)))))
-(defn myodd? [n]
+      (my-odd? (dec (Math/abs n)))))
+
+(defn my-odd? [n]
   (and (not (zero? n))
-       (myeven? (dec (Math/abs n)))))
+       (my-even? (dec (Math/abs n)))))
 
 ;; Q041: 0 以上の整数 n に対し、 n 番目のフィボナッチ数を求める関数 fibonacci を書け。（直接の再帰を用いて良い）
 (defn fibonacci
@@ -393,30 +396,29 @@
     []
     (cons (first xs) (evens (rest xs)))))
 
-;; Q044: Haskell の init 関数を自作( myinit )せよ。(直接の再帰を用いたもの、遅延評価関数を用いたもの両方書くこと）
+;; Q044: Haskell の init 関数を自作( my-init )せよ。(直接の再帰を用いたもの、遅延評価関数を用いたもの両方書くこと）
 ;; 再帰版
-(defn myinit [coll]
+(defn my-init [coll]
   (if-not (seq (rest coll))
     []
-    (cons (first coll) (myinit (rest coll)))))
+    (cons (first coll) (my-init (rest coll)))))
 
 ;; 遅延評価関数版
-#_(defn myinit
+#_(defn my-init
     [xs]
     (-> xs
         reverse
         rest
         reverse))
 
-;; Q045: elemを再帰を用いて自作せよ。
+;; Q045: Haskell の elem を再帰を用いて自作( my-elem )せよ。
 ;;       elem :: Eq a => a -> [a] -> Bool
-;; A
-(defn elem
+(defn my-elem
   [x xs]
   (when (seq xs)
     (or
      (= x (first xs))
-     (elem x (rest xs)))))
+     (my-elem x (rest xs)))))
 
 ;; Q046: !!の前置記法版のindex関数を再帰を用いて自作せよ。(my-index)
 ;; A
