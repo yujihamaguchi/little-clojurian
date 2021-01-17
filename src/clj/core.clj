@@ -411,7 +411,7 @@
         rest
         reverse))
 
-;; Q045: Haskell の elem を再帰を用いて自作( my-elem )せよ。
+;; Q045: Haskell の elem を直接の再帰を用いて自作( my-elem )せよ。
 ;;       elem :: Eq a => a -> [a] -> Bool
 (defn my-elem
   [x xs]
@@ -420,14 +420,12 @@
      (= x (first xs))
      (my-elem x (rest xs)))))
 
-;; Q046: !!の前置記法版のindex関数を再帰を用いて自作せよ。(my-index)
-;; A
+;; Q046: Haskell の !! の前置記法版の index 関数を直接の再帰を用いて自作せよ。( my-index )
 (defn my-index
   [xs n]
-  (when (seq xs)
-    (if (zero? n)
-      (first xs)
-      (my-index (rest xs) (dec n)))))
+  (if (zero? n)
+    (first xs)
+    (my-index (rest xs) (dec n))))
 
 ;; Q047: 整列されたリストを二つとり、一つの整列されたリストにして返す関数mergeを自作せよ。
 ;;    insertやisort等、整列されたリストを処理する関数は用いてはならない。
