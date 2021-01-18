@@ -420,17 +420,16 @@
      (= x (first xs))
      (my-elem x (rest xs)))))
 
-;; Q046: Haskell の !! の前置記法版の index 関数を直接の再帰を用いて自作せよ。( my-index )
+;; Q046: Haskell の !! の前置記法版である index 関数を直接の再帰を用いて自作せよ。( my-index )
 (defn my-index
   [xs n]
   (if (zero? n)
     (first xs)
     (my-index (rest xs) (dec n))))
 
-;; Q047: 整列されたリストを二つとり、一つの整列されたリストにして返す関数mergeを自作せよ。
-;;    insertやisort等、整列されたリストを処理する関数は用いてはならない。
-;;    ex) merge [2,5,6] [1,3,4] ==> [1,2,3,4,5,6]
-;; A
+;; Q047: 整列されたリストを二つとり、一つの整列されたリストにして返す関数 merge を自作せよ。( my-merge )
+;;       insert や isort 等、整列されたリストを処理する関数は用いてはならない。
+;;       ex) merge [2,5,6] [1,3,4] ==> [1,2,3,4,5,6]
 (defn my-merge
   [xs ys]
   (cond

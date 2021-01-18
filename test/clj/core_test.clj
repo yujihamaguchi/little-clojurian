@@ -430,7 +430,7 @@
 
 (deftest my-merge-test
   (testing
-    (is (= (my-merge [2 5 6] [1 3 4]) [1 2 3 4 5 6]))
+    (is (= [1 2 3 4 5 6] (my-merge [2 5 6] [1 3 4])))
   )
 )
 
