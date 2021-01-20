@@ -441,21 +441,19 @@
                  (cons x (my-merge (rest xs) ys))
                  (cons y (my-merge xs (rest ys)))))))
 
-;; Q048: 関数my-mergeを用いてマージソートを実行する関数msortを再帰を用いて書け。
+;; Q048: 関数 my-merge を用いてマージソートを実行する関数 msort を再帰を用いて書け。
 ;;       マージソートは、引数のリストを二つに分割し、それぞれを整列した後、再び一つに戻す事で、整列を実現する。
 ;;       最初に、リストを半分に分割する関数 simple-halve を書け。
-;; A
 (defn simple-halve
   [xs]
   (let [n (quot (count xs) 2)]
     [(take n xs) (drop n xs)]))
 (defn msort
   [xs]
-  (cond
-    (not (seq xs)) []
-    (not (next xs)) xs
-    :else (let [[xs1 xs2] (simple-halve xs)]
-            (my-merge (msort xs1) (msort xs2)))))
+  (if-not (seq (next xs))
+    xs
+    (let [[ys zs] (simple-halve xs)]
+      (my-merge (msort ys) (msort zs)))))
 
 ;; Q049: replicateを再帰を用いて自作せよ。(my-replicate-rec [n x])
 ;; A
