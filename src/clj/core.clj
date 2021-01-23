@@ -463,16 +463,14 @@
     []
     (cons x (my-replicate-rec (dec n) x))))
 
-;; Q050: 負でない整数に対する累乗演算を行うmyを定義せよ。
-;; A
+;; Q050: 負でない整数に対する累乗演算を行う関数 my を直接の再帰を用いて定義せよ。
 (defn my
-  [n m]
-  (if (zero? m)
+  [a n]
+  (if (zero? n)
     1
-    (* n (my n (dec m)))))
+    (* a (my a (dec n)))))
 
-;; Q051: mapをリスト内包表記を用いて自作せよ。
-;; A
+;; Q051: map をリスト内包表記を用いて自作せよ( my-map )。
 (defn my-map
   [f xs]
   (for [x xs] (f x)))

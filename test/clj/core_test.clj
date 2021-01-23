@@ -452,12 +452,9 @@
 )
 
 (deftest my-test
-  (testing
-    (is (= (my 2 3) 8))
-    (is (= (my 1 3) 1))
-    (is (= (my 0 0) 1))
-  )
-)
+  (testing (is (=  8 (my 2 3)))
+    (is (=  1 (my 1 3)))
+    (is (=  1 (my 0 0)))))
 
 (deftest map-test
   (testing
