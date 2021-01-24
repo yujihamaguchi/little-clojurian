@@ -475,14 +475,12 @@
   [f xs]
   (for [x xs] (f x)))
 
-;; Q052: filterをリスト内包表記を用いて自作せよ。
-;; A
+;; Q052: filterをリスト内包表記を用いて自作せよ。( my-filter )
 (defn my-filter
   [f xs]
   (for [x xs :when (f x)] x))
 
 ;; Q053: mapを再帰を用いて自作せよ。(my-map-recur)
-;; A
 ;; 直接の再帰を用いたパターン
 (defn my-map-recur
   [f xs]
