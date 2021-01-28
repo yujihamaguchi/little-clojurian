@@ -500,8 +500,7 @@
                      (rest xs))))]
     (my-map-recur' [] xs)))
 
-;; Q054: リストの先頭から述語を満たす連続した要素を取り除く関数drop-whileを自作せよ。
-;; A:
+;; Q054: リストの先頭から述語を満たす連続した要素を取り除く関数 drop-while を自作せよ。( my-drop-while )
 (defn my-drop-while [p xs]
   (if (or (empty? xs) (not (p (first xs))))
     xs
