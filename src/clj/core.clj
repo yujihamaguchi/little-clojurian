@@ -506,9 +506,8 @@
     xs
     (my-drop-while p (rest xs))))
 
-;; Q055: filterを再帰を用いて自作せよ。(my-filter-recur)
+;; Q055: filter を再帰を用いて自作せよ。( my-filter-recur )
 ;;       線形再帰、末尾再帰、recurを用いた末尾再帰の3パターンを書くこと
-;; A
 ;; 線形再帰
 (defn my-filter-recur [p xs]
   (if-not (seq xs)
@@ -520,14 +519,14 @@
         (my-filter-recur p xs')))))
 ;; 末尾再帰
 #_(defn my-filter-recur
-    [f xs]
+    [p xs]
     (letfn [(my-filter-recur'
               [xs acc]
               (if-not (seq xs)
                 acc
                 (let [x (first xs)
                       xs' (rest xs)]
-                  (my-filter-recur' xs' (if (f x) (conj acc x) acc)))))]
+                  (my-filter-recur' xs' (if (p x) (conj acc x) acc)))))]
       (my-filter-recur' xs [])))
 ;; recurを用いた末尾再帰
 #_(defn my-filter-recur
