@@ -507,36 +507,39 @@
     (my-drop-while p (rest xs))))
 
 ;; Q055: filter を再帰を用いて自作せよ。( my-filter-recur )
-;;       線形再帰、末尾再帰、recurを用いた末尾再帰の3パターンを書くこと
+;;       線形再帰、末尾再帰、 recur を用いた末尾再帰の 3 パターンを書くこと
 ;; 線形再帰
-(defn my-filter-recur [p xs]
+(defn my-filter-recur
+  [p xs]
   (if-not (seq xs)
     []
-    (let [x (first xs)
+    (let [x   (first xs)
           xs' (rest xs)]
       (if (p x)
         (cons x (my-filter-recur p xs'))
         (my-filter-recur p xs')))))
+
 ;; 末尾再帰
 #_(defn my-filter-recur
-    [p xs]
-    (letfn [(my-filter-recur'
-              [xs acc]
-              (if-not (seq xs)
-                acc
-                (let [x (first xs)
-                      xs' (rest xs)]
-                  (my-filter-recur' xs' (if (p x) (conj acc x) acc)))))]
-      (my-filter-recur' xs [])))
-;; recurを用いた末尾再帰
+  [p xs]
+  (letfn [(my-filter-recur'
+            [acc xs]
+            (if-not (seq xs)
+              acc
+              (let [x   (first xs)
+                    xs' (rest xs)]
+                (my-filter-recur' (if (p x) (conj acc x) acc) xs'))))]
+    (my-filter-recur' [] xs)))
+
+;; recur を用いた末尾再帰
 #_(defn my-filter-recur
-    [f xs]
-    (loop [xs' xs acc []]
-      (if-not (seq xs')
-        acc
-        (let [x (first xs')
-              xs'' (rest xs')]
-          (recur xs'' (if (f x) (conj acc x) acc))))))
+  [p xs]
+  (loop [acc [] xs xs]
+    (if-not (seq xs)
+      acc
+      (let [x   (first xs)
+            xs' (rest xs)]
+        (recur (if (p x) (conj acc x) acc) xs')))))
 
 ;; Q056: リストの先頭から述語を満たす連続した要素を取り出す関数takeWhileを自作せよ。(my-take-while)
 ;; A:

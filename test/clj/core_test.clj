@@ -506,11 +506,9 @@
 
 (deftest my-filter-recur-test
   (testing
-    (is (= (my-filter-recur odd? [1 2 3]) [1 3]))
-    (is (= (my-filter-recur odd? []) []))
-    (is (= (my-filter-recur odd? [2 4]) []))
-  )
-)
+      (is (=  [1 3] (my-filter-recur odd? [1 2 3])))
+    (is (=  [] (my-filter-recur odd? [])))
+    (is (=  [] (my-filter-recur odd? [2 4])))))
 
 (deftest my-take-while-test
   (testing
