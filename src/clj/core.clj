@@ -549,21 +549,25 @@
     (not (p x)) []
     :else (cons x (my-take-while p xs'))))
 
-;; Q057-01: 以下の様に使用できる関数foldrを自作せよ。(my-foldr)
-;; cons = foldr (:) []
-;; sum = foldr (+) 0
-;; product = foldr (*) 1
-;; or = foldr (||) False
-;; and = foldr (&&) True
-;; A:
-;; myFoldr :: (a -> b -> b) -> b -> [a] -> b
-;; myFoldr _ x' [] = x'
-;; myFoldr f x' (x:xs) = f x (myFoldr f x' xs)
+;; Q057: foldr を末尾再帰を用いて自作せよ。（ my-foldr ）
+;;       * Haskell では以下のような実装になる。
+;;
+;;         myFoldr :: (a -> b -> b) -> b -> [a] -> b
+;;         myFoldr _ x' [] = x'
+;;         myFoldr f x' (x:xs) = f x (myFoldr f x' xs)
+;;
+;;         以下のように、 foldr に部分適用して関数をつくることができる。
+;;
+;;         cons = foldr (:) []
+;;         sum = foldr (+) 0
+;;         product = foldr (*) 1
+;;         or = foldr (||) False
+;;         and = foldr (&&) True
 (defn my-foldr
-  [f x xs]
+  [f val xs]
   (if-not (seq xs)
-    x
-    (f (first xs) (my-foldr f x (rest xs)))))
+    val
+    (f (first xs) (my-foldr f val (rest xs)))))
 
 ;; Q057-02: ビットのリストで表現される二進表記を整数に変換する関数bit2intを書け。
 ;;    ・iterateを用いること

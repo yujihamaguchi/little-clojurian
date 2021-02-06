@@ -522,8 +522,8 @@
 
 (deftest my-foldr-test
   (testing
-    (is (= (my-foldr + 0 [1 2 3 4]) 10))
-    (is (= (apply str (my-foldr concat "Q" ["a" "b" "c" "d"])) "abcdQ"))
+    (is (= 10 (my-foldr + 0 [1 2 3 4])))
+    (is (= "abcdQ" (apply str (my-foldr concat "Q" ["a" "b" "c" "d"]))))
   )
 )
 
