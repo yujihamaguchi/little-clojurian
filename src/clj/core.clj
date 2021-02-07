@@ -549,7 +549,8 @@
     (not (p x)) []
     :else (cons x (my-take-while p xs'))))
 
-;; Q057: foldr を末尾再帰を用いて自作せよ。（ my-foldr ）
+;; Q057: foldr を自作せよ。（ my-foldr ）
+;;       非末尾再帰および末尾再帰の両方のパターンをつくること。
 ;;       * Haskell では以下のような実装になる。
 ;;
 ;;         myFoldr :: (a -> b -> b) -> b -> [a] -> b
@@ -563,11 +564,15 @@
 ;;         product = foldr (*) 1
 ;;         or = foldr (||) False
 ;;         and = foldr (&&) True
+;;
+;; 非末尾再帰パターン
+;; TODO
+;; 末尾再帰パターン
 (defn my-foldr
-  [f val xs]
+  [f v [x & xs' :as xs]]
   (if-not (seq xs)
-    val
-    (f (first xs) (my-foldr f val (rest xs)))))
+    v
+    (my-foldr f (f v x) xs')))
 
 ;; Q057-02: ビットのリストで表現される二進表記を整数に変換する関数bit2intを書け。
 ;;    ・iterateを用いること
