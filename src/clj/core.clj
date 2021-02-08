@@ -565,14 +565,14 @@
 ;;         or = foldr (||) False
 ;;         and = foldr (&&) True
 ;;
-;; 非末尾再帰パターン
+;; 末尾再帰
 ;; TODO
-;; 末尾再帰パターン
+;; 非末尾再帰パターン
 (defn my-foldr
   [f v [x & xs' :as xs]]
   (if-not (seq xs)
     v
-    (my-foldr f (f v x) xs')))
+    (f x (my-foldr f v xs'))))
 
 ;; Q057-02: ビットのリストで表現される二進表記を整数に変換する関数bit2intを書け。
 ;;    ・iterateを用いること
