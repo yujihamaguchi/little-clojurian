@@ -523,9 +523,12 @@
 (deftest my-foldr-test
   (testing
     (is (= 10 (my-foldr + 0 [1 2 3 4])))
-    (is (= "abcdQ" (apply str (my-foldr concat "Q" ["a" "b" "c" "d"]))))
-  )
-)
+    (is (= "abcdQ" (apply str (my-foldr concat "Q" ["a" "b" "c" "d"]))))))
+
+(deftest my-foldl-test
+  (testing
+    (is (= 10 (my-foldl + 0 [1 2 3 4])))
+    (is (= "Qabcd" (apply str (my-foldl concat "Q" ["a" "b" "c" "d"]))))))
 
 (deftest bit2int-test
   (testing
