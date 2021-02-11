@@ -1,5 +1,6 @@
 (ns clj.core
-  (:require [clojure.core.match :refer [match]]))
+  (:require [clojure.core.match :refer [match]])
+  (:require [clojure.core.async :as async :refer [chan >!! <!! close! thread go >! <! alts!! timeout]]))
 
 (def table [8.2 1.5 2.8 4.3 12.7 2.2 2.0 6.1 7.0 0.2 0.8 4.0 2.4 6.7 7.5 1.9 0.1 6.0 6.3 9.1 2.8 1.0 2.4 0.2 2.0 0.1])
 
@@ -93,10 +94,10 @@
 ;;         last [1,2,3]   = 3
 ;;         last []        = エラー
 #_(defn my-last
-  [xs]
-  (if-not (seq xs)
-    (throw (java.util.NoSuchElementException.))
-    ((comp first reverse) xs)))
+    [xs]
+    (if-not (seq xs)
+      (throw (java.util.NoSuchElementException.))
+      ((comp first reverse) xs)))
 ;; A: Using recursion.
 (defn my-last
   [xs]
@@ -192,7 +193,7 @@
 (defn char-count [c cs]
   (count (filter #(= c %) cs)))
 #_(defn char-count
-  [c cs]
+    [c cs]
     (sum (for [c' cs :when (= c' c)] 1)))
 
 ;; Q020: 文字列から小文字を数える関数 lower-count を書け。（正規表現を用いたパターンも）
@@ -200,8 +201,8 @@
   [cs]
   (count (filter #(Character/isLowerCase %) cs)))
 #_(defn lower-count
-  [cs]
-  (count (re-seq #"[a-z]" cs)))
+    [cs]
+    (count (re-seq #"[a-z]" cs)))
 
 ;; Q021: Unicode コードポイント（整数、 'a' を 0 とする）を文字に変換する関数 int2let を書け。
 (defn int2let
@@ -333,7 +334,7 @@
   (if-not (seq xs)
     xs
     (my-insert (first xs)
-              (isort (rest xs)))))
+               (isort (rest xs)))))
 
 ;; Q038: drop を再帰を用いて自作( my-drop )せよ。
 (defn my-drop
@@ -491,14 +492,14 @@
 
 ;; recurを用いたパターン
 #_(defn my-map-recur
-  [f xs]
-  (letfn [(my-map-recur'
-            [acc xs]
-            (if-not (seq xs)
-              acc
-              (recur (conj acc (f (first xs)))
-                     (rest xs))))]
-    (my-map-recur' [] xs)))
+    [f xs]
+    (letfn [(my-map-recur'
+              [acc xs]
+              (if-not (seq xs)
+                acc
+                (recur (conj acc (f (first xs)))
+                       (rest xs))))]
+      (my-map-recur' [] xs)))
 
 ;; Q054: リストの先頭から述語を満たす連続した要素を取り除く関数 drop-while を自作せよ。( my-drop-while )
 (defn my-drop-while [p xs]
@@ -521,25 +522,25 @@
 
 ;; 末尾再帰
 #_(defn my-filter-recur
-  [p xs]
-  (letfn [(my-filter-recur'
-            [acc xs]
-            (if-not (seq xs)
-              acc
-              (let [x   (first xs)
-                    xs' (rest xs)]
-                (my-filter-recur' (if (p x) (conj acc x) acc) xs'))))]
-    (my-filter-recur' [] xs)))
+    [p xs]
+    (letfn [(my-filter-recur'
+              [acc xs]
+              (if-not (seq xs)
+                acc
+                (let [x   (first xs)
+                      xs' (rest xs)]
+                  (my-filter-recur' (if (p x) (conj acc x) acc) xs'))))]
+      (my-filter-recur' [] xs)))
 
 ;; recur を用いた末尾再帰
 #_(defn my-filter-recur
-  [p xs]
-  (loop [acc [] xs xs]
-    (if-not (seq xs)
-      acc
-      (let [x   (first xs)
-            xs' (rest xs)]
-        (recur (if (p x) (conj acc x) acc) xs')))))
+    [p xs]
+    (loop [acc [] xs xs]
+      (if-not (seq xs)
+        acc
+        (let [x   (first xs)
+              xs' (rest xs)]
+          (recur (if (p x) (conj acc x) acc) xs')))))
 
 ;; Q056: リストの先頭から述語を満たす連続した要素を取り出す関数 takeWhile を自作せよ。( my-take-while )
 (defn my-take-while
@@ -563,7 +564,6 @@
 ;;         product = foldr (*) 1
 ;;         or = foldr (||) False
 ;;         and = foldr (&&) True
-;;
 (defn my-foldr
   [f v [x & xs' :as xs]]
   (if-not (seq xs)
@@ -595,6 +595,39 @@
   (reduce +
           (map #(* %1 %2) bs (iterate #(* 2 %) 1))))
 
+;; Q057-03:
+;; (let [c (chan)]
+;;   (thread (>!! c "hello"))
+;;   (assert (= "hello" (<!! c)))
+;;   (close! c))
+;; (let [c (chan)]
+;;   (go (>! c "hello"))
+;;   (assert (= "hello" (<!! (go (<! c)))))
+;;   (close! c))
+;; (let [c1 (chan)
+;;       c2 (chan)]
+;;   (thread (while true
+;;             (let [[v ch] (alts!! [c1 c2])]
+;;               (println "Read" v "from" ch))))
+;;   (>!! c1 "hi")
+;;   (>!! c2 "there"))
+;; (let [n     1000
+;;       cs    (repeatedly n chan)
+;;       begin (System/currentTimeMillis)]
+;;   (doseq [c cs] (go (>! c "hi")))
+;;   (dotimes [i n]
+;;     (let [[v c] (alts!! cs)]
+;;       (assert (= "hi" v))))
+;;   (println "Read" n "msgs in" (- (System/currentTimeMillis) begin) "ms"))
+;; (let [t     (timeout 100)
+;;       begin (System/currentTimeMillis)]
+;;   (<!! t)
+;;   (println "Waited" (- (System/currentTimeMillis) begin) "ms"))
+;; (let [c (chan)
+;;       begin (System/currentTimeMillis)]
+;;   (alts!! [c (timeout 100)])
+;;   (>! c "hi")
+;;   (println "Gave up after" (- (System/currentTimeMillis) begin)))
 ;; Q058: 負でない整数を二進表記へ変換する関数int2bitを書け。(0は正の整数ではない)
 ;; A
 (defn int2bit [n]
@@ -602,7 +635,7 @@
     []
     (cons (mod n 2) (int2bit (quot n 2)))))
 
-;; Q059: 二進表記が必ず8ビットになるように切り詰めたり適切な数の0を詰め込んだりする関数make8を書け。
+;; Q059:二進表記が必ず8ビットになるように切り詰めたり適切な数の0を詰め込んだりする関数make8を書け。
 ;; A
 (defn make8
   [bs]
@@ -2208,13 +2241,13 @@
 ;;                        (= (mod a 2) (mod b 2)))
 ;;                      :same))))
 #_(defn p132
-  [p a coll]
-  (if-not (seq (rest coll))
-    coll
-    (let [coll' (map (fn [[x y]] (if (p x y) [x a y] [x y])) (partition 2 1 coll))
-          x' (first coll')
-          xs' (map rest (rest coll'))]
-      (reduce concat x' xs'))))
+    [p a coll]
+    (if-not (seq (rest coll))
+      coll
+      (let [coll' (map (fn [[x y]] (if (p x y) [x a y] [x y])) (partition 2 1 coll))
+            x' (first coll')
+            xs' (map rest (rest coll'))]
+        (reduce concat x' xs'))))
 ;;; 上記では integer overflow を起こすので、明示的遅延評価を使えるように再帰で書き直す
 (defn p132 [p v coll]
   (when (seq coll)
@@ -2419,12 +2452,12 @@
 
 ;; Q153: resources ディレクトリ配下の config.edn から都市名(city)を抽出する関数 configured-city を書け
 #_(defn configured-city
-  []
-  (-> (clojufre.java.io/resource "config.edn")
-      slurp
-      load-string
-      :addr
-      :city))
+    []
+    (-> (clojufre.java.io/resource "config.edn")
+        slurp
+        load-string
+        :addr
+        :city))
 
 (defprotocol Shape
   (area [this]))
