@@ -628,8 +628,8 @@
 ;;   (alts!! [c (timeout 100)])
 ;;   (>! c "hi")
 ;;   (println "Gave up after" (- (System/currentTimeMillis) begin)))
-;; Q058: 負でない整数を二進表記へ変換する関数int2bitを書け。(0は正の整数ではない)
-;; A
+
+;; Q058: 負でない整数を二進表記へ変換する関数 int2bit を書け。( 0 は正の整数ではない)
 (defn int2bit [n]
   (if (zero? n)
     []
