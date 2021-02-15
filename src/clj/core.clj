@@ -595,39 +595,8 @@
   (reduce +
           (map #(* %1 %2) bs (iterate #(* 2 %) 1))))
 
-;; Q057-03:
-;; (let [c (chan)]
-;;   (thread (>!! c "hello"))
-;;   (assert (= "hello" (<!! c)))
-;;   (close! c))
-;; (let [c (chan)]
-;;   (go (>! c "hello"))
-;;   (assert (= "hello" (<!! (go (<! c)))))
-;;   (close! c))
-;; (let [c1 (chan)
-;;       c2 (chan)]
-;;   (thread (while true
-;;             (let [[v ch] (alts!! [c1 c2])]
-;;               (println "Read" v "from" ch))))
-;;   (>!! c1 "hi")
-;;   (>!! c2 "there"))
-;; (let [n     1000
-;;       cs    (repeatedly n chan)
-;;       begin (System/currentTimeMillis)]
-;;   (doseq [c cs] (go (>! c "hi")))
-;;   (dotimes [i n]
-;;     (let [[v c] (alts!! cs)]
-;;       (assert (= "hi" v))))
-;;   (println "Read" n "msgs in" (- (System/currentTimeMillis) begin) "ms"))
-;; (let [t     (timeout 100)
-;;       begin (System/currentTimeMillis)]
-;;   (<!! t)
-;;   (println "Waited" (- (System/currentTimeMillis) begin) "ms"))
-;; (let [c (chan)
-;;       begin (System/currentTimeMillis)]
-;;   (alts!! [c (timeout 100)])
-;;   (>! c "hi")
-;;   (println "Gave up after" (- (System/currentTimeMillis) begin)))
+;; Q057-03: core.async
+;; https://github.com/clojure/core.async/blob/master/examples/walkthrough.clj
 
 ;; Q058: 負でない整数を二進表記へ変換する関数 int2bit を書け。( 0 は正の整数ではない)
 (defn int2bit [n]
@@ -635,14 +604,12 @@
     []
     (cons (mod n 2) (int2bit (quot n 2)))))
 
-;; Q059:二進表記が必ず8ビットになるように切り詰めたり適切な数の0を詰め込んだりする関数make8を書け。
-;; A
+;; Q059: 二進表記が必ず 8 ビットになるように切り詰めたり適切な数の 0 を詰め込んだりする関数 make8 を書け。
 (defn make8
   [bs]
   (take 8 (concat bs (repeat 0))))
 
 ;; Q060: ビット列を8ビットの二進表記に分割する関数chop8を書け。
-;; A
 (defn chop8 [bs]
   (if (empty? bs)
     []

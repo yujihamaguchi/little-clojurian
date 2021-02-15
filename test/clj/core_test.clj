@@ -562,11 +562,9 @@
 
 (deftest make8-test
   (testing
-    (is (= (make8 [1]) [1 0 0 0 0 0 0 0]))
-    (is (= (make8 [1 0 0 0 0 0 0 0 0]) [1 0 0 0 0 0 0 0]))
-    (is (= (make8 [1 0 1]) [1 0 1 0 0 0 0 0]))
-  )
-)
+      (is (=  [1 0 0 0 0 0 0 0] (make8 [1])))
+    (is (=  [1 0 0 0 0 0 0 0] (make8 [1 0 0 0 0 0 0 0 0])))
+    (is (=  [1 0 1 0 0 0 0 0] (make8 [1 0 1])))))
 
 (deftest chop8-test
   (testing
