@@ -610,16 +610,15 @@
   [bs]
   (take 8 (concat bs (repeat 0))))
 
-;; Q060: ビット列を8ビットの二進表記に分割する関数chop8を書け。
+;; Q060: ビット列を 8 ビットの二進表記に分割する関数 chop8 を書け。
 (defn chop8 [bs]
   (if (empty? bs)
     []
     (lazy-seq (cons (make8 (take 8 bs)) (chop8 (drop 8 bs))))))
 
 ;; Q061: ビットのリストを文字列に復号する関数decodeを書け。(threading macroを使ったものも)
-;;    リストを分割し、二進表記をUnicodeのコードポイント（整数）へ変換し、文字へ直して、全体として文字列にする。
-;;    関数合成を用いて実装せよ。
-;; A
+;;       リストを分割し、二進表記をUnicodeのコードポイント（整数）へ変換し、文字へ直して、全体として文字列にする。
+;;       関数合成を用いて実装せよ。
 (defn decode [bs]
   (apply str (map (comp char bits->int) (chop8 bs))))
 #_(defn decode
