@@ -532,16 +532,16 @@
 
 (deftest bit2int-test
   (testing
-    (is (== (bit2int [0]) 0))
-    (is (== (bit2int [1]) 1))
-    (is (== (bit2int [0 1]) 2))
-    (is (== (bit2int [1 1]) 3))
-    (is (== (bit2int [0 0 1]) 4))
-    (is (== (bit2int [1 0 1]) 5))
-    (is (== (bit2int [0 1 1]) 6))
-    (is (== (bit2int [1 1 1]) 7))
-    (is (== (bit2int [0 0 0 1]) 8))
-    (is (== (bit2int [1 0 0 1]) 9))
+    (is (== (bits->int [0]) 0))
+    (is (== (bits->int [1]) 1))
+    (is (== (bits->int [0 1]) 2))
+    (is (== (bits->int [1 1]) 3))
+    (is (== (bits->int [0 0 1]) 4))
+    (is (== (bits->int [1 0 1]) 5))
+    (is (== (bits->int [0 1 1]) 6))
+    (is (== (bits->int [1 1 1]) 7))
+    (is (== (bits->int [0 0 0 1]) 8))
+    (is (== (bits->int [1 0 0 1]) 9))
   )
 )
 
