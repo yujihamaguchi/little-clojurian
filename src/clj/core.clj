@@ -616,18 +616,14 @@
     []
     (lazy-seq (cons (make8 (take 8 bs)) (chop8 (drop 8 bs))))))
 
-;; Q061: ビットのリストを文字列に復号する関数decodeを書け。(threading macroを使ったものも)
-;;       リストを分割し、二進表記をUnicodeのコードポイント（整数）へ変換し、文字へ直して、全体として文字列にする。
-;;       関数合成を用いて実装せよ。
-(defn decode [bs]
-  (apply str (map (comp char bits->int) (chop8 bs))))
-#_(defn decode
-    [bs]
-    (-> bs
-        chop8
-        ((partial map bit2int))
-        ((partial map char))
-        ((partial apply str))))
+;; Q061: ビットのリストを文字列に復号する関数 decode を書け。
+;;       リストを分割し、二進表記を Unicode のコードポイント（整数）へ変換し、文字へ直して、全体として文字列にする。
+(defn decode
+  [bs]
+  (->> (chop8 bs)
+       (map bits->int)
+       (map char)
+       (apply str)))
 
 ;; Q062: 文字列をビット列に符号化する関数encodeを書け。
 ;;    それぞれの文字列をunicodeのコードポイント（整数）に変換し、さらに8ビットの二進表記に直して、全体を連結することで、ビットのリストを作る。高階関数mapと関数合成を用いて実装せよ。
