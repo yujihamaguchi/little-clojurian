@@ -545,18 +545,18 @@
   )
 )
 
-(deftest int2bit-test
+(deftest int->bit-test
   (testing
-    (is (= (int2bit 1) [1]))
-    (is (= (int2bit 2) [0 1]))
-    (is (= (int2bit 3) [1 1]))
-    (is (= (int2bit 4) [0 0 1]))
-    (is (= (int2bit 5) [1 0 1]))
-    (is (= (int2bit 6) [0 1 1]))
-    (is (= (int2bit 7) [1 1 1]))
-    (is (= (int2bit 8) [0 0 0 1]))
-    (is (= (int2bit 9) [1 0 0 1]))
-    (is (= (int2bit 10) [0 1 0 1]))
+    (is (= (int->bits 1) [1]))
+    (is (= (int->bits 2) [0 1]))
+    (is (= (int->bits 3) [1 1]))
+    (is (= (int->bits 4) [0 0 1]))
+    (is (= (int->bits 5) [1 0 1]))
+    (is (= (int->bits 6) [0 1 1]))
+    (is (= (int->bits 7) [1 1 1]))
+    (is (= (int->bits 8) [0 0 0 1]))
+    (is (= (int->bits 9) [1 0 0 1]))
+    (is (= (int->bits 10) [0 1 0 1]))
   )
 )
 

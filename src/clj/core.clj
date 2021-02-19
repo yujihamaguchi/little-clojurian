@@ -600,10 +600,10 @@
 ;; https://github.com/clojure/core.async/blob/master/examples/walkthrough.clj
 
 ;; Q058: 負でない整数を二進表記へ変換する関数 int2bit を書け。( 0 は正の整数ではない)
-(defn int2bit [n]
+(defn int->bits [n]
   (if (zero? n)
     []
-    (cons (mod n 2) (int2bit (quot n 2)))))
+    (cons (mod n 2) (int->bits (quot n 2)))))
 
 ;; Q059: 二進表記が必ず 8 ビットになるように切り詰めたり適切な数の 0 を詰め込んだりする関数 make8 を書け。
 (defn make8
@@ -625,12 +625,14 @@
        (map char)
        (apply str)))
 
-;; Q062: 文字列をビット列に符号化する関数encodeを書け。
-;;    それぞれの文字列をunicodeのコードポイント（整数）に変換し、さらに8ビットの二進表記に直して、全体を連結することで、ビットのリストを作る。高階関数mapと関数合成を用いて実装せよ。
-;; A
+;; Q062: 文字列をビット列に符号化する関数 encode を書け。
+;;       それぞれの文字列を unicode のコードポイント（整数）に変換し、
+;;       さらに 8 ビットの二進表記に直して、全体を連結することで、ビットのリストを作る。
 (defn encode
-  [cs]
-  (apply concat (mapcat (comp chop8 int2bit int) cs)))
+  [s]
+  (->> (map int s)
+       (map int->bits)
+       (mapcat make8)))
 
 ;; Q063: 関数allを自作せよ。(my-all)
 ;; Prelude.all
