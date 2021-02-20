@@ -480,13 +480,11 @@
 
 (deftest all-test
   (testing
-    (is (= (my-all odd? [1 3 5]) true))
-    (is (= (my-all odd? [1 2 5]) false))
-    (is (= (my-all odd? [2 3 5]) false))
-    (is (= (my-all odd? [1 3 4]) false))
-    (is (= (my-all odd? []) true))
-  )
-)
+      (is (=  true (my-all odd? [1 3 5])))
+    (is (=  false (my-all odd? [1 2 5])))
+    (is (=  false (my-all odd? [2 3 5])))
+    (is (=  false (my-all odd? [1 3 4])))
+    (is (=  true (my-all odd? [])))))
 
 (deftest any-test
   (testing

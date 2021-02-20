@@ -634,20 +634,21 @@
        (map int->bits)
        (mapcat make8)))
 
-;; Q063: 関数 all を自作せよ。(my-all)
-;; Prelude.all
-;; all :: (a -> Bool) -> [a] -> Bool
-;; all f xs
-;;     xs の要素 x について、f x がすべて True なら True。
-;;     see also: any, and
-;;         all (==1) [5,4,3,2,1]   = False
-;;         all (==1) [1,1,1]       = True
-;;         all (==1) []            = True
-;; A
-(defn my-all [p coll]
-  (if-not (seq coll)
+;; Q063: 関数 all を自作せよ。( my-all )
+;;       all :: (a -> Bool) -> [a] -> Bool
+;;       all f xs
+;;       xs の要素 x について、f x がすべて True なら True。
+;;
+;;       all (==1) [5,4,3,2,1]   = False
+;;       all (==1) [1,1,1]       = True
+;;       all (==1) []            = True
+(defn my-all
+  [p [x & xs' :as xs]]
+  (if-not (seq xs)
     true
-    (and (p (first coll)) (my-all p (rest coll)))))
+    (and (p x)
+         (my-all p xs'))))
+
 
 ;; Q064: 関数anyを自作せよ。(my-any)
 ;; Prelude.any
