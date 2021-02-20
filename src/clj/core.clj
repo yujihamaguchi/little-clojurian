@@ -634,7 +634,7 @@
        (map int->bits)
        (mapcat make8)))
 
-;; Q063: 関数allを自作せよ。(my-all)
+;; Q063: 関数 all を自作せよ。(my-all)
 ;; Prelude.all
 ;; all :: (a -> Bool) -> [a] -> Bool
 ;; all f xs
