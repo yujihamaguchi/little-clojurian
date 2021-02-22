@@ -488,11 +488,9 @@
 
 (deftest any-test
   (testing
-    (is (= (my-any odd? [1 3 5]) true))
-    (is (= (my-any odd? [2 4 6]) false))
-    (is (= (my-any odd? []) false))
-  )
-)
+      (is (=  true (my-any odd? [1 3 5])))
+    (is (=  false (my-any odd? [2 4 6])))
+    (is (=  false (my-any odd? [])))))
 
 (deftest my-drop-while-test
   (testing
