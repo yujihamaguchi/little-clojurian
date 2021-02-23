@@ -626,13 +626,11 @@
       (is (= true
              (let [f (java.io.File. "./resources/ut-recently-modified.txt")]
                (.setLastModified f (- (System/currentTimeMillis) (* 1000 60 29)))
-               (recently-modified? f))
-             ))
+               (recently-modified? f))))
     (is (= false
            (let [f (java.io.File. "./resources/ut-recently-modified.txt")]
              (.setLastModified f (- (System/currentTimeMillis) (* 1000 60 31)))
-             (recently-modified? f))
-           ))))
+             (recently-modified? f))))))
 
 (deftest my-set-test
   (testing
