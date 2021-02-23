@@ -741,11 +741,13 @@
 (defn crack [s]
   (shift-string s (guess-shift-count (round-shift-string s) table)))
 
-;; Q066: ファイルが過去半時間の間に更新されたかどうか調べる述語recently-modified?を書け。
-;;       （パラメータとして、java.io.File オブジェクトが渡される想定）
+;; Q066: ファイルが過去半時間の間に更新されたかどうか調べる述語 recently-modified? を書け。
+;;       （パラメータとして、 java.io.File オブジェクトが渡される想定）
 (defn recently-modified?
   [f]
-  (>= (* 30 60 1000) (- (System/currentTimeMillis) (.lastModified f))))
+  (>= (* 1000 60 30)
+      (- (System/currentTimeMillis)
+         (.lastModified f))))
 
 ;; #{集合}
 (def compositions #{
