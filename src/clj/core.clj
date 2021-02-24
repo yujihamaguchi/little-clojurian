@@ -750,22 +750,19 @@
          (.lastModified f))))
 
 ;; #{集合}
-(def compositions #{
-                    {:name "The Art of the Fugue", :composer "J. S. Bach"}
+(def compositions #{{:name "The Art of the Fugue", :composer "J. S. Bach"}
                     {:name "Requiem", :composer "W. A. Mozart"}
                     {:name "Requiem", :composer "Giuseppe Verdi"}
                     {:name "Musical Offering", :composer "J. S. Bach"}})
-(def composers #{
-                 {:composer "J. S. Bach" :country "Germany"}
+(def composers #{{:composer "J. S. Bach" :country "Germany"}
                  {:composer "W. A. Mozart" :country "Austria"}
                  {:composer "Giuseppe Verdi" :country "Italy"}})
-(def nations #{
-               {:nation "Germany" :language "Germany"}
+(def nations #{{:nation "Germany" :language "Germany"}
                {:nation "Austria" :language "German"}
                {:nation "Italy" :language "Italian"}})
 
 (use 'clojure.set)
-;; Q067: compositionsのキーワード:nameの別名として:titleを持つ集合を取得せよ。(set1関数の戻り値として)
+;; Q067: compositions のキーワード :name の別名として :title を持つ集合を取得せよ。( set1 関数の戻り値として)
 (defn set1
   []
   (rename compositions {:name :title}))
