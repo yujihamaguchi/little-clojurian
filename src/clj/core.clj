@@ -767,8 +767,9 @@
   []
   (rename compositions {:name :title}))
 
-;; Q068: compositionsから:nameが"Requiem"のレコードを抽出せよ（set2関数の戻り値として）
-(defn set2 []
+;; Q068: compositions から :nameが "Requiem" のレコードを抽出せよ（ set2 関数の戻り値として）
+(defn set2
+  []
   (select #(= "Requiem" (:name %)) compositions))
 
 ;; Q069: compositionsから:nameキーの値のみを射影せよ。（set3関数の戻り値として）
