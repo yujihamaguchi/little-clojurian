@@ -772,8 +772,9 @@
   []
   (select #(= "Requiem" (:name %)) compositions))
 
-;; Q069: compositionsから:nameキーの値のみを射影せよ。（set3関数の戻り値として）
-(defn set3 []
+;; Q069: compositions を　:name で射影せよ。（ set3 関数の戻り値として）
+(defn set3
+  []
   (project compositions [:name]))
 
 ;; Q070: compositionsとcomposersを自然結合せよ。（set4関数の戻り値として）
