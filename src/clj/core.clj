@@ -777,8 +777,9 @@
   []
   (project compositions [:name]))
 
-;; Q070: compositionsとcomposersを自然結合せよ。（set4関数の戻り値として）
-(defn set4 []
+;; Q070: compositions と composers を自然結合せよ。（ set4 関数の戻り値として）
+(defn set4
+  []
   (join compositions composers))
 
 ;; Q071: composersとnationsを:countryと:nationで結合せよ。（set5関数の戻り値として）
