@@ -649,10 +649,10 @@
     (and (p x)
          (my-all p xs'))))
 #_(defn my-all
-  [p [x & xs' :as xs]]
-  (or (not (seq xs))
-      (and (p x)
-           (my-all p xs'))))
+    [p [x & xs' :as xs]]
+    (or (not (seq xs))
+        (and (p x)
+             (my-all p xs'))))
 
 ;; Q064: 関数 any を自作せよ。( my-any )
 ;;       any :: (a -> Bool) -> [a] -> Bool
@@ -782,11 +782,12 @@
   []
   (join compositions composers))
 
-;; Q071: composersとnationsを:countryと:nationで結合せよ。（set5関数の戻り値として）
-(defn set5 []
+;; Q071: composers と nations を :country と :nation で結合せよ。（ set5 関数の戻り値として）
+(defn set5
+  []
   (join composers nations {:country :nation}))
 
-;; Q072: compositionsから:nameが"Requiem"のレコードを抽出し、composersと自然結合し、:countryキーで射影せよ。（set6関数の戻り値として）
+;; Q072: compositions から :name が "Requiem" のレコードを抽出し、 composers と自然結合し、 :country キーで射影せよ。（ set6 関数の戻り値として）
 (defn set6
   []
   (-> (select #(= "Requiem" (:name %)) compositions)
