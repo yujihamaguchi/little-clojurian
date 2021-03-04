@@ -794,24 +794,25 @@
       (join composers)
       (project [:country])))
 
-;; Q073: 最底部にbottomというシンボルを持つ、任意のnレベルまでネストしたリストを作るdeeply-nested関数を書け。
+;; Q073: 最底部に bottom というシンボルを持つ、任意の n レベルまでネストしたリストを作る deeply-nested 関数を書け。
 (defn deeply-nested
   [n]
   (if (zero? n)
     'bottom
     (list (deeply-nested (dec n)))))
 
-
-;; Q074: 以下のコイントスの結果データ（:h 表、:t 裏）について、 表が2回続けて出たケースをカウントする関数count-heads-pairsをloop/recurを用いて書け。
+;; Q074: 以下のコイントスの結果データ（ :h 表、 :t 裏 ）について、 表が 2 回続けて出たケースをカウントする関数 count-heads-pairs を loop/recur を用いて書け。
 ;; (count-heads-pairs [:h :t :t :h :h :h])
 ;; ;= 2
-(defn count-heads-pairs [coll]
-  (loop [acc 0 coll coll]
-    (if-not (next coll)
-      acc
-      (if (every? #(= :h %) (take 2 coll))
-        (recur (inc acc) (rest coll))
-        (recur acc (rest coll))))))
+(defn count-heads-pairs
+  [rs]
+  (loop [rs rs cnt 0]
+    (if-not (next rs)
+      cnt
+      (recur (rest rs)
+             (if (every? #(= :h %) (take 2 rs))
+               (inc cnt)
+               cnt)))))
 
 ;; Q075: 以下の変換を行う関数by-pairsを、lazy-seqを用いて書け。
 ;;     変換前：[:h :t :t :h :h :h]
