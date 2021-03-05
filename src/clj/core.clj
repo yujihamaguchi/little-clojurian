@@ -814,12 +814,13 @@
                (inc cnt)
                cnt)))))
 
-;; Q075: 以下の変換を行う関数by-pairsを、lazy-seqを用いて書け。
-;;     変換前：[:h :t :t :h :h :h]
-;;     変換後：((:h :t) (:t :t) (:t :h) (:h :h) (:h :h))
-(defn by-pairs [coll]
+;; Q075: 以下の変換を行う関数 by-pairs を、 lazy-seq を用いて書け。
+;;     変換前： [:h :t :t :h :h :h]
+;;     変換後： ((:h :t) (:t :t) (:t :h) (:h :h) (:h :h))
+(defn by-pairs
+  [coll]
   (if-not (next coll)
-    '()
+    []
     (lazy-seq (cons (take 2 coll) (by-pairs (rest coll))))))
 
 ;; Q076: ホフスタッタの男女シーケンスを書け。(f, m)
