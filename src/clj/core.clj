@@ -842,16 +842,10 @@
 ;; キャッシュが作られる前にスタックが溢れてしまう。
 ;; それを防ぐ為に、関数ではなくシーケンスを見せることでキャッシュが頭から作られるのを保証し、以下を満たす性能を獲得すること。
 ;;
-;;   (def f-seq (map f (range)))
-;;   (def m-seq (map m (range)))
+;;   (is (< (elapsed-time (nth f-seq 250)) 100))
+;;   (is (< (elapsed-time (nth m-seq 250)) 100))
 ;;
 (declare f m)
-
-(defmacro elapsed-time
-  [expr]
-  `(let [start# (System/currentTimeMillis)]
-     ~expr
-     (- (System/currentTimeMillis) start#)))
 
 (defn f
   [n]
@@ -868,15 +862,23 @@
 (def f (memoize f))
 (def m (memoize m))
 
+(defmacro elapsed-time
+  [expr]
+  `(let [start# (System/currentTimeMillis)]
+     ~expr
+     (- (System/currentTimeMillis) start#)))
+
 (def f-seq (map f (range)))
 (def m-seq (map m (range)))
 
-;; Q077-01: s-list（シンボルとシンボルのリスト両方を要素に出来るリスト）、oldsym、newsymを引数に取り、s-listの中のoldsymをすべてnewsymに置き換える関数replace-symbolを、
-;; シンボル（と見られる要素）の置換を行うreplace-symbol-expression関数との相互再帰で書け。
-;; (replace-symbol '((a b) (((b g r) (f r)) c (d e)) b) 'b 'a)
-;; ;;= ((a a) (((a g r) (f r)) c (d e)) a)
-;; この関数は深くネストした構造をあたえるとスタックを溢れさせる可能性がある。これを避ける為に遅延評価を用いること。
-
+;; Q077-01: s-list （シンボルとシンボルのリスト両方を要素に出来るリスト）、 oldsym、 newsym を引数に取り
+;;          s-list の中の oldsym をすべて newsym に置き換える関数 replace-symbol を
+;;          シンボル（と見られる要素）の置換を行う replace-symbol-expression 関数との相互再帰で書け。
+;;
+;;            (replace-symbol '((a b) (((b g r) (f r)) c (d e)) b) 'b 'a)
+;;            ;;= ((a a) (((a g r) (f r)) c (d e)) a)
+;;
+;;          この関数は深くネストした構造をあたえるとスタックを溢れさせる可能性がある。これを避ける為に遅延評価を用いること。
 ;; 相互再帰版
 (declare replace-symbol replace-symbol-expression)
 
