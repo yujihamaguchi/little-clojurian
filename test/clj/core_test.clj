@@ -717,21 +717,18 @@
     (is (< (elapsed-time (nth m-seq 250)) 100))))
 
 (deftest replace-symbol-test
-  (is (= (replace-symbol [] 'a 'b') []))
-  (is (= (replace-symbol ['a] 'a 'b) ['b]))
-  (is (= (replace-symbol ['a 'b] 'a 'b) ['b 'b]))
-  (is (= (replace-symbol ['b 'a] 'a 'b) ['b 'b]))
-  (is (= (replace-symbol [['a] 'b] 'a 'b) [['b] 'b]))
-  (is (= (replace-symbol ['b ['a]] 'a 'b) ['b ['b]]))
-  (is (= (replace-symbol ['a ['a] 'b] 'a 'b) ['b ['b] 'b]))
-  (is (= (replace-symbol [['a] [['a]] 'b] 'a 'b) [['b] [['b]] 'b]))
+  (is (=  [] (replace-symbol [] 'a 'b')))
+  (is (=  ['b] (replace-symbol ['a] 'a 'b)))
+  (is (=  ['b 'b](replace-symbol ['a 'b] 'a 'b)))
+  (is (=  ['b 'b](replace-symbol ['b 'a] 'a 'b)))
+  (is (=  [['b] 'b](replace-symbol [['a] 'b] 'a 'b)))
+  (is (=  ['b ['b]](replace-symbol ['b ['a]] 'a 'b)))
+  (is (=  ['b ['b] 'b](replace-symbol ['a ['a] 'b] 'a 'b)))
+  (is (=  [['b] [['b]] 'b](replace-symbol [['a] [['a]] 'b] 'a 'b)))
   (is
-    (=
-      (replace-symbol '((a b) (((b g r) (f r)) c (d e)) b) 'b 'a)
-      '((a a) (((a g r) (f r)) c (d e)) a)
-    )
-  )
-)
+   (=
+    '((a a) (((a g r) (f r)) c (d e)) a)
+    (replace-symbol '((a b) (((b g r) (f r)) c (d e)) b) 'b 'a))))
 
 (deftest make-greeter-test
   (testing
