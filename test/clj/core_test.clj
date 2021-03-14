@@ -1,30 +1,30 @@
 (ns clj.core-test
   (:require [clojure.test :refer :all]
-    [clj.core :refer :all]))
+            [clj.core :refer :all]))
 
 (deftest my-zip-test
   (testing
-    (is (= (my-zip [1 2] "xy" "ab") '((1 \x \a) (2 \y \b)) ))
+      (is (= (my-zip [1 2] "xy" "ab") '((1 \x \a) (2 \y \b)) ))
     (is (= (my-zip [1 2] "x") '((1 \x)) ))
     (is (= (my-zip [1] "xy") '((1 \x)) ))
     (is (= (my-zip) nil ))
     (is (or (= (my-zip "") nil) (= (my-zip "") '())))
     (is (or (= (my-zip "" [1]) nil ) (= (my-zip "" [1]) '())))
     (is (or (my-zip [1] "") nil ) (= (my-zip [1] "") '()))
+    )
   )
-)
 
 (deftest sum-test
   (testing
-    (is (= (sum [1]) 1))
+      (is (= (sum [1]) 1))
     (is (= (sum [1 2]) 3))
     (is (= (sum []) 0 ))
+    )
   )
-)
 
 (deftest qsort01-test
   (testing
-    (is (= (qsort01 [3 2 1]) [1 2 3]))
+      (is (= (qsort01 [3 2 1]) [1 2 3]))
     (is (= (qsort01 [2 3 1]) [1 2 3]))
     (is (= (qsort01 [1 2 3]) [1 2 3]))
     (is (= (qsort01 "cba") '(\a \b \c)))
@@ -34,20 +34,20 @@
     (is (= (qsort01 "a") '(\a)))
     (is (= (qsort01 "") ()))
     (is (= (qsort01 ()) ()))
+    )
   )
-)
 
 (deftest product-test
   (testing
-    (is (= (product [1 2 3]) 6))
+      (is (= (product [1 2 3]) 6))
     (is (= (product [1]) 1))
     (is (= (product []) 1))
+    )
   )
-)
 
 (deftest rqsort-test
   (testing
-    (is (= (rqsort [3 2 1]) [3 2 1]))
+      (is (= (rqsort [3 2 1]) [3 2 1]))
     (is (= (rqsort [2 3 1]) [3 2 1]))
     (is (= (rqsort [1 2 3]) [3 2 1]))
     (is (= (rqsort "cba") '(\c \b \a)))
@@ -57,399 +57,399 @@
     (is (= (rqsort "a") '(\a)))
     (is (= (rqsort "") ()))
     (is (= (rqsort ()) ()))
+    )
   )
-)
 
 (deftest my-init-test
   (testing
-    (is (= (my-init [1 2 3]) [1 2]))
+      (is (= (my-init [1 2 3]) [1 2]))
     (is (= (my-init [1 2]) [1]))
     (is (= (my-init [1]) []))
+    )
   )
-)
 
 (deftest last-test
   (testing
-    (is (= (my-last [1 2 3]) 3))
+      (is (= (my-last [1 2 3]) 3))
     (is (= (my-last [1 2]) 2))
     (is (= (my-last [1]) 1))
     (is (thrown? java.util.NoSuchElementException (my-last [])))
+    )
   )
-)
 
 (deftest halve-test
   (testing
-    (is (= (halve [1 2]) [[1] [2]]))
+      (is (= (halve [1 2]) [[1] [2]]))
     (is (= (halve [1 2 3 4]) [[1 2] [3 4]]))
     (is (thrown? java.lang.IllegalArgumentException (halve [])))
     (is (thrown? java.lang.IllegalArgumentException (halve [1])))
     (is (thrown? java.lang.IllegalArgumentException (halve [1 2 3])))        
+    )
   )
-)
 
 (deftest concat-test
   (testing
       (is (= (my-concat [[1 2] [3 4]]) [1 2 3 4]))
     (is (= (my-concat [[1 2] [3]]) [1 2 3]))
     (is (= (my-concat [[1 2]]) [1 2]))
+    )
   )
-)
 
 (deftest factors-test
   (testing
-    (is (= (factors 10) [1 2 5 10]))
+      (is (= (factors 10) [1 2 5 10]))
     (is (= (factors 5) [1 5]))
     (is (= (factors 1) [1]))
     (is (= (factors 0) []))
+    )
   )
-)
 
 (deftest und
   (testing
-    (is (= (my-find 4 [ [1 \a] [2 \b] ]) []))
+      (is (= (my-find 4 [ [1 \a] [2 \b] ]) []))
     (is (= (my-find 1 [ [1 \a] [2 \b] ]) [\a]))
     (is (= (my-find 1 [ [2 \b] [1 \a] ]) [\a]))
     (is (= (my-find 1 [ [2 \b] [1 \a] [3 \c] ]) [\a]))
     (is (= (my-find 1 [ [1 \a] [1 \b] [3 \c] ]) [\a \b]))
     (is (= (my-find \a [ [\a 1] [\b 2] [\c 3] ]) [1]))
     (is (= (my-find "abc" [ ["abc" 1] ["def" 2] ]) [1]))
+    )
   )
-)
 
 (deftest firsts-test
   (testing
-    (is (= (firsts [[1]]) [1]))
+      (is (= (firsts [[1]]) [1]))
     (is (= (firsts [[1 2]]) [1]))
     (is (= (firsts [[1 2 3]]) [1]))
     (is (= (firsts [[1] [2]]) [1 2]))
     (is (= (firsts [[1 2] [3 4]]) [1 3]))
     (is (= (firsts [[1 2 3] [4 5 6]]) [1 4]))
     (is (= (firsts ["abc" "def"]) [\a \d]))
+    )
   )
-)
 
 (deftest length-test
   (testing
-    (is (= (length []) 0))
+      (is (= (length []) 0))
     (is (= (length [1]) 1))
     (is (= (length [1 2]) 2))
     (is (= (length "abc") 3))
     (is (= (length #{1 2 3}) 3))
     (is (= (length {:a 1 :b 2 :c 3}) 3))
+    )
   )
-)
 
 (deftest prime-test
   (testing
-    (is (not (prime? 1)))
+      (is (not (prime? 1)))
     (is (prime? 2))
     (is (prime? 3))
     (is (not (prime? 4)))
     (is (prime? 5))
     (is (not (prime? 6)))
+    )
   )
-)
 
 (deftest primes-test
   (testing
-    (is (= (primes 1) '()))
+      (is (= (primes 1) '()))
     (is (= (primes 5) '(2 3 5)))
+    )
   )
-)
 
 (deftest pairs-test
   (testing
-    (is (= (pairs [1 2]) {1 2}))
+      (is (= (pairs [1 2]) {1 2}))
     (is (= (pairs [1 2 3]) {1 2, 2 3}))
     (is (= (pairs [1 2 3 4]) {1 2, 2 3, 3 4}))
     (is (= (pairs [1]) {}))
     (is (= (pairs []) {}))
     (is (= (pairs "abc") {\a \b, \b \c}))
+    )
   )
-)
 
 (deftest sorted-test
   (testing
-    (is (sorted? [1 2]))
+      (is (sorted? [1 2]))
     (is (not (sorted? [2 1])))
     (is (sorted? [1]))
     (is (sorted? []))
+    )
   )
-)
 
 (deftest positions-test
   (testing
-    (is (= (positions 1 [1 2]) [0]))
+      (is (= (positions 1 [1 2]) [0]))
     (is (= (positions 1 [1 2 1]) [0 2]))
     (is (= (positions 1 [0 1 1 2]) [1 2]))
     (is (= (positions 1 [2 3]) []))
+    )
   )
-)
 
 (deftest char-count-test
   (testing
-    (is (= (char-count \a "abc") 1))
+      (is (= (char-count \a "abc") 1))
     (is (= (char-count \b "abc") 1))
     (is (= (char-count \c "abc") 1))
     (is (= (char-count \c "abca") 1))
     (is (= (char-count \c "abbca") 1))
     (is (= (char-count \c "abbccac") 3))
+    )
   )
-)
 
 (deftest lowers-test
   (testing
-    (is (= (lower-count "abcあ亜ア") 3))
+      (is (= (lower-count "abcあ亜ア") 3))
     (is (= (lower-count "あ亜アAbc") 2))
     (is (= (lower-count "aBcあ亜ア") 2))
     (is (= (lower-count "あ亜アabC") 2))
+    )
   )
-)
 
 (deftest int2let-test
   (testing
-    (is (= (int2let 0) \a))
+      (is (= (int2let 0) \a))
     (is (= (int2let 1) \b))
     (is (= (int2let 2) \c))
+    )
   )
-)
 
 (deftest let2int-test
   (testing
-    (is (= (let2int \a) 0))
+      (is (= (let2int \a) 0))
     (is (= (let2int \b) 1))
     (is (= (let2int \c) 2))
+    )
   )
-)
 
 (deftest shift-test
   (testing
-    (is (= (my-shift 1 \a) \b))
+      (is (= (my-shift 1 \a) \b))
     (is (= (my-shift 1 \z) \a))
     (is (= (my-shift 1 \A) \A))
+    )
   )
-)
 
 (deftest my-encode-test
   (testing
-    (is (= (my-encode 1 "abc") "bcd"))
+      (is (= (my-encode 1 "abc") "bcd"))
     (is (= (my-encode 1 "xyz") "yza"))
+    )
   )
-)
 
 (deftest percent-test
   (testing
-    (is (= (percent 1 1) 100))
+      (is (= (percent 1 1) 100))
     (is (= (percent 1 2) 50N))
     (is (= (percent 1 3) 100/3))
+    )
   )
-)
 
 (deftest freqs-test
   (testing
-    (is (= (freqs "a") [100 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]))
+      (is (= (freqs "a") [100 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]))
     (is (= (freqs "ab") [50N 50N 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]))
     (is (= (freqs "bcd") [0 100/3 100/3 100/3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]))
     (is (= (freqs "ac") [50N 0 50N 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]))
     (is (= (freqs "az") [50N 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 50N]))    
+    )
   )
-)
 
 (deftest chisqr-test
   (testing
-    (is (= (chisqr [1 2 3] [4 5 6]) 5.549999952316284))
+      (is (= (chisqr [1 2 3] [4 5 6]) 5.549999952316284))
     (is (= (chisqr [1 2 3] [4 5]) 4.049999952316284))))
 
 (deftest rotate-test
   (testing
-    (is (= (rotate 1 "abc") "bca"))
+      (is (= (rotate 1 "abc") "bca"))
     (is (= (rotate 2 "abc") "cab"))
     (is (= (rotate 3 "abc") "abc"))
     (is (= (rotate 4 "abc") "bca"))
+    )
   )
-)
 
 (deftest sum-square-1-to-100-test
   (testing
-    (is (sum-square-1-to-100) 338350)
+      (is (sum-square-1-to-100) 338350)
+    )
   )
-)
 
 (deftest perfects-test
   (testing
-    (is (= (perfects 10) [6]))
+      (is (= (perfects 10) [6]))
     (is (= (perfects 100) [6 28]))
+    )
   )
-)
 
 (deftest pyths-test
   (testing
       (is (= (pyths 10)
              [[3 4 5] [6 8 10]]))
+    )
   )
-)
 
 (deftest my-replicate-test
   (testing
-    (is (= (my-replicate 3 true) [true true true]))
+      (is (= (my-replicate 3 true) [true true true]))
+    )
   )
-)
 
 (deftest scalarproduct-test
   (testing
-    (is (= (scalarproduct [1 2 3] [4 5 6]) 32))
+      (is (= (scalarproduct [1 2 3] [4 5 6]) 32))
+    )
   )
-)
 
 (deftest my-reverse-test
   (testing
-    (is (= (my-reverse [1 2 3]) [3 2 1]))
+      (is (= (my-reverse [1 2 3]) [3 2 1]))
+    )
   )
-)
 
 (deftest insert-test
   (testing
-    (is (= (my-insert 3 [1 2 4 5]) [1 2 3 4 5]))
+      (is (= (my-insert 3 [1 2 4 5]) [1 2 3 4 5]))
+    )
   )
-)
 
 (deftest isort-test
   (testing
-    (is (= (isort [2 5 1 3 4]) [1 2 3 4 5]))
+      (is (= (isort [2 5 1 3 4]) [1 2 3 4 5]))
     (is (= (isort [1]) [1]))
     (is (= (isort []) []))
+    )
   )
-)
 
 (deftest my-drop-test
   (testing
-    (is (= (my-drop 2 [1 2 3 4 5]) [3 4 5]))
+      (is (= (my-drop 2 [1 2 3 4 5]) [3 4 5]))
     (is (= (my-drop 0 [1 2 3 4 5]) [1 2 3 4 5]))
     (is (= (my-drop 5 [1 2 3 4 5]) []))
     (is (= (my-drop 100 [1 2 3 4 5]) []))
     (is (= (my-drop 1 []) []))
+    )
   )
-)
 
 (deftest my-zip2-test
   (testing
-    (is (= (my-zip2 [1 2 3 4 5] "abcde") [[1 \a] [2 \b] [3 \c] [4 \d] [5 \e]]))
+      (is (= (my-zip2 [1 2 3 4 5] "abcde") [[1 \a] [2 \b] [3 \c] [4 \d] [5 \e]]))
     (is (= (my-zip2 [1 2 3] "abcde") [[1 \a] [2 \b] [3 \c]]))
     (is (= (my-zip2 [1 2 3 4 5] "abc") [[1 \a] [2 \b] [3 \c]]))
+    )
   )
-)
 
 (deftest my-even?-test
   (testing
-    (is (= (my-even? -1) false))
+      (is (= (my-even? -1) false))
     (is (= (my-even? -2) true))
     (is (= (my-even? -3) false))
     (is (= (my-even? 0) true))
     (is (= (my-even? 1) false))
     (is (= (my-even? 2) true))
     (is (= (my-even? 3) false))
+    )
   )
-)
 
 (deftest my-odd?-test
   (testing
-    (is (= (my-odd? -1) true))
+      (is (= (my-odd? -1) true))
     (is (= (my-odd? -2) false))
     (is (= (my-odd? -3) true))
     (is (= (my-odd? 0) false))
     (is (= (my-odd? 1) true))
     (is (= (my-odd? 2) false))
     (is (= (my-odd? 3) true))
+    )
   )
-)
 
 (deftest fibonacci-test
   (testing
-    (is (= (fibonacci 0) 0))
+      (is (= (fibonacci 0) 0))
     (is (= (fibonacci 1) 1))
     (is (= (fibonacci 2) 1))
     (is (= (fibonacci 3) 2))
     (is (= (fibonacci 4) 3))
+    )
   )
-)
 
 (deftest qsort-test
   (testing
-    (is (= (qsort [1 2 3]) [1 2 3]))
+      (is (= (qsort [1 2 3]) [1 2 3]))
     (is (= (qsort [2 3 1]) [1 2 3]))
     (is (= (qsort [3 1 2]) [1 2 3]))
     (is (= (qsort [1]) [1]))
     (is (= (qsort []) []))
+    )
   )
-)
 
 (deftest evens-test
   (testing
-    (is (= (evens []) []))
+      (is (= (evens []) []))
     (is (= (evens [1 2]) [2]))
     (is (= (evens [1 2 3]) [2]))
     (is (= (evens [1 2 3 4]) [2 4]))
+    )
   )
-)
 
 (deftest odds-test
   (testing
-    (is (= (odds []) []))
+      (is (= (odds []) []))
     (is (= (odds [1 2]) [1]))
     (is (= (odds [1 2 3]) [1 3]))
     (is (= (odds [1 2 3 4]) [1 3]))
+    )
   )
-)
 
 (deftest my-init-test
   (testing
-    (is (= (my-init []) []))
+      (is (= (my-init []) []))
     (is (= (my-init [1]) []))
     (is (= (my-init [1 2]) [1]))
     (is (= (my-init [1 2 3]) [1 2]))
+    )
   )
-)
 
 (deftest my-elem-test
   (testing
-    (is (not (my-elem 1 [])))
+      (is (not (my-elem 1 [])))
     (is (my-elem 1 [1]))
     (is (not (my-elem 3 [1 2])))
     (is (my-elem 3 [1 2 3]))
+    )
   )
-)
 
 (deftest my-index-test
   (testing
-    (is (= (my-index [] 0) nil))
+      (is (= (my-index [] 0) nil))
     (is (= (my-index [] 1) nil))
     (is (= (my-index [1] 0) 1))
     (is (= (my-index [1 2] 1) 2))
+    )
   )
-)
 
 (deftest my-merge-test
   (testing
-    (is (= [1 2 3 4 5 6] (my-merge [2 5 6] [1 3 4])))
+      (is (= [1 2 3 4 5 6] (my-merge [2 5 6] [1 3 4])))
+    )
   )
-)
 
 (deftest msort-test
   (testing
-    (is (= (msort []) []))
+      (is (= (msort []) []))
     (is (= (msort [1 2 3]) [1 2 3]))
     (is (= (msort [3 2 1]) [1 2 3]))
     (is (= (msort [2 3 1]) [1 2 3]))
+    )
   )
-)
 
 (deftest my-replicate-rec-test
   (testing
-    (is (= (my-replicate-rec 0 "a") []))
+      (is (= (my-replicate-rec 0 "a") []))
     (is (= (my-replicate-rec 1 "a") ["a"]))
     (is (= (my-replicate-rec 2 "a") ["a" "a"]))
+    )
   )
-)
 
 (deftest my-test
   (testing (is (=  8 (my 2 3)))
@@ -458,25 +458,25 @@
 
 (deftest map-test
   (testing
-    (is (= (my-map inc [1 2 3]) [2 3 4]))
+      (is (= (my-map inc [1 2 3]) [2 3 4]))
     (is (= (my-map #(* % %) [1 2 3]) [1 4 9]))
+    )
   )
-)
 
 (deftest filter-test
   (testing
-    (is (= (my-filter odd? [1 2 3]) [1 3]))
+      (is (= (my-filter odd? [1 2 3]) [1 3]))
     (is (= (my-filter odd? [2]) []))
     (is (= (my-filter odd? []) []))
+    )
   )
-)
 
 (deftest map-recur-test
   (testing
-    (is (= (my-map-recur inc [1 2 3]) [2 3 4]))
+      (is (= (my-map-recur inc [1 2 3]) [2 3 4]))
     (is (= (my-map-recur #(* % %) [1 2 3]) [1 4 9]))
+    )
   )
-)
 
 (deftest all-test
   (testing
@@ -494,11 +494,11 @@
 
 (deftest my-drop-while-test
   (testing
-    (is (= (my-drop-while odd? [1 2 3]) [2 3]))
+      (is (= (my-drop-while odd? [1 2 3]) [2 3]))
     (is (= (my-drop-while odd? []) []))
     (is (= (my-drop-while odd? [2 3 4]) [2 3 4]))
+    )
   )
-)
 
 (deftest my-filter-recur-test
   (testing
@@ -508,27 +508,27 @@
 
 (deftest my-take-while-test
   (testing
-    (is (= (my-take-while odd? [1 2 3]) [1]))
+      (is (= (my-take-while odd? [1 2 3]) [1]))
     (is (= (my-take-while odd? [1 3 4]) [1 3]))
     (is (= (my-take-while odd? [1 3 5]) [1 3 5]))
     (is (= (my-take-while odd? []) []))
     (is (= (my-take-while odd? [2 3]) []))
+    )
   )
-)
 
 (deftest my-foldr-test
   (testing
-    (is (= 10 (my-foldr + 0 [1 2 3 4])))
+      (is (= 10 (my-foldr + 0 [1 2 3 4])))
     (is (= "abcdQ" (apply str (my-foldr concat "Q" ["a" "b" "c" "d"]))))))
 
 (deftest my-foldl-test
   (testing
-    (is (= 10 (my-foldl + 0 [1 2 3 4])))
+      (is (= 10 (my-foldl + 0 [1 2 3 4])))
     (is (= "Qabcd" (apply str (my-foldl concat "Q" ["a" "b" "c" "d"]))))))
 
 (deftest bit2int-test
   (testing
-    (is (== (bits->int [0]) 0))
+      (is (== (bits->int [0]) 0))
     (is (== (bits->int [1]) 1))
     (is (== (bits->int [0 1]) 2))
     (is (== (bits->int [1 1]) 3))
@@ -538,12 +538,12 @@
     (is (== (bits->int [1 1 1]) 7))
     (is (== (bits->int [0 0 0 1]) 8))
     (is (== (bits->int [1 0 0 1]) 9))
+    )
   )
-)
 
 (deftest int->bit-test
   (testing
-    (is (= (int->bits 1) [1]))
+      (is (= (int->bits 1) [1]))
     (is (= (int->bits 2) [0 1]))
     (is (= (int->bits 3) [1 1]))
     (is (= (int->bits 4) [0 0 1]))
@@ -553,8 +553,8 @@
     (is (= (int->bits 8) [0 0 0 1]))
     (is (= (int->bits 9) [1 0 0 1]))
     (is (= (int->bits 10) [0 1 0 1]))
+    )
   )
-)
 
 (deftest make8-test
   (testing
@@ -569,57 +569,57 @@
 
 (deftest decode-test
   (testing
-    (is (= (decode [1 0 0 0 0 1 1 0 0 1 0 0 0 1 1 0]) "ab"))
+      (is (= (decode [1 0 0 0 0 1 1 0 0 1 0 0 0 1 1 0]) "ab"))
     (is (= (decode [1 0 0 0 0 1 1 0 1 1 0 0 0 1 1 0]) "ac"))
+    )
   )
-)
 
 (deftest encode-test
   (testing
-    (is (= (encode "ab") [1 0 0 0 0 1 1 0 0 1 0 0 0 1 1 0]))
+      (is (= (encode "ab") [1 0 0 0 0 1 1 0 0 1 0 0 0 1 1 0]))
     (is (= (encode "ac") [1 0 0 0 0 1 1 0 1 1 0 0 0 1 1 0]))
+    )
   )
-)
 
 (deftest my-all-test
   (testing
-    (is (= (my-all #(= 1 %) [5,4,3,2,1]) false))
+      (is (= (my-all #(= 1 %) [5,4,3,2,1]) false))
     (is (= (my-all #(= 1 %) [1,1,1]) true))
     (is (= (my-all #(= 1 %) []) true))
+    )
   )
-)
 
 (deftest my-any-test
   (testing
-    (is (= (my-any #(= 1 %) [5,4,3,2,1]) true))
+      (is (= (my-any #(= 1 %) [5,4,3,2,1]) true))
     (is (= (my-any #(= 1 %) [1,1,1]) true))
     (is (= (my-any #(= 1 %) []) false))
+    )
   )
-)
 
 (deftest my-drop-while-test
   (testing
-    (is (= (my-drop-while odd? [1 2 3]) [2 3]))
+      (is (= (my-drop-while odd? [1 2 3]) [2 3]))
     (is (= (my-drop-while odd? [1 3 4]) [4]))
     (is (= (my-drop-while odd? [1 3]) []))
+    )
   )
-)
 
 (deftest my-take-while-test
   (testing
-    (is (= (my-take-while odd? [1 2 3]) [1]))
+      (is (= (my-take-while odd? [1 2 3]) [1]))
     (is (= (my-take-while odd? [1 3 4]) [1 3]))
     (is (= (my-take-while odd? [2 3]) []))
+    )
   )
-)
 
 (deftest crack-test
   (testing
-    (is (= (crack (shift-string "i have attached work book, where we need to show two sheets in a dashboard." 3)) "i have attached work book, where we need to show two sheets in a dashboard."))
+      (is (= (crack (shift-string "i have attached work book, where we need to show two sheets in a dashboard." 3)) "i have attached work book, where we need to show two sheets in a dashboard."))
     (is (= (crack (shift-string "i have attached work book, where we need to show two sheets in a dashboard." 13)) "i have attached work book, where we need to show two sheets in a dashboard."))
     (is (= (crack (shift-string "i have attached work book, where we need to show two sheets in a dashboard." 23)) "i have attached work book, where we need to show two sheets in a dashboard."))
+    )
   )
-)
 
 (deftest recently-modified?-test
   (testing
@@ -634,50 +634,50 @@
 
 (deftest my-set-test
   (testing
+      (is (=
+           (set1)
+           #{{:title "The Art of the Fugue", :composer "J. S. Bach"}
+             {:title "Requiem", :composer "W. A. Mozart"}
+             {:title "Requiem", :composer "Giuseppe Verdi"}
+             {:title "Musical Offering", :composer "J. S. Bach"}}))
     (is (=
-      (set1)
-      #{{:title "The Art of the Fugue", :composer "J. S. Bach"}
-        {:title "Requiem", :composer "W. A. Mozart"}
-        {:title "Requiem", :composer "Giuseppe Verdi"}
-        {:title "Musical Offering", :composer "J. S. Bach"}}))
+         (set2)
+         #{{:name "Requiem", :composer "W. A. Mozart"}
+           {:name "Requiem", :composer "Giuseppe Verdi"}}))
     (is (=
-      (set2)
-      #{{:name "Requiem", :composer "W. A. Mozart"}
-        {:name "Requiem", :composer "Giuseppe Verdi"}}))
+         (set3)
+         #{{:name "Requiem"}
+           {:name "The Art of the Fugue"}
+           {:name "Musical Offering"}}))
     (is (=
-      (set3)
-      #{{:name "Requiem"}
-        {:name "The Art of the Fugue"}
-        {:name "Musical Offering"}}))
+         (set4)
+         #{{:country "Italy", :name "Requiem", :composer "Giuseppe Verdi"}
+           {:country "Germany", :name "Musical Offering", :composer "J. S. Bach"}
+           {:country "Austria", :name "Requiem", :composer "W. A. Mozart"}
+           {:country "Germany", :name "The Art of the Fugue", :composer "J. S. Bach"}}))
     (is (=
-      (set4)
-      #{{:country "Italy", :name "Requiem", :composer "Giuseppe Verdi"}
-        {:country "Germany", :name "Musical Offering", :composer "J. S. Bach"}
-        {:country "Austria", :name "Requiem", :composer "W. A. Mozart"}
-        {:country "Germany", :name "The Art of the Fugue", :composer "J. S. Bach"}}))
+         (set5)
+         #{{:country "Germany", :nation "Germany", :language "Germany", :composer "J. S. Bach"}
+           {:country "Italy", :nation "Italy", :language "Italian", :composer "Giuseppe Verdi"}
+           {:country "Austria", :nation "Austria", :language "German", :composer "W. A. Mozart"}}))
     (is (=
-      (set5)
-      #{{:country "Germany", :nation "Germany", :language "Germany", :composer "J. S. Bach"}
-        {:country "Italy", :nation "Italy", :language "Italian", :composer "Giuseppe Verdi"}
-        {:country "Austria", :nation "Austria", :language "German", :composer "W. A. Mozart"}}))
-    (is (=
-      (set6)
-      #{{:country "Italy"}
-        {:country "Austria"}}))
+         (set6)
+         #{{:country "Italy"}
+           {:country "Austria"}}))
+    )
   )
-)
 
 (deftest deeply-nested-test
   (testing
-    (is (= (deeply-nested 0) 'bottom))
+      (is (= (deeply-nested 0) 'bottom))
     (is (= (deeply-nested 1) '(bottom)))
     (is (= (deeply-nested 2) '((bottom))))
+    )
   )
-)
 
 (deftest count-heads-pairs-test
   (testing
-    (is (= (count-heads-pairs []) 0))
+      (is (= (count-heads-pairs []) 0))
     (is (= (count-heads-pairs [:h]) 0))
     (is (= (count-heads-pairs [:t :h]) 0))
     (is (= (count-heads-pairs [:h :t]) 0))
@@ -694,27 +694,27 @@
     (is (= (count-heads-pairs [:h :h :h :h :t]) 3))
     (is (= (count-heads-pairs [:h :h :h :t :h]) 2))
     (is (= (count-heads-pairs [:h :t :t :h :h :h]) 2))
+    )
   )
-)
 
 (deftest by-pairs-test
   (testing
-    (is (= (by-pairs []) '()))
+      (is (= (by-pairs []) '()))
     (is (= (by-pairs [:t]) '()))
     (is (= (by-pairs [:t :t]) '((:t :t))))
     (is (= (by-pairs [:t :t :t]) '((:t :t) (:t :t))))
     (is (= (by-pairs [:t :t :t :t]) '((:t :t) (:t :t) (:t :t))))
     (is (= (by-pairs [:h :t :t :h :h :h]) '((:h :t) (:t :t) (:t :h) (:h :h) (:h :h))))
+    )
   )
-)
 
 (deftest f-test
   (testing
-    (is (< (elapsed-time (nth f-seq 250)) 100))))
+      (is (< (elapsed-time (nth f-seq 250)) 100))))
 
 (deftest m-test
   (testing
-    (is (< (elapsed-time (nth m-seq 250)) 100))))
+      (is (< (elapsed-time (nth m-seq 250)) 100))))
 
 (deftest replace-symbol-test
   (is (=  [] (replace-symbol [] 'a 'b')))
@@ -725,10 +725,9 @@
   (is (=  ['b ['b]](replace-symbol ['b ['a]] 'a 'b)))
   (is (=  ['b ['b] 'b](replace-symbol ['a ['a] 'b] 'a 'b)))
   (is (=  [['b] [['b]] 'b](replace-symbol [['a] [['a]] 'b] 'a 'b)))
-  (is
-   (=
-    '((a a) (((a g r) (f r)) c (d e)) a)
-    (replace-symbol '((a b) (((b g r) (f r)) c (d e)) b) 'b 'a))))
+  (is (= '((a a) (((a g r) (f r)) c (d e)) a)
+         (replace-symbol '((a b) (((b g r) (f r)) c (d e)) b) 'b 'a)))
+  (is (= (repeat 5 'b) (take 5 (replace-symbol (repeat 'a) 'a 'b)))))
 
 (deftest make-greeter-test
   (testing

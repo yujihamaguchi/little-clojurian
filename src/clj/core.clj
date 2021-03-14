@@ -879,20 +879,25 @@
 ;;            ;;= ((a a) (((a g r) (f r)) c (d e)) a)
 ;;
 ;;          この関数は深くネストした構造をあたえるとスタックを溢れさせる可能性がある。これを避ける為に遅延評価を用いること。
-(declare replace-symbol-expression replace-symbol)
-
-(defn replace-symbol-expression
-  [s-expr oldsym newsym]
-  (if (symbol? s-expr)
-    (if (= s-expr oldsym) newsym s-expr)
-    (replace-symbol s-expr oldsym newsym)))
+;;
+(declare replace-symbol-expression)
 
 (defn replace-symbol
   [s-list oldsym newsym]
   (if-not (seq s-list)
     []
-    (lazy-seq (cons (replace-symbol-expression (first s-list) oldsym newsym)
-                    (replace-symbol (rest s-list) oldsym newsym)))))
+    (lazy-seq (cons (replace-symbol-expression (first s-list)
+                                               oldsym
+                                               newsym)
+                    (replace-symbol (rest s-list)
+                                    oldsym
+                                    newsym)))))
+
+(defn replace-symbol-expression
+  [s-expr oldsym newsym]
+  (if (symbol? s-expr)
+    (if (= oldsym s-expr) newsym s-expr)
+    (replace-symbol s-expr oldsym newsym)))
 
 ;; Q077-02: また、マルチメソッドを用いたバージョンも書け。
 ;; マルチメソッド版
@@ -2450,4 +2455,3 @@
 (deftype Circle [radius]
   Shape
   (area [this] (* radius radius Math/PI)))
-
