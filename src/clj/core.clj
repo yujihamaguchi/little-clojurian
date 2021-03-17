@@ -900,7 +900,6 @@
     (replace-symbol s-expr oldsym newsym)))
 
 ;; Q077-02: また、マルチメソッドを用いたバージョンも書け。
-;; マルチメソッド版
 ;; 2018/11/18 my not bad answer
 ;; (defmulti replace-symbol (fn [expr _ _] (symbol? expr)))
 
