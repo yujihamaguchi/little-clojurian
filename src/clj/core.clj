@@ -918,28 +918,32 @@
 ;;      (cons (replace-symbol (first s-list) oldsym newsym)
 ;;            (replace-symbol (rest s-list) oldsym newsym)))))
 
-;; Q078: 名前（username）をパラメータとし、"{greeting-prefix}, {username}"の文字列を返す関数を返す、
-;;       挨拶の種類（greeting-prefix）をパラメータとする関数make-greeterを書け。
-;; ((make-greeter "Hello") "Yuji")
-;; ;;= "Hello, Yuji"
-;; ((make-greeter "Aloha") "Yuji")
-;; ;;= "Aloha, Yuji"
+;; Q078: 名前（ username ）をパラメータとし、 "{greeting-prefix}, {username}" の文字列を返す関数を返す、
+;;       挨拶の種類（ greeting-prefix ）をパラメータとする関数 make-greeter を書け。
+;;
+;;       ((make-greeter "Hello") "Yuji")
+;;       ;;= "Hello, Yuji"
+;;       ((make-greeter "Aloha") "Yuji")
+;;       ;;= "Aloha, Yuji"
+;;
 (defn make-greeter
   [greeting-prefix]
   (fn [username]
-    (str greeting-prefix ", " username)))
+    (format "%s, %s" greeting-prefix username)))
 
-;; Q079: n番目のフィボナッチ数を返す、recurで明示的な再帰を行う関数recur-fiboを書け。
-;; (recur-fibo 9)
-;; ;;= 34N
-;; (recur-fibo 1000000)
-;; ;;= 195 ...(中略)... 875N
-(defn recur-fibo [n]
-  (letfn [(recur-fibo- [n f1 f2]
-            (if (zero? n)
-              f1
-              (recur (dec n) f2 (+' f1 f2))))]
-    (recur-fibo- n 0 1)))
+;; Q079: n 番目のフィボナッチ数を返す、 recur で明示的な再帰を行う関数 recur-fibo を書け。
+;;
+;;       (recur-fibo 9)
+;;       ;;= 34N
+;;       (recur-fibo 1000000)
+;;       ;;= 195 ...(中略)... 875N
+;;
+(defn recur-fibo
+  [n]
+  (loop [f1 0 f2 1 i 0]
+    (if (= n i)
+      f1
+      (recur f2 (+ f1 f2) (inc i)))))
 
 ;; Q080: 遅延評価されるフィボナッチ数列を生成する関数lazy-seq-fiboを書け。
 ;; A:
