@@ -874,12 +874,14 @@
 ;; Q077-01: s-list （シンボルとシンボルのリスト両方を要素に出来るリスト）、 oldsym、 newsym を引数に取り
 ;;          s-list の中の oldsym をすべて newsym に置き換える関数 replace-symbol を
 ;;          シンボル（と見られる要素）の置換を行う replace-symbol-expression 関数との相互再帰で書け。
+;;          マルチメソッドを用いたパターンも書け。
 ;;
 ;;            (replace-symbol '((a b) (((b g r) (f r)) c (d e)) b) 'b 'a)
 ;;            ;;= ((a a) (((a g r) (f r)) c (d e)) a)
 ;;
 ;;          この関数は深くネストした構造をあたえるとスタックを溢れさせる可能性がある。これを避ける為に遅延評価を用いること。
 ;;
+;; A. 相互再帰版
 (declare replace-symbol-expression)
 
 (defn replace-symbol
@@ -899,39 +901,22 @@
     (if (= oldsym s-expr) newsym s-expr)
     (replace-symbol s-expr oldsym newsym)))
 
-;; Q077-02: また、マルチメソッドを用いたバージョンも書け。
-;; 2018/11/18 my not bad answer
-;; (defmulti replace-symbol (fn [expr _ _] (symbol? expr)))
+;; A. マルチメソッド版
+;; (defmulti replace-symbol (fn [s-expr _ _] (symbol? s-expr)))
+
+;; (defmethod replace-symbol true
+;;   [sym oldsym newsym]
+;;   (if (= oldsym sym)
+;;     newsym
+;;     sym))
 
 ;; (defmethod replace-symbol false
 ;;   [s-list oldsym newsym]
 ;;   (if-not (seq s-list)
 ;;     []
 ;;     (lazy-seq
-;;      (cons
-;;       (replace-symbol (first s-list) oldsym newsym)
-;;       (replace-symbol (rest s-list) oldsym newsym)))))
-
-;; (defmethod replace-symbol true
-;;   [symbol-expr oldsym newsym]
-;;   (if (= symbol-expr oldsym)
-;;     newsym
-;;     symbol-expr))
-;; お手本通りの答え
-;; (defn- coll-or-scalar [x & _] (if (coll? x) :collection :scalar))
-
-;; (defmulti replace-symbol coll-or-scalar)
-
-;; (defmethod replace-symbol :collection [coll oldsym newsym]
-;;   (if-not (seq coll)
-;;     []
-;;     (lazy-seq
-;;      (cons
-;;       (replace-symbol (first coll) oldsym newsym)
-;;       (replace-symbol (rest coll) oldsym newsym)))))
-
-;; (defmethod replace-symbol :scalar [sym oldsym newsym]
-;;   (if (= sym oldsym) newsym sym))
+;;      (cons (replace-symbol (first s-list) oldsym newsym)
+;;            (replace-symbol (rest s-list) oldsym newsym)))))
 
 ;; Q078: 名前（username）をパラメータとし、"{greeting-prefix}, {username}"の文字列を返す関数を返す、
 ;;       挨拶の種類（greeting-prefix）をパラメータとする関数make-greeterを書け。
