@@ -736,23 +736,20 @@
   )
 )
 
-; (deftest ut-recur-fibo
-;   (testing
-;     (is (= (recur-fibo 0) 0))
-;     (is (= (recur-fibo 1) 1))
-;     (is (= (recur-fibo 2) 1))
-;     (is (= (recur-fibo 3) 2))
-;     (is (= (recur-fibo 4) 3))
-;     (is (= (recur-fibo 5) 5))
-;     (is (= (recur-fibo 6) 8))
-;     (is (> (recur-fibo 1000000) 1)) ; Not StackOverflowError
-;   )
-; )
+(deftest ut-recur-fibo
+  (testing
+    (is (= (recur-fibo 0) 0))
+    (is (= (recur-fibo 1) 1))
+    (is (= (recur-fibo 2) 1))
+    (is (= (recur-fibo 3) 2))
+    (is (= (recur-fibo 4) 3))
+    (is (= (recur-fibo 5) 5))
+    (is (= (recur-fibo 6) 8))
+    #_(is (> (recur-fibo 1000000) 1))))
 
-; (deftest ut-lazy-seq-fibo
-;   (is (= (take 10 (lazy-seq-fibo)) [0 1 1 2 3 5 8 13 21 34]))
-;   (is (= (rem (nth (lazy-seq-fibo) 1000000) 1000) 875N))
-; )
+(deftest ut-lazy-seq-fibo
+  (is (= (take 10 (lazy-seq-fibo)) [0 1 1 2 3 5 8 13 21 34]))
+  #_(is (= (rem (nth (lazy-seq-fibo) 1000000) 1000) 875N)))
 
 #_(deftest ut-clojure-loc
   (is (= (clojure-loc (java.io.File. "/home/hamaguchiu2/source/personal/clojure-QA/resources/clojure-loc/")) 4))

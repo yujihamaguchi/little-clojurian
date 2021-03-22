@@ -938,25 +938,29 @@
 ;;       (recur-fibo 1000000)
 ;;       ;;= 195 ...(中略)... 875N
 ;;
+;;       ※ テストに時間が掛かるため、該当テストをコメントアウトしている
 (defn recur-fibo
   [n]
-  (loop [f1 0 f2 1 i 0]
+  (loop [i 0 f1 0 f2 1]
     (if (= n i)
       f1
-      (recur f2 (+ f1 f2) (inc i)))))
+      (recur (inc i)
+             f2
+             (+' f1 f2)))))
 
-;; Q080: 遅延評価されるフィボナッチ数列を生成する関数lazy-seq-fiboを書け。
+;; Q080: 遅延評価されるフィボナッチ数列を生成する関数 lazy-seq-fibo を書け。
 ;; A:
 ;; my answer 2018/11/22
 (defn lazy-seq-fibo
   []
   (letfn [(lazy-seq-fibo-
             [n m]
-            (lazy-seq (cons n (lazy-seq-fibo- m (+ n m)))))]
+            (lazy-seq (cons n (lazy-seq-fibo- m (+' n m)))))]
     (lazy-seq-fibo- 0 1)))
+
 ;; my answer 2014/11/03
-;; (defn lazy-seq-fibo []
-;;   (map first (iterate (fn [[n m]] [m (+' n m)]) [0 1])))
+#_(defn lazy-seq-fibo []
+  (map first (iterate (fn [[n m]] [m (+' n m)]) [0 1])))
 ;; (defn lazy-seq-fibo
 ;;   ([] (lazy-seq-fibo 1 1))
 ;;   ([n m] (lazy-seq (cons m (lazy-seq-fibo m (+' n m))))))
@@ -2444,3 +2448,17 @@
   Shape
   (area [this] (* radius radius Math/PI)))
 
+(let [c (chan 10)]
+  (>!! c "hello")
+  (assert (= "hello" (<!! c)))
+  (close! c))
+
+(let [c (chan)]
+  (thread (>!! c "hello"))
+  (println (class (<!! c)))
+  (close! c))
+
+(let [c (chan)]
+  (go (>! c "hello"))
+  (println (class (<!! (go (<! c)))))
+  (close! c))
