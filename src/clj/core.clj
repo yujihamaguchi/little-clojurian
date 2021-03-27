@@ -949,60 +949,60 @@
              (+' f1 f2)))))
 
 ;; Q080: 遅延評価されるフィボナッチ数列を生成する関数 lazy-seq-fibo を書け。
-;; A:
-;; my answer 2018/11/22
 (defn lazy-seq-fibo
   []
-  (letfn [(lazy-seq-fibo-
+  (letfn [(lazy-seq-fibo'
             [n m]
-            (lazy-seq (cons n (lazy-seq-fibo- m (+' n m)))))]
-    (lazy-seq-fibo- 0 1)))
+            (lazy-seq (cons n (lazy-seq-fibo' m (+ n m)))))]
+    (lazy-seq-fibo' 0 1)))
 
-;; my answer 2014/11/03
-#_(defn lazy-seq-fibo []
-  (map first (iterate (fn [[n m]] [m (+' n m)]) [0 1])))
-;; (defn lazy-seq-fibo
-;;   ([] (lazy-seq-fibo 1 1))
-;;   ([n m] (lazy-seq (cons m (lazy-seq-fibo m (+' n m))))))
-
-;; Q081: 以下のように、指定したディレクトリ／ファイル以下のClojureソースファイルの（空行を除いた）行数の合計をカウントする関数clojure-locを書け。
-;; (下記「参考」に目を通し、slurpを使用しないバージョンも書け)
+;; Q081: 以下のように、指定したディレクトリ / ファイル以下の Clojure ソースファイルの（空行を除いた）行数の合計をカウントする関数 clojure-loc を書け。
+;;       (下記「参考」に目を通し、 slurp を使用しないバージョンも書け)
 ;;
-;; (clojure-loc (java.io.File. "C:/Dropbox/_training/clojure-master/src/clj/clojure"))
-;; ;;= 16606
-;; (clojure-loc (java.io.File. "C:/Dropbox/_training/clojure-master/src/clj/clojure/core.clj"))
-;; ;;= 6149
+;;       [参考] https://coderwall.com/p/f1a9xa
+;;       WHAT IS SLURP?
+;;         slurp is technically a fully realized result of a clojure.java.io/reader.
+;;       WHEN SHOULD I USE SLURP?
+;;         When memory is not a concern.
+;;       WHAT IS READER?
+;;         reader will attempt to convert its argument to a BufferedReader.
+;;       WHEN SHOULD I USE READER
+;;         When a lazy sequence of the results are needed or to create a new BufferedReader.
 ;;
-;; [参考] https://coderwall.com/p/f1a9xa
-;; WHAT IS SLURP?
-;;   slurp is technically a fully realized result of a clojure.java.io/reader.
-;; WHEN SHOULD I USE SLURP?
-;;   When memory is not a concern.
-;; WHAT IS READER?
-;;   reader will attempt to convert its argument to a BufferedReader.
-;; WHEN SHOULD I USE READER
-;;   When a lazy sequence of the results are needed or to create a new BufferedReader.
-;; [slurpを使う]
+;; using slurp
 (defn clojure-loc
   [f]
-  (letfn [(is-clj-file?
+  (letfn [(clj-file?
             [f]
-            (re-seq #"\.clj$" (.getName f)))
-          (row-count
-            [f]
-            (count (re-seq #"\S" (slurp (.getAbsolutePath f)))))]
-    (reduce + (for [f' (file-seq f) :when (is-clj-file? f')] (row-count f')))))
-;; [readerを使う]
+            (->> f
+                 .getName
+                 (re-seq #"^.+\.clj$")))]
+    (->> f
+         file-seq
+         (filter clj-file?)
+         (map #(->> %
+                    slurp
+                    (re-seq #".+\n")
+                    count))
+         (reduce +))))
+
+;; using reader
 #_(defn clojure-loc
-    [f]
-    (letfn [(is-clj-file?
-              [f]
-              (re-seq #"\.clj$" (.getName f)))
-            (row-count
-              [f]
-              (with-open [rdr (clojure.java.io/reader (.getAbsolutePath f))]
-                (count (filter #(not (empty? %)) (line-seq rdr)))))]
-      (reduce + (for [f' (file-seq f) :when (is-clj-file? f')] (row-count f')))))
+  [f]
+  (letfn [(clj-file?
+            [f]
+            (->> f
+                 .getName
+                 (re-seq #"^.+\.clj$")))]
+    (->> f
+         file-seq
+         (filter clj-file?)
+         (map #(with-open [rdr (clojure.java.io/reader %)]
+                 (->> rdr
+                      line-seq
+                      (filter (complement empty?))
+                      count)))
+         (reduce +))))
 
 ;; Q082: 文字列中の文字で、探すべき文字のセットにマッチするもののインデックスを得る関数index-filterを書け。
 ;; ([pred coll])
