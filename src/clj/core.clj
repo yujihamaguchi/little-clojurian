@@ -956,7 +956,7 @@
             (lazy-seq (cons n (lazy-seq-fibo' m (+ n m)))))]
     (lazy-seq-fibo' 0 1)))
 
-;; Q081: 以下のように、指定したディレクトリ / ファイル以下の Clojure ソースファイルの（空行を除いた）行数の合計をカウントする関数 clojure-loc を書け。
+;; Q081: 指定したディレクトリ、またはファイル以下にある Clojure のソースファイル（ *.clj ）の（空行を除いた）行数の合計をカウントする関数 clojure-loc を書け。
 ;;       (下記「参考」に目を通し、 slurp を使用しないバージョンも書け)
 ;;
 ;;       [参考] https://coderwall.com/p/f1a9xa
@@ -972,37 +972,31 @@
 ;; using slurp
 (defn clojure-loc
   [f]
-  (letfn [(clj-file?
-            [f]
-            (->> f
-                 .getName
-                 (re-seq #"^.+\.clj$")))]
-    (->> f
-         file-seq
-         (filter clj-file?)
-         (map #(->> %
-                    slurp
-                    (re-seq #".+\n")
-                    count))
-         (reduce +))))
+  (->> f
+       file-seq
+       (filter (fn [f]
+                 (and (.isFile f)
+                      (re-seq #"\.clj" (.getName f)))))
+       (map #(->> %
+                  slurp
+                  (re-seq #"\S")
+                  count))
+       (reduce +)))
 
 ;; using reader
 #_(defn clojure-loc
   [f]
-  (letfn [(clj-file?
-            [f]
-            (->> f
-                 .getName
-                 (re-seq #"^.+\.clj$")))]
-    (->> f
-         file-seq
-         (filter clj-file?)
-         (map #(with-open [rdr (clojure.java.io/reader %)]
-                 (->> rdr
-                      line-seq
-                      (filter (complement empty?))
-                      count)))
-         (reduce +))))
+  (->> f
+       file-seq
+       (filter (fn [f]
+                 (and (.isFile f)
+                      (re-seq #"\.clj" (.getName f)))))
+       (map #(with-open [r (clojure.java.io/reader %)]
+               (->> r
+                    line-seq
+                    (filter (complement empty?))
+                    count)))
+       (reduce +)))
 
 ;; Q082: 文字列中の文字で、探すべき文字のセットにマッチするもののインデックスを得る関数index-filterを書け。
 ;; ([pred coll])
