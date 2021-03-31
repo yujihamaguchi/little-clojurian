@@ -998,16 +998,19 @@
                     count)))
        (reduce +)))
 
-;; Q082: 文字列中の文字で、探すべき文字のセットにマッチするもののインデックスを得る関数index-filterを書け。
-;; ([pred coll])
-;; ex)
-;; (index-filter #{\a \b} "abcdbbb")
-;; ;;= (0 1 4 5 6)
-;; (index-filter #{\a \b} "xyz")
-;; ;;= ()
+;; Q082: 文字列中の文字で、探すべき文字のセットにマッチする文字のインデックスを得る関数 index-filter を書け。
+;;       
+;;       ex)
+;;         (index-filter #{\a \b} "abcdbbb")
+;;         ;;= (0 1 4 5 6)
+;;         (index-filter #{\a \b} "xyz")
+;;         ;;= ()
+;;
 (defn index-filter
-  [p cs]
-  (for [[i v] (zipmap (range) cs) :when (p v)] i))
+  [cs s]
+  (for [[i c'] (zipmap (range) s)
+        :when (cs c')]
+    i))
 
 ;; Q083: 以下の./resources/compositions.xmlから、作曲家（composer）の名前だけを抜き出す関数（get-composer)を書け。
 ;; <compositions>
