@@ -762,8 +762,7 @@
 )
 
 (deftest get-composer-test
-  (is (= (get-composer "./resources/compositions.xml") ["J. S. Bach" "J. S. Bach" "W. A. Mozart"]))
-)
+  (is (=  ["J. S. Bach" "J. S. Bach" "W. A. Mozart"] (get-composer "./resources/compositions.xml"))))
 
 (deftest my-and-test
   (is (my-and))

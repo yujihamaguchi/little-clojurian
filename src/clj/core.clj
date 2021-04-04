@@ -1012,7 +1012,8 @@
         :when (cs c')]
     i))
 
-;; Q083: 以下の./resources/compositions.xmlから、作曲家（composer）の名前だけを抜き出す関数（get-composer)を書け。
+;; Q083: 以下の ./resources/compositions.xml から、作曲家（ composer ）の名前だけを抜き出す関数（ get-composer )を書け。
+;;
 ;; <compositions>
 ;;   <composition composer="J. S. Bach">
 ;;     <name>The Art of the Fugue</name>
@@ -1024,13 +1025,19 @@
 ;;     <name>Requiem</name>
 ;;   </composition>
 ;; </compositions>
-;; A:
-(use '[clojure.xml :as xml])
+;;
+(require '[clojure.xml :as xml])
 (defn get-composer
   [f]
-  (for [a (xml-seq (xml/parse f))
-        :when (= :composition (:tag a))]
-    (:composer (:attrs a))))
+  (->> f
+       xml/parse
+       xml-seq
+       (filter #(-> %
+                    :tag
+                    (= :composition)))
+       (map #(-> %
+                 :attrs
+                 :composer))))
 
 ;; Q083-2: マクロand、orをmy-and、my-orとして自作せよ。
 ;; A
