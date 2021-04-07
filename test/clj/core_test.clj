@@ -770,8 +770,7 @@
   (is (my-and true true))
   (is (not (my-and false)))
   (is (not (my-and true false)))
-  (is (not (my-and false true)))
-)
+  (is (not (my-and false true))))
 
 (deftest my-or-test
   (is (not (my-or)))

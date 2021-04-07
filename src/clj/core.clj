@@ -1039,8 +1039,7 @@
                  :attrs
                  :composer))))
 
-;; Q083-2: マクロand、orをmy-and、my-orとして自作せよ。
-;; A
+;; Q083-2: マクロ and、 or を my-and、 my-or として自作せよ。
 (defmacro my-and
   ([] true)
   ([p] p)
