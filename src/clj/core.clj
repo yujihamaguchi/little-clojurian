@@ -1042,19 +1042,19 @@
 ;; Q083-2: マクロ and、 or を my-and、 my-or として自作せよ。
 (defmacro my-and
   ([] true)
-  ([p] p)
-  ([p & ps]
-   `(if (not ~p)
+  ([b] b)
+  ([b & bs]
+   `(if-not ~b
       false
-      (my-and ~@ps))))
+      (my-and ~@bs))))
 
 (defmacro my-or
   ([] false)
-  ([p] p)
-  ([p & ps]
-   `(if ~p
+  ([b] b)
+  ([b & bs]
+   `(if ~b
       true
-      (my-or ~@ps))))
+      (my-or ~@bs))))
 
 ;;(defmacro my-and
 ;;  ([] true)
