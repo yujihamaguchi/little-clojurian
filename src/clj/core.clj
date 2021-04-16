@@ -1056,37 +1056,19 @@
       true
       (my-or ~@bs))))
 
-;;(defmacro my-and
-;;  ([] true)
-;;  ([x] x)
-;;  ([x & rest]
-;;   `(let [and# ~x]
-;;      (if and# (my-and ~@rest) and#))))
-;;
-;;(defmacro my-or
-;;  ([] false)
-;;  ([x] x)
-;;  ([x & rest]
-;;   `(let [or# ~x]
-;;      (if or# or# (my-or ~@rest)))))
-
-
-;; Q083-3: 相互再帰を使って、my-odd?およびmy-even?を定義せよ。(*utのコメントアウト部分でStackOverflowエラー発生課題残*)
-;; A
-(declare my-odd? my-even?)
+;; Q083-3: 相互再帰を使って、 my-odd? および my-even? を定義せよ。
+(declare my-odd?)
+(defn my-even?
+  [n]
+  (if (zero? n)
+    true
+    #(my-odd? (dec n))))
 
 (defn my-odd?
   [n]
   (if (zero? n)
     false
-    (my-even? (dec n))))
-
-(defn my-even?
-  [n]
-  (if (zero? n)
-    true
-    (my-odd? (dec n))))
-
+    #(my-even? (dec n))))
 
 ;; Q084: 任意のディレクトリ以下のファイル、ディレクトリ名をシーケンスとして取得する関数list-filesを書け。
 ;; A
