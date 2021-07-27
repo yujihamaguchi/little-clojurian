@@ -6,7 +6,8 @@
 
 ;; Q001: haskell の zip と同様の機能の関数 my-zip を書け （パラメータの数は可変であること）
 ;; zip :: [a] -> [b] -> [(a, b)]
-(defn my-zip [& colls]
+(defn my-zip
+  [& colls]
   (when (seq colls)
     (apply (partial map vector) colls)))
 
@@ -34,16 +35,16 @@
 ;; (defn sum [ns]
 ;;   (apply + ns))
 
-
 ;; Q003: クイックソート関数 qsort01 を書け（リスト内包表記を使うこと）
 (defn qsort01
   [xs]
   (if-not (seq xs)
     []
     (let [x (first xs)
-          lt (for [x' xs :when (< (int x') (int x))] x')
-          gt (for [x' xs :when (> (int x') (int x))] x')]
-      (concat (qsort01 lt) [x] (qsort01 gt)))))
+          xs' (rest xs)
+          lt (for [x' xs' :when (< (int x') (int x))] x')
+          ge (for [x' xs' :when (>= (int x') (int x))] x')]
+      (concat (qsort01 lt) [x] (qsort01 ge)))))
 
 ;; Q004: Haskell の product と同様の機能の関数を書け(再帰を用いるパターン、 reduce を用いるパターン、 apply を用いるパターン)
 ;; product :: (Num a) => [a] -> a
@@ -71,8 +72,9 @@
   (if-not (seq xs)
     []
     (let [x (first xs)
-          lt (for [x' xs :when (< (int x') (int x))] x')
-          gt (for [x' xs :when (> (int x') (int x))] x')]
+          xs' (rest xs)
+          gt (for [x' xs' :when (< (int x) (int x'))] x')
+          lt (for [x' xs' :when (> (int x) (int x'))] x')]
       (concat (rqsort gt) [x] (rqsort lt)))))
 
 ;; Q006: Haskell の init と同様の機能の関数 my-init を書け(再帰を用いるバージョンも書くこと)
