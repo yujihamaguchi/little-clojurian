@@ -95,13 +95,15 @@
 ;;     リストの最後の要素を返す。
 ;;         last [1,2,3]   = 3
 ;;         last []        = エラー
-#_(defn my-last
-    [xs]
-    (if-not (seq xs)
-      (throw (java.util.NoSuchElementException.))
-      ((comp first reverse) xs)))
-;; A: Using recursion.
 (defn my-last
+  [xs]
+  (if-not (seq xs)
+    (throw (java.util.NoSuchElementException.))
+    (-> xs
+        reverse
+        first)))
+;; A: Using recursion.
+#_(defn my-last
   [xs]
   (if-not (seq xs)
     (throw (java.util.NoSuchElementException.))
@@ -110,6 +112,13 @@
                 (first xs)
                 (my-last' (rest xs))))]
       (my-last' xs))))
+;; or
+#_(defn my-last
+  [xs]
+  (cond
+    (not (seq xs)) (throw (java.util.NoSuchElementException.))
+    (= 1 (count xs)) (first xs)
+    :else (my-last (rest xs))))
 
 ;; Q008: 偶数の長さを持つリストを半分ずつに分割する関数 halve を書け。
 (defn halve
