@@ -4,10 +4,10 @@
 
 (deftest my-zip-test
   (testing
-      (is (= (my-zip [1 2] "xy" "ab") '((1 \x \a) (2 \y \b)) ))
-    (is (= (my-zip [1 2] "x") '((1 \x)) ))
-    (is (= (my-zip [1] "xy") '((1 \x)) ))
-    (is (= (my-zip) nil ))
+      (is (=  '((1 \x \a) (2 \y \b)) (my-zip [1 2] "xy" "ab")))
+    (is (=  '((1 \x)) (my-zip [1 2] "x")))
+    (is (=  '((1 \x)) (my-zip [1] "xy")))
+    (is (=  nil (my-zip)))
     (is (or (= (my-zip "") nil) (= (my-zip "") '())))
     (is (or (= (my-zip "" [1]) nil ) (= (my-zip "" [1]) '())))
     (is (or (my-zip [1] "") nil ) (= (my-zip [1] "") '()))
