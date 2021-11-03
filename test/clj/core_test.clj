@@ -16,9 +16,9 @@
 
 (deftest sum-test
   (testing
-      (is (= (sum [1]) 1))
-    (is (= (sum [1 2]) 3))
-    (is (= (sum []) 0 ))
+      (is (= 1 (sum [1])))
+    (is (= 3 (sum [1 2])))
+    (is (= 0 (sum [])))
     )
   )
 
