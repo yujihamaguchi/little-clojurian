@@ -11,7 +11,7 @@
   (when (seq colls)
     (apply (partial map vector) colls)))
 
-;; Q002: haskellのsumと同様の機能の関数を書け。(再帰を用いるパターン,reduceを用いるパターン、applyを用いるパターン)
+;; Q002: haskell の sum と同様の機能の関数 sum を書け。(再帰を用いるパターン, reduce を用いるパターン、 apply を用いるパターン)
 ;; sum :: (Num a) => [a] -> a
 ;; sum ns
 ;;     数値のリスト ns の総和を返す。
@@ -22,16 +22,10 @@
   [ns]
   (if-not (seq ns)
     0
-    (+ (first ns) (sum (rest ns)))))
-;; A: Using recursion.
-;;(defn sum [ns]
-;;  (if-not (seq ns)
-;;    0
-;;    (+ (first ns) (sum (rest ns)))))
-;; A: Using reduce.
+    (+ (first ns)
+       (sum (rest ns)))))
 ;; (defn sum [ns]
 ;;   (reduce + ns))
-;; A: Using apply.
 ;; (defn sum [ns]
 ;;   (apply + ns))
 
