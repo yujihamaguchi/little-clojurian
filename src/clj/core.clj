@@ -37,8 +37,8 @@
     (let [x (first xs)
           xs' (rest xs)
           lt (for [x' xs' :when (< (int x') (int x))] x')
-          ge (for [x' xs' :when (>= (int x') (int x))] x')]
-      (concat (qsort01 lt) [x] (qsort01 ge)))))
+          gt (for [x' xs' :when (> (int x') (int x))] x')]
+      (concat (qsort01 lt) [x] (qsort01 gt)))))
 
 ;; Q004: Haskell の product と同様の機能の関数を書け(再帰を用いるパターン、 reduce を用いるパターン、 apply を用いるパターン)
 ;; product :: (Num a) => [a] -> a
