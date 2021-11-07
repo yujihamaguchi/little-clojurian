@@ -76,8 +76,12 @@
 ;; リスト xs の最後の要素を除いたリストを返す。
 ;;     init [1,2,3]   = [1,2]
 ;;     init [1]       = []
-(defn my-init [xs]
-  ((comp reverse rest reverse) xs))
+(defn my-init
+  [xs]
+  (-> xs
+      reverse
+      rest
+      reverse))
 ;; A: Using recursion.
 ;;(defn my-init [xs]
 ;;  (if-not (seq (rest xs))
@@ -404,7 +408,7 @@
 
 ;; Q044: Haskell の init 関数を自作( my-init )せよ。(直接の再帰を用いたもの、遅延評価関数を用いたもの両方書くこと）
 ;; 再帰版
-(defn my-init [coll]
+#_(defn my-init [coll]
   (if-not (seq (rest coll))
     []
     (cons (first coll) (my-init (rest coll)))))

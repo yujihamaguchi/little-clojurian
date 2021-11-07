@@ -62,9 +62,9 @@
 
 (deftest my-init-test
   (testing
-      (is (= (my-init [1 2 3]) [1 2]))
-    (is (= (my-init [1 2]) [1]))
-    (is (= (my-init [1]) []))
+      (is (=  [1 2] (my-init [1 2 3])))
+    (is (=  [1] (my-init [1 2])))
+    (is (=  [] (my-init [1])))
     )
   )
 
