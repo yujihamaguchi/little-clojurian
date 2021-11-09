@@ -79,8 +79,8 @@
 
 (deftest halve-test
   (testing
-      (is (= (halve [1 2]) [[1] [2]]))
-    (is (= (halve [1 2 3 4]) [[1 2] [3 4]]))
+      (is (=  [[1] [2]] (halve [1 2])))
+    (is (=  [[1 2] [3 4]] (halve [1 2 3 4])))
     (is (thrown? java.lang.IllegalArgumentException (halve [])))
     (is (thrown? java.lang.IllegalArgumentException (halve [1])))
     (is (thrown? java.lang.IllegalArgumentException (halve [1 2 3])))        
