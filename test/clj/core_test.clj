@@ -70,9 +70,9 @@
 
 (deftest last-test
   (testing
-      (is (= (my-last [1 2 3]) 3))
-    (is (= (my-last [1 2]) 2))
-    (is (= (my-last [1]) 1))
+      (is (=  3 (my-last [1 2 3])))
+    (is (=  2 (my-last [1 2])))
+    (is (=  1 (my-last [1])))
     (is (thrown? java.util.NoSuchElementException (my-last [])))
     )
   )
