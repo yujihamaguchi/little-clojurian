@@ -62,25 +62,25 @@
 
 (deftest my-init-test
   (testing
-      (is (= (my-init [1 2 3]) [1 2]))
-    (is (= (my-init [1 2]) [1]))
-    (is (= (my-init [1]) []))
+      (is (=  [1 2] (my-init [1 2 3])))
+    (is (=  [1] (my-init [1 2])))
+    (is (=  [] (my-init [1])))
     )
   )
 
 (deftest last-test
   (testing
-      (is (= (my-last [1 2 3]) 3))
-    (is (= (my-last [1 2]) 2))
-    (is (= (my-last [1]) 1))
+      (is (=  3 (my-last [1 2 3])))
+    (is (=  2 (my-last [1 2])))
+    (is (=  1 (my-last [1])))
     (is (thrown? java.util.NoSuchElementException (my-last [])))
     )
   )
 
 (deftest halve-test
   (testing
-      (is (= (halve [1 2]) [[1] [2]]))
-    (is (= (halve [1 2 3 4]) [[1 2] [3 4]]))
+      (is (=  [[1] [2]] (halve [1 2])))
+    (is (=  [[1 2] [3 4]] (halve [1 2 3 4])))
     (is (thrown? java.lang.IllegalArgumentException (halve [])))
     (is (thrown? java.lang.IllegalArgumentException (halve [1])))
     (is (thrown? java.lang.IllegalArgumentException (halve [1 2 3])))        
