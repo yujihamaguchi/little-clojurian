@@ -135,8 +135,8 @@
   [xss]
   (for [xs xss, x xs] x))
 
-;; Q010: 正の整数に対し、すべての約数を計算する関数 factors を書け
-(defn factors
+;; Q010: 正の整数に対し、すべての約数を計算する関数 my-factors を書け
+(defn my-factors
   [n]
   (for [n' (range 1 (inc n)) :when (zero? (rem n n'))] n'))
 
@@ -162,10 +162,10 @@
   [xs]
   (sum (for [_ xs] 1)))
 
-;; Q014: factors を用いて、整数が素数か判定する関数 prime? を書け。
+;; Q014: my-factors を用いて、整数が素数か判定する関数 prime? を書け。
 (defn prime?
   [n]
-  (= [1 n] (factors n)))
+  (= [1 n] (my-factors n)))
 
 ;; Q015: prime を用いて与えられた上限数までの全ての素数を生成する関数 primes を書け。
 (defn primes
@@ -272,11 +272,11 @@
 (=  (for [x [1 2 3] y [4 5 6]] [x y])
     (apply concat (for [x [1 2 3]] (for [y [4 5 6]] [x y]))))
 
-;; Q031: 与えられた上限の数値までに含まれる完全数全てを算出する関数 perfects をリスト内包表記と関数 factors および sum を使って定義せよ。
+;; Q031: 与えられた上限の数値までに含まれる完全数全てを算出する関数 perfects をリスト内包表記と関数 my-factors および sum を使って定義せよ。
 ;;       完全数：自分自身をのぞく約数の和が自分自身と等しい整数
 (defn perfects
   [n]
-  (for [n' (range 1 n) :when (= n' (- (sum (factors n')) n'))] n'))
+  (for [n' (range 1 n) :when (= n' (- (sum (my-factors n')) n'))] n'))
 
 ;; Q032: ピタゴラス数のリストを生成する関数 pyths をリスト内包表記を使って定義せよ。
 ;;       ただし、ピタゴラス数の要素は与えられた上限 n 以下であるとする。

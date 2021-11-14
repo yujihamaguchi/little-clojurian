@@ -95,12 +95,12 @@
     )
   )
 
-(deftest factors-test
+(deftest my-factors-test
   (testing
-      (is (= (factors 10) [1 2 5 10]))
-    (is (= (factors 5) [1 5]))
-    (is (= (factors 1) [1]))
-    (is (= (factors 0) []))
+      (is (=  [1 2 5 10] (my-factors 10)))
+    (is (=  [1 5] (my-factors 5)))
+    (is (=  [1] (my-factors 1)))
+    (is (=  [] (my-factors 0)))
     )
   )
 
