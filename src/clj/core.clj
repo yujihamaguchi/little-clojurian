@@ -146,8 +146,8 @@
 
 ;; Q011: 対( pair )のリストを検索キーで探索し、対応する値を取り出してリストにする関数 my-find をリスト内包表記と分配束縛を用いて書け。
 (defn my-find
-  [k ps]
-  (for [[k' v] ps :when (= k k')] v))
+  [k m]
+  (for [[k' v] m :when (= k k')] v))
 
 ;; Q012: 対のリストから、対の先頭の要素を取り出してリストを生成する firsts をリスト内包表記と分配束縛を用いて書け。
 (defn firsts
@@ -169,7 +169,8 @@
 ;; Q014: my-factors を用いて、整数が素数か判定する関数 prime? を書け。
 (defn prime?
   [n]
-  (= [1 n] (my-factors n)))
+  (and (> n 1)
+       (= [1 n] (my-factors n))))
 
 ;; Q015: prime を用いて与えられた上限数までの全ての素数を生成する関数 primes を書け。
 (defn primes
@@ -2336,7 +2337,7 @@
 ;; (= 1103 (nth (filter __ (range)) 15))
 (defn factors [n] (for [n' (range 1 (inc n)) :when (zero? (mod n n'))] n'))
 (def factors' (memoize factors))
-(defn prime? [n] (= [1, n] (factors' n)))
+#_(defn prime? [n] (= [1, n] (factors' n)))
 (def prime?' (memoize prime?))
 (defn pre-prime [n] (if (or (<= n 0) (prime?' n)) n (pre-prime (dec n))))
 (def pre-prime' (memoize pre-prime))

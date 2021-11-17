@@ -106,36 +106,36 @@
 
 (deftest und
   (testing
-      (is (= (my-find 4 [ [1 \a] [2 \b] ]) []))
-    (is (= (my-find 1 [ [1 \a] [2 \b] ]) [\a]))
-    (is (= (my-find 1 [ [2 \b] [1 \a] ]) [\a]))
-    (is (= (my-find 1 [ [2 \b] [1 \a] [3 \c] ]) [\a]))
-    (is (= (my-find 1 [ [1 \a] [1 \b] [3 \c] ]) [\a \b]))
-    (is (= (my-find \a [ [\a 1] [\b 2] [\c 3] ]) [1]))
-    (is (= (my-find "abc" [ ["abc" 1] ["def" 2] ]) [1]))
+      (is (=  [] (my-find 4 [ [1 \a] [2 \b] ])))
+    (is (=  [\a] (my-find 1 [ [1 \a] [2 \b] ])))
+    (is (=  [\a] (my-find 1 [ [2 \b] [1 \a] ])))
+    (is (=  [\a] (my-find 1 [ [2 \b] [1 \a] [3 \c] ])))
+    (is (=  [\a \b] (my-find 1 [ [1 \a] [1 \b] [3 \c] ])))
+    (is (=  [1] (my-find \a [ [\a 1] [\b 2] [\c 3] ])))
+    (is (=  [1] (my-find "abc" [ ["abc" 1] ["def" 2] ])))
     )
   )
 
 (deftest firsts-test
   (testing
-      (is (= (firsts [[1]]) [1]))
-    (is (= (firsts [[1 2]]) [1]))
-    (is (= (firsts [[1 2 3]]) [1]))
-    (is (= (firsts [[1] [2]]) [1 2]))
-    (is (= (firsts [[1 2] [3 4]]) [1 3]))
-    (is (= (firsts [[1 2 3] [4 5 6]]) [1 4]))
-    (is (= (firsts ["abc" "def"]) [\a \d]))
+      (is (=  [1] (firsts [[1]])))
+    (is (=  [1] (firsts [[1 2]])))
+    (is (=  [1] (firsts [[1 2 3]])))
+    (is (=  [1 2] (firsts [[1] [2]])))
+    (is (=  [1 3] (firsts [[1 2] [3 4]])))
+    (is (=  [1 4] (firsts [[1 2 3] [4 5 6]])))
+    (is (=  [\a \d] (firsts ["abc" "def"])))
     )
   )
 
 (deftest length-test
   (testing
-      (is (= (length []) 0))
-    (is (= (length [1]) 1))
-    (is (= (length [1 2]) 2))
-    (is (= (length "abc") 3))
-    (is (= (length #{1 2 3}) 3))
-    (is (= (length {:a 1 :b 2 :c 3}) 3))
+      (is (=  0 (length [])))
+    (is (=  1 (length [1])))
+    (is (=  2 (length [1 2])))
+    (is (=  3 (length "abc")))
+    (is (=  3 (length #{1 2 3})))
+    (is (=  3 (length {:a 1 :b 2 :c 3})))
     )
   )
 
