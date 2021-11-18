@@ -172,7 +172,7 @@
   (and (> n 1)
        (= [1 n] (my-factors n))))
 
-;; Q015: prime を用いて与えられた上限数までの全ての素数を生成する関数 primes を書け。
+;; Q015: prime? を用いて与えられた上限数までの全ての素数を生成する関数 primes を書け。
 (defn primes
   [n]
   (for [n' (range 2 (inc n)) :when (prime? n')] n'))

@@ -152,8 +152,8 @@
 
 (deftest primes-test
   (testing
-      (is (= (primes 1) '()))
-    (is (= (primes 5) '(2 3 5)))
+      (is (=  '() (primes 1)))
+    (is (=  '(2 3 5) (primes 5)))
     )
   )
 
