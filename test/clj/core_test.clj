@@ -159,12 +159,12 @@
 
 (deftest pairs-test
   (testing
-      (is (= (pairs [1 2]) {1 2}))
-    (is (= (pairs [1 2 3]) {1 2, 2 3}))
-    (is (= (pairs [1 2 3 4]) {1 2, 2 3, 3 4}))
-    (is (= (pairs [1]) {}))
-    (is (= (pairs []) {}))
-    (is (= (pairs "abc") {\a \b, \b \c}))
+      (is (=  {1 2} (pairs [1 2])))
+    (is (=  {1 2, 2 3} (pairs [1 2 3])))
+    (is (=  {1 2, 2 3, 3 4} (pairs [1 2 3 4])))
+    (is (=  {} (pairs [1])))
+    (is (=  {} (pairs [])))
+    (is (=  {\a \b, \b \c} (pairs "abc")))
     )
   )
 
