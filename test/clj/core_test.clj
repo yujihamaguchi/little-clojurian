@@ -179,21 +179,21 @@
 
 (deftest positions-test
   (testing
-      (is (= (positions 1 [1 2]) [0]))
-    (is (= (positions 1 [1 2 1]) [0 2]))
-    (is (= (positions 1 [0 1 1 2]) [1 2]))
-    (is (= (positions 1 [2 3]) []))
+      (is (=  [0] (positions 1 [1 2])))
+    (is (=  [0 2] (positions 1 [1 2 1])))
+    (is (=  [1 2] (positions 1 [0 1 1 2])))
+    (is (=  [] (positions 1 [2 3])))
     )
   )
 
 (deftest char-count-test
   (testing
-      (is (= (char-count \a "abc") 1))
-    (is (= (char-count \b "abc") 1))
-    (is (= (char-count \c "abc") 1))
-    (is (= (char-count \c "abca") 1))
-    (is (= (char-count \c "abbca") 1))
-    (is (= (char-count \c "abbccac") 3))
+      (is (=  1 (char-count \a "abc")))
+    (is (=  1 (char-count \b "abc")))
+    (is (=  1 (char-count \c "abc")))
+    (is (=  1 (char-count \c "abca")))
+    (is (=  1 (char-count \c "abbca")))
+    (is (=  3 (char-count \c "abbccac")))
     )
   )
 
