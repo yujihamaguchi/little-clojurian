@@ -199,10 +199,10 @@
 
 (deftest lowers-test
   (testing
-      (is (= (lower-count "abcあ亜ア") 3))
-    (is (= (lower-count "あ亜アAbc") 2))
-    (is (= (lower-count "aBcあ亜ア") 2))
-    (is (= (lower-count "あ亜アabC") 2))
+      (is (=  3 (lower-count "abcあ亜ア")))
+    (is (=  2 (lower-count "あ亜アAbc")))
+    (is (=  2 (lower-count "aBcあ亜ア")))
+    (is (=  2 (lower-count "あ亜アabC")))
     )
   )
 
