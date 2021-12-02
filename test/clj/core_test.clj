@@ -208,32 +208,32 @@
 
 (deftest int2let-test
   (testing
-      (is (= (int2let 0) \a))
-    (is (= (int2let 1) \b))
-    (is (= (int2let 2) \c))
+      (is (=  \a (int2let 0)))
+    (is (=  \b (int2let 1)))
+    (is (=  \c (int2let 2)))
     )
   )
 
 (deftest let2int-test
   (testing
-      (is (= (let2int \a) 0))
-    (is (= (let2int \b) 1))
-    (is (= (let2int \c) 2))
+      (is (=  0 (let2int \a)))
+    (is (=  1 (let2int \b)))
+    (is (=  2 (let2int \c)))
     )
   )
 
 (deftest shift-test
   (testing
-      (is (= (my-shift 1 \a) \b))
-    (is (= (my-shift 1 \z) \a))
-    (is (= (my-shift 1 \A) \A))
+      (is (=  \b (my-shift 1 \a)))
+    (is (=  \a (my-shift 1 \z)))
+    (is (=  \A (my-shift 1 \A)))
     )
   )
 
 (deftest my-encode-test
   (testing
-      (is (= (my-encode 1 "abc") "bcd"))
-    (is (= (my-encode 1 "xyz") "yza"))
+      (is (=  "bcd" (my-encode 1 "abc")))
+    (is (=  "yza" (my-encode 1 "xyz")))
     )
   )
 

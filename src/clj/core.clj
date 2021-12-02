@@ -217,7 +217,7 @@
     [cs]
     (count (re-seq #"[a-z]" cs)))
 
-;; Q021: Unicode コードポイント（整数、 'a' を 0 とする）を文字に変換する関数 int2let を書け。
+;; Q021: Unicode コードポイント（整数、 0 を 'a' とする）を文字に変換する関数 int2let を書け。
 (defn int2let
   [n]
   (char (+ n (int \a))))
@@ -230,10 +230,10 @@
 ;; Q023: 小文字をシフト数だけずらす my-shift を書け。 (循環すること。 'z' に対し、 1 ならば 'a' となる）
 (defn my-shift
   [n c]
-  (if-not (re-seq #"[a-z]" (str c))
+  (if-not (Character/isLowerCase c)
     c
-    (let [a2z-letter-count (count (range (let2int \a) (inc (let2int \z))))
-          n' (rem (+ n (let2int c)) a2z-letter-count)]
+    (let [alphabet-letter-count (count (range (let2int \a) (inc (let2int \z))))
+          n' (rem (+ n (let2int c)) alphabet-letter-count)]
       (int2let n'))))
 
 ;; Q024: 与えられたシフト数で文字列を暗号化する関数 my-encode を書け。
