@@ -266,9 +266,9 @@
 
 ;; Q028: 文字列を任意の数 n だけ左に回転させる関数 rotate を書け。（先頭の文字は末尾に接続していると考える）
 (defn rotate
-  [n s]
-  (let [n' (rem n (count s))]
-    (apply str (concat (drop n' s) (take n' s)))))
+  [n cs]
+  (let [n (rem n (count cs))]
+    (apply str (concat (drop n cs) (take n cs)))))
 
 ;; Q029: 1 から 100 までの二乗の和を計算する関数 sum-square-1-to-100 をリスト内包表記を用いて書け。
 (defn sum-square-1-to-100

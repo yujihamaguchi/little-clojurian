@@ -262,10 +262,10 @@
 
 (deftest rotate-test
   (testing
-      (is (= (rotate 1 "abc") "bca"))
-    (is (= (rotate 2 "abc") "cab"))
-    (is (= (rotate 3 "abc") "abc"))
-    (is (= (rotate 4 "abc") "bca"))
+      (is (=  "bca" (rotate 1 "abc")))
+    (is (=  "cab" (rotate 2 "abc")))
+    (is (=  "abc" (rotate 3 "abc")))
+    (is (=  "bca" (rotate 4 "abc")))
     )
   )
 
