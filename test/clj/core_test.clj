@@ -277,8 +277,8 @@
 
 (deftest perfects-test
   (testing
-      (is (= (perfects 10) [6]))
-    (is (= (perfects 100) [6 28]))
+      (is (=  [6] (perfects 10)))
+    (is (=  [6 28] (perfects 100)))
     )
   )
 

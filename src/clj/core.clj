@@ -284,7 +284,7 @@
 ;;       完全数：自分自身をのぞく約数の和が自分自身と等しい整数
 (defn perfects
   [n]
-  (for [n' (range 1 n) :when (= n' (- (sum (my-factors n')) n'))] n'))
+  (for [n (range 1 (inc n)) :when (= n (sum (rest (reverse (my-factors n)))))] n))
 
 ;; Q032: ピタゴラス数のリストを生成する関数 pyths をリスト内包表記を使って定義せよ。
 ;;       ただし、ピタゴラス数の要素は与えられた上限 n 以下であるとする。
