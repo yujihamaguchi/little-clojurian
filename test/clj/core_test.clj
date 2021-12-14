@@ -284,8 +284,9 @@
 
 (deftest pyths-test
   (testing
-      (is (= (pyths 10)
-             [[3 4 5] [6 8 10]]))
+      (is (= 
+           [[3 4 5] [6 8 10]]
+           (pyths 10)))
     )
   )
 
