@@ -292,7 +292,7 @@
 
 (deftest my-replicate-test
   (testing
-      (is (= (my-replicate 3 true) [true true true]))
+      (is (=  [true true true] (my-replicate 3 true)))
     )
   )
 

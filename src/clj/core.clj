@@ -301,21 +301,23 @@
                        (pyth? a b c))]
         [a b c]))))
 
-;; Q033: ある要素のみからなるリストを生成する関数 my-replicate を書け。(直接の再帰、それを使わないバージョンをそれぞれ書け)
+;; Q033: ある要素のみからなるリストを生成する関数 my-replicate を書け。(直接の再帰、末尾再帰のそれぞれを書け)
 ;;    ex) >replicate 3 True
 ;;        [True, True, True]
 ;; 直接の再帰
-(defn my-replicate [n x]
-  (if (zero? n)
-    []
+(defn my-replicate
+  [n x]
+  (if-not (zero? n)
     (cons x (my-replicate (dec n) x))))
-;; 直接の再帰ではない
-;; (defn my-replicate [n x]
-;;   (letfn [(my-replicate' [n acc]
-;;             (if (zero? n)
-;;               acc
-;;               (my-replicate' (dec n) (cons x acc))))]
-;;     (my-replicate' n [])))
+
+;; 末尾再帰
+#_(defn my-replicate
+  [n x]
+  (letfn [(my-replicate' [n acc]
+            (if (zero? n)
+              acc
+              (my-replicate' (dec n) (cons x acc))))]
+    (my-replicate' n [])))
 
 ;; Q034: 二つの整数のリストの内積を求める関数　scalarproduct　を書け。
 ;; A
