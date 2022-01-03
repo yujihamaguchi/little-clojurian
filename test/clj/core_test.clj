@@ -316,9 +316,9 @@
 
 (deftest isort-test
   (testing
-      (is (= (isort [2 5 1 3 4]) [1 2 3 4 5]))
-    (is (= (isort [1]) [1]))
-    (is (= (isort []) []))
+      (is (=  [1 2 3 4 5] (isort [2 5 1 3 4])))
+    (is (=  [1] (isort [1])))
+    (is (=  [] (isort [])))
     )
   )
 

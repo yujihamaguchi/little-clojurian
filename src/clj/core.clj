@@ -340,7 +340,7 @@
     (cons x xs)
     (cons (first xs) (my-insert x (rest xs)))))
 
-;; Q037: 関数 myinsert を用いてリストのソートを"挿入ソート"で行う関数　isort　を書け。
+;; Q037: 関数 my-insert を用いてリストのソートを"挿入ソート"で行う関数　isort　を書け。
 (defn isort
   [xs]
   (if-not (seq xs)
