@@ -326,9 +326,6 @@
   (reduce + (map #(* %1 %2) ns ms)))
 
 ;; Q035: リストの順番を逆転する関数 my-reverse を直接の再帰を用いて書け。
-;;       *hint*
-;;       vector: indexed なデータ型
-;;       list: 連結リスト
 (defn my-reverse
   [xs]
   (if-not (seq xs)
