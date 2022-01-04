@@ -351,8 +351,7 @@
 ;; Q038: drop を再帰を用いて自作( my-drop )せよ。
 (defn my-drop
   [n xs]
-  (if (or (zero? n)
-          (not (seq xs)))
+  (if (zero? n)
     xs
     (my-drop (dec n) (rest xs))))
 

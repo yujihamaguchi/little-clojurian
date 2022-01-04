@@ -324,11 +324,11 @@
 
 (deftest my-drop-test
   (testing
-      (is (= (my-drop 2 [1 2 3 4 5]) [3 4 5]))
-    (is (= (my-drop 0 [1 2 3 4 5]) [1 2 3 4 5]))
-    (is (= (my-drop 5 [1 2 3 4 5]) []))
-    (is (= (my-drop 100 [1 2 3 4 5]) []))
-    (is (= (my-drop 1 []) []))
+      (is (=  [3 4 5] (my-drop 2 [1 2 3 4 5])))
+    (is (=  [1 2 3 4 5] (my-drop 0 [1 2 3 4 5])))
+    (is (=  [] (my-drop 5 [1 2 3 4 5])))
+    (is (=  [] (my-drop 100 [1 2 3 4 5])))
+    (is (=  [] (my-drop 1 [])))
     )
   )
 
