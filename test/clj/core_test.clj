@@ -334,9 +334,9 @@
 
 (deftest my-zip2-test
   (testing
-      (is (= (my-zip2 [1 2 3 4 5] "abcde") [[1 \a] [2 \b] [3 \c] [4 \d] [5 \e]]))
-    (is (= (my-zip2 [1 2 3] "abcde") [[1 \a] [2 \b] [3 \c]]))
-    (is (= (my-zip2 [1 2 3 4 5] "abc") [[1 \a] [2 \b] [3 \c]]))
+      (is (=  [[1 \a] [2 \b] [3 \c] [4 \d] [5 \e]] (my-zip2 [1 2 3 4 5] "abcde")))
+    (is (=  [[1 \a] [2 \b] [3 \c]] (my-zip2 [1 2 3] "abcde")))
+    (is (=  [[1 \a] [2 \b] [3 \c]] (my-zip2 [1 2 3 4 5] "abc")))
     )
   )
 
