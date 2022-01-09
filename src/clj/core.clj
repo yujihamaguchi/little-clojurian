@@ -380,7 +380,7 @@
 (defn my-odd? [n]
   (and (not (zero? n))
        (my-even? (dec (Math/abs n)))))
-
+ 
 ;; Q041: 0 以上の整数 n に対し、 n 番目のフィボナッチ数を求める関数 fibonacci を書け。（直接の再帰を用いて良い）
 (defn fibonacci
   [n]
