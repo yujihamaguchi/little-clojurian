@@ -342,25 +342,25 @@
 
 (deftest my-even?-test
   (testing
-      (is (= (my-even? -1) false))
-    (is (= (my-even? -2) true))
-    (is (= (my-even? -3) false))
-    (is (= (my-even? 0) true))
-    (is (= (my-even? 1) false))
-    (is (= (my-even? 2) true))
-    (is (= (my-even? 3) false))
+      (is (=  false (my-even? -1)))
+    (is (=  true (my-even? -2)))
+    (is (=  false (my-even? -3)))
+    (is (=  true (my-even? 0)))
+    (is (=  false (my-even? 1)))
+    (is (=  true (my-even? 2)))
+    (is (=  false (my-even? 3)))
     )
   )
 
 (deftest my-odd?-test
   (testing
-      (is (= (my-odd? -1) true))
-    (is (= (my-odd? -2) false))
-    (is (= (my-odd? -3) true))
-    (is (= (my-odd? 0) false))
-    (is (= (my-odd? 1) true))
-    (is (= (my-odd? 2) false))
-    (is (= (my-odd? 3) true))
+      (is (=  true (my-odd? -1)))
+    (is (=  false (my-odd? -2)))
+    (is (=  true (my-odd? -3)))
+    (is (=  false (my-odd? 0)))
+    (is (=  true (my-odd? 1)))
+    (is (=  false (my-odd? 2)))
+    (is (=  true (my-odd? 3)))
     )
   )
 
@@ -782,19 +782,19 @@
   (is (my-or false true))
   )
 
-(deftest my-odd?-test
-  (is (= false (trampoline my-odd? 0) ))
-  (is (= true (trampoline my-odd? 1)))
-  (is (= false (trampoline my-odd? 2)))
-  (is (= true (trampoline my-odd? 3)))
-  (is (= false (trampoline my-odd? 100000))))
+(deftest my-odd2?-test
+  (is (= false (trampoline my-odd2? 0) ))
+  (is (= true (trampoline my-odd2? 1)))
+  (is (= false (trampoline my-odd2? 2)))
+  (is (= true (trampoline my-odd2? 3)))
+  (is (= false (trampoline my-odd2? 100000))))
 
-(deftest my-even?-test
-  (is (= true (trampoline my-even? 0)))
-  (is (= false (trampoline my-even? 1)))
-  (is (= true (trampoline my-even? 2)))
-  (is (= false (trampoline my-even? 3)))
-  (is (= true (trampoline my-even? 1000))))
+(deftest my-even2?-test
+  (is (= true (trampoline my-even2? 0)))
+  (is (= false (trampoline my-even2? 1)))
+  (is (= true (trampoline my-even2? 2)))
+  (is (= false (trampoline my-even2? 3)))
+  (is (= true (trampoline my-even2? 1000))))
 
 (deftest list-files-test
   (is (= (list-files "./resources/ut-list-files/00") []))

@@ -365,7 +365,8 @@
     (cons [(first xs) (first ys)] (my-zip2 (rest xs) (rest ys)))))
 
 
-;; Q040: even と odd を相互再帰を用いて自作( my-even?, my-odd? )せよ。( declare を自作( my-declare )してそれを用いること。 if を使わないこと)
+;; Q040: Step.1 even と odd を相互再帰を用いて自作( my-even?, my-odd? )せよ。
+;;       Step.2 declare を自作( my-declare )してそれを用いること。 if を使わないこと。
 ;;       ヒント： 0 は偶数、 -3 は奇数
 (defmacro my-declare [& expr]
   `(do ~@(map #(list 'def %) expr)))
@@ -1072,18 +1073,18 @@
       (my-or ~@bs))))
 
 ;; Q083-3: 相互再帰を使って、 my-odd? および my-even? を定義せよ。
-(declare my-odd?)
-(defn my-even?
+(declare my-odd2?)
+(defn my-even2?
   [n]
   (if (zero? n)
     true
-    #(my-odd? (dec n))))
+    #(my-odd2? (dec n))))
 
-(defn my-odd?
+(defn my-odd2?
   [n]
   (if (zero? n)
     false
-    #(my-even? (dec n))))
+    #(my-even2? (dec n))))
 
 ;; Q084: 任意のディレクトリ以下のファイル、ディレクトリ名をシーケンスとして取得する関数list-filesを書け。
 ;; A
