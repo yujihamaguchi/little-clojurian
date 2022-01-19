@@ -366,11 +366,11 @@
 
 (deftest fibonacci-test
   (testing
-      (is (= (fibonacci 0) 0))
-    (is (= (fibonacci 1) 1))
-    (is (= (fibonacci 2) 1))
-    (is (= (fibonacci 3) 2))
-    (is (= (fibonacci 4) 3))
+      (is (=  0 (fibonacci 0)))
+    (is (=  1 (fibonacci 1)))
+    (is (=  1 (fibonacci 2)))
+    (is (=  2 (fibonacci 3)))
+    (is (=  3 (fibonacci 4)))
     )
   )
 

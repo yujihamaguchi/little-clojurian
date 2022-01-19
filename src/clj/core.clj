@@ -387,8 +387,8 @@
   (case n
     0 0
     1 1
-    (+ (fibonacci (- n 1))
-       (fibonacci (- n 2)))))
+    (+ (fibonacci (- n 2))
+       (fibonacci (- n 1)))))
 
 ;; Q042: qsort を再帰を用いて書け。（直接の再帰を用いて良い）
 (defn qsort
