@@ -24,16 +24,16 @@
 
 (deftest qsort01-test
   (testing
-      (is (=  [1 2 3] (qsort01 [3 2 1])))
-    (is (=  [1 2 3] (qsort01 [2 3 1])))
-    (is (=  [1 2 3] (qsort01 [1 2 3])))
-    (is (=  '(\a \b \c) (qsort01 "cba")))
-    (is (=  '(\a \b \c) (qsort01 "bca")))
-    (is (=  '(\a \b \c) (qsort01 "abc")))
-    (is (=  '(1) (qsort01 '(1))))
-    (is (=  '(\a) (qsort01 "a")))
-    (is (=  () (qsort01 "")))
-    (is (=  () (qsort01 ())))
+      (is (=  (qsort01 [3 2 1]) [1 2 3] ))
+    (is (=  (qsort01 [2 3 1]) [1 2 3] ))
+    (is (=  (qsort01 [1 2 3]) [1 2 3] ))
+    (is (=  (qsort01 "cba") '(\a \b \c) ))
+    (is (=  (qsort01 "bca") '(\a \b \c) ))
+    (is (=  (qsort01 "abc") '(\a \b \c) ))
+    (is (=  (qsort01 '(1)) '(1) ))
+    (is (=  (qsort01 "a") '(\a) ))
+    (is (=  (qsort01 "") () ))
+    (is (=  (qsort01 ()) () ))
     )
   )
 
@@ -57,14 +57,6 @@
     (is (= (rqsort "a") '(\a)))
     (is (= (rqsort "") ()))
     (is (= (rqsort ()) ()))
-    )
-  )
-
-(deftest my-init-test
-  (testing
-      (is (=  [1 2] (my-init [1 2 3])))
-    (is (=  [1] (my-init [1 2])))
-    (is (=  [] (my-init [1])))
     )
   )
 
@@ -386,37 +378,37 @@
 
 (deftest evens-test
   (testing
-      (is (= (evens []) []))
-    (is (= (evens [1 2]) [2]))
-    (is (= (evens [1 2 3]) [2]))
-    (is (= (evens [1 2 3 4]) [2 4]))
+      (is (=  [] (evens [])))
+    (is (=  [2] (evens [1 2])))
+    (is (=  [2] (evens [1 2 3])))
+    (is (=  [2 4] (evens [1 2 3 4])))
     )
   )
 
 (deftest odds-test
   (testing
-      (is (= (odds []) []))
-    (is (= (odds [1 2]) [1]))
-    (is (= (odds [1 2 3]) [1 3]))
-    (is (= (odds [1 2 3 4]) [1 3]))
+      (is (=  [] (odds [])))
+    (is (=  [1] (odds [1 2])))
+    (is (=  [1 3] (odds [1 2 3])))
+    (is (=  [1 3] (odds [1 2 3 4])))
     )
   )
 
 (deftest my-init-test
   (testing
-      (is (= (my-init []) []))
-    (is (= (my-init [1]) []))
-    (is (= (my-init [1 2]) [1]))
-    (is (= (my-init [1 2 3]) [1 2]))
+      (is (=  [] (my-init [])))
+    (is (=  [] (my-init [1])))
+    (is (=  [1] (my-init [1 2])))
+    (is (=  [1 2] (my-init [1 2 3])))
     )
   )
 
 (deftest my-elem-test
   (testing
-      (is (not (my-elem 1 [])))
-    (is (my-elem 1 [1]))
-    (is (not (my-elem 3 [1 2])))
-    (is (my-elem 3 [1 2 3]))
+      (is (= false (my-elem 1 [])))
+    (is (= true (my-elem 1 [1])))
+    (is (= false (my-elem 3 [1 2])))
+    (is (= true (my-elem 3 [1 2 3])))
     )
   )
 

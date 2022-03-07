@@ -71,23 +71,6 @@
           lt (for [x' xs' :when (> (int x) (int x'))] x')]
       (concat (rqsort gt) [x] (rqsort lt)))))
 
-;; Q006: Haskell の init と同様の機能の関数 my-init を書け(再帰を用いるバージョンも書くこと)
-;; init :: [a] -> [a]
-;; リスト xs の最後の要素を除いたリストを返す。
-;;     init [1,2,3]   = [1,2]
-;;     init [1]       = []
-(defn my-init
-  [xs]
-  (-> xs
-      reverse
-      rest
-      reverse))
-;; A: Using recursion.
-;;(defn my-init [xs]
-;;  (if-not (seq (rest xs))
-;;    []
-;;    (cons (first xs) (my-init (rest xs)))))
-
 ;; Q007: Haskell の last と同様の機能の関数 my-last を書け(再帰を用いるバージョンも書くこと)
 ;; last :: [a] -> a
 ;;     リストの最後の要素を返す。
@@ -387,8 +370,8 @@
   (case n
     0 0
     1 1
-    (+ (fibonacci (- n 2))
-       (fibonacci (- n 1)))))
+    (+ (fibonacci (- n 1))
+       (fibonacci (- n 2)))))
 
 ;; Q042: qsort を再帰を用いて書け。（直接の再帰を用いて良い）
 (defn qsort
@@ -414,11 +397,18 @@
     (cons (first xs) (evens (rest xs)))))
 
 ;; Q044: Haskell の init 関数を自作( my-init )せよ。(直接の再帰を用いたもの、遅延評価関数を用いたもの両方書くこと）
+;; init :: [a] -> [a]
+;; リスト xs の最後の要素を除いたリストを返す。
+;;     init [1,2,3]   = [1,2]
+;;     init [1]       = []
+;;
 ;; 再帰版
-#_(defn my-init [coll]
-  (if-not (seq (rest coll))
-    []
-    (cons (first coll) (my-init (rest coll)))))
+(defn my-init
+  [xs]
+  (-> xs
+      reverse
+      rest
+      reverse))
 
 ;; 遅延評価関数版
 #_(defn my-init
@@ -432,10 +422,10 @@
 ;;       elem :: Eq a => a -> [a] -> Bool
 (defn my-elem
   [x xs]
-  (when (seq xs)
-    (or
-     (= x (first xs))
-     (my-elem x (rest xs)))))
+  (if-not (seq xs)
+    false
+    (or (= x (first xs))
+        (my-elem x (rest xs)))))
 
 ;; Q046: Haskell の !! の前置記法版である index 関数を直接の再帰を用いて自作せよ。( my-index )
 (defn my-index
