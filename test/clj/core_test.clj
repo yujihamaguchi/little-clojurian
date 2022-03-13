@@ -414,10 +414,10 @@
 
 (deftest my-index-test
   (testing
-      (is (= (my-index [] 0) nil))
-    (is (= (my-index [] 1) nil))
-    (is (= (my-index [1] 0) 1))
-    (is (= (my-index [1 2] 1) 2))
+      (is (=  nil (my-index [] 0)))
+    (is (=  nil (my-index [] 1)))
+    (is (=  1 (my-index [1] 0)))
+    (is (=  2 (my-index [1 2] 1)))
     )
   )
 
