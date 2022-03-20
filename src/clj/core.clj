@@ -459,8 +459,9 @@
   [xs]
   (if-not (seq (next xs))
     xs
-    (let [[xs1 xs2] (simple-halve xs)]
-      (my-merge (msort xs1) (msort xs2)))))
+    (let [[xs ys] (simple-halve xs)] 
+      (my-merge (msort xs) (msort ys)))))
+
 
 ;; Q049: Haskell の replicate を再帰を用いて自作せよ。( my-replicate-rec )
 ;;       replicate :: Int -> a -> [a]

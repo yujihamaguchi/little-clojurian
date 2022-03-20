@@ -429,10 +429,10 @@
 
 (deftest msort-test
   (testing
-      (is (= (msort []) []))
-    (is (= (msort [1 2 3]) [1 2 3]))
-    (is (= (msort [3 2 1]) [1 2 3]))
-    (is (= (msort [2 3 1]) [1 2 3]))
+      (is (=  [] (msort [])))
+    (is (=  [1 2 3] (msort [1 2 3])))
+    (is (=  [1 2 3] (msort [3 2 1])))
+    (is (=  [1 2 3] (msort [2 3 1])))
     )
   )
 
