@@ -438,9 +438,9 @@
 
 (deftest my-replicate-rec-test
   (testing
-      (is (= (my-replicate-rec 0 "a") []))
-    (is (= (my-replicate-rec 1 "a") ["a"]))
-    (is (= (my-replicate-rec 2 "a") ["a" "a"]))
+      (is (=  [] (my-replicate-rec 0 "a")))
+    (is (=  ["a"] (my-replicate-rec 1 "a")))
+    (is (=  ["a" "a"] (my-replicate-rec 2 "a")))
     )
   )
 
@@ -451,23 +451,23 @@
 
 (deftest map-test
   (testing
-      (is (= (my-map inc [1 2 3]) [2 3 4]))
-    (is (= (my-map #(* % %) [1 2 3]) [1 4 9]))
+      (is (=  [2 3 4] (my-map inc [1 2 3])))
+    (is (=  [1 4 9] (my-map #(* % %) [1 2 3])))
     )
   )
 
 (deftest filter-test
   (testing
-      (is (= (my-filter odd? [1 2 3]) [1 3]))
-    (is (= (my-filter odd? [2]) []))
-    (is (= (my-filter odd? []) []))
+      (is (=  [1 3] (my-filter odd? [1 2 3])))
+    (is (=  [] (my-filter odd? [2])))
+    (is (=  [] (my-filter odd? [])))
     )
   )
 
 (deftest map-recur-test
   (testing
-      (is (= (my-map-recur inc [1 2 3]) [2 3 4]))
-    (is (= (my-map-recur #(* % %) [1 2 3]) [1 4 9]))
+      (is (=  [2 3 4] (my-map-recur inc [1 2 3])))
+    (is (=  [1 4 9] (my-map-recur #(* % %) [1 2 3])))
     )
   )
 

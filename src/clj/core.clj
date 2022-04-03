@@ -462,7 +462,6 @@
     (let [[xs ys] (simple-halve xs)] 
       (my-merge (msort xs) (msort ys)))))
 
-
 ;; Q049: Haskell の replicate を再帰を用いて自作せよ。( my-replicate-rec )
 ;;       replicate :: Int -> a -> [a]
 (defn my-replicate-rec
@@ -485,28 +484,27 @@
 
 ;; Q052: filterをリスト内包表記を用いて自作せよ。( my-filter )
 (defn my-filter
-  [f xs]
-  (for [x xs :when (f x)] x))
+  [p xs]
+  (for [x xs :when (p x)] x))
 
 ;; Q053: map を再帰を用いて自作せよ。( my-map-recur )
 ;; 直接の再帰を用いたパターン
 (defn my-map-recur
   [f xs]
-  (if-not (seq xs)
-    []
+  (when (seq xs)
     (cons (f (first xs))
           (my-map-recur f (rest xs)))))
 
 ;; recurを用いたパターン
 #_(defn my-map-recur
-    [f xs]
-    (letfn [(my-map-recur'
-              [acc xs]
-              (if-not (seq xs)
-                acc
-                (recur (conj acc (f (first xs)))
-                       (rest xs))))]
-      (my-map-recur' [] xs)))
+  [f xs]
+  (letfn [(my-map-recur'
+            [acc xs]
+            (if-not (seq xs)
+              acc
+              (recur (conj acc (f (first xs)))
+                     (rest xs))))]
+    (my-map-recur' [] xs)))
 
 ;; Q054: リストの先頭から述語を満たす連続した要素を取り除く関数 drop-while を自作せよ。( my-drop-while )
 (defn my-drop-while [p xs]
