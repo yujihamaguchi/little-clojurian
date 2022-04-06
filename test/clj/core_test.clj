@@ -485,14 +485,6 @@
     (is (=  false (my-any odd? [2 4 6])))
     (is (=  false (my-any odd? [])))))
 
-(deftest my-drop-while-test
-  (testing
-      (is (= (my-drop-while odd? [1 2 3]) [2 3]))
-    (is (= (my-drop-while odd? []) []))
-    (is (= (my-drop-while odd? [2 3 4]) [2 3 4]))
-    )
-  )
-
 (deftest my-filter-recur-test
   (testing
       (is (=  [1 3] (my-filter-recur odd? [1 2 3])))
@@ -501,11 +493,11 @@
 
 (deftest my-take-while-test
   (testing
-      (is (= (my-take-while odd? [1 2 3]) [1]))
-    (is (= (my-take-while odd? [1 3 4]) [1 3]))
-    (is (= (my-take-while odd? [1 3 5]) [1 3 5]))
-    (is (= (my-take-while odd? []) []))
-    (is (= (my-take-while odd? [2 3]) []))
+      (is (=  [1] (my-take-while odd? [1 2 3])))
+    (is (=  [1 3] (my-take-while odd? [1 3 4])))
+    (is (=  [1 3 5] (my-take-while odd? [1 3 5])))
+    (is (=  [] (my-take-while odd? [])))
+    (is (=  [] (my-take-while odd? [2 3])))
     )
   )
 
@@ -592,17 +584,9 @@
 
 (deftest my-drop-while-test
   (testing
-      (is (= (my-drop-while odd? [1 2 3]) [2 3]))
-    (is (= (my-drop-while odd? [1 3 4]) [4]))
-    (is (= (my-drop-while odd? [1 3]) []))
-    )
-  )
-
-(deftest my-take-while-test
-  (testing
-      (is (= (my-take-while odd? [1 2 3]) [1]))
-    (is (= (my-take-while odd? [1 3 4]) [1 3]))
-    (is (= (my-take-while odd? [2 3]) []))
+      (is (=  [2 3] (my-drop-while odd? [1 2 3])))
+    (is (=  [4] (my-drop-while odd? [1 3 4])))
+    (is (=  [] (my-drop-while odd? [1 3])))
     )
   )
 
