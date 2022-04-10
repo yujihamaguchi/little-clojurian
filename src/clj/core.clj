@@ -558,12 +558,6 @@
     :else (cons x (my-take-while p xs'))))
 
 ;; Q057: foldr を自作せよ。（ my-foldr ）
-;;       * Haskell では以下のような実装になる。
-;;
-;;         myFoldr :: (a -> b -> b) -> b -> [a] -> b
-;;         myFoldr _ v [] = v
-;;         myFoldr f v (x:xs) = f x (myFoldr f v xs)
-;;
 ;;         以下のように、 foldr に部分適用して関数をつくることができる。
 ;;
 ;;         cons = foldr (:) []
@@ -571,6 +565,13 @@
 ;;         product = foldr (*) 1
 ;;         or = foldr (||) False
 ;;         and = foldr (&&) True
+;;
+;;       hint)
+;;       * Haskell では以下のような実装になる。
+;;
+;;         myFoldr :: (a -> b -> b) -> b -> [a] -> b
+;;         myFoldr _ v [] = v
+;;         myFoldr f v (x:xs) = f x (myFoldr f v xs)
 (defn my-foldr
   [f v [x & xs' :as xs]]
   (if-not (seq xs)
