@@ -526,7 +526,7 @@
     )
   )
 
-(deftest int->bit-test
+(deftest int->bits-test
   (testing
       (is (= (int->bits 1) [1]))
     (is (= (int->bits 2) [0 1]))
