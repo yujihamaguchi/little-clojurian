@@ -619,8 +619,9 @@
   (take 8 (concat bs (repeat 0))))
 
 ;; Q060: ビット列を 8 ビットの二進表記に分割する関数 chop8 を書け。
-(defn chop8 [bs]
-  (if (empty? bs)
+(defn chop8
+  [bs]
+  (if-not (seq bs)
     []
     (lazy-seq (cons (make8 (take 8 bs)) (chop8 (drop 8 bs))))))
 
