@@ -554,15 +554,15 @@
 
 (deftest decode-test
   (testing
-      (is (= (decode [1 0 0 0 0 1 1 0 0 1 0 0 0 1 1 0]) "ab"))
-    (is (= (decode [1 0 0 0 0 1 1 0 1 1 0 0 0 1 1 0]) "ac"))
+      (is (= "ab" (decode [1 0 0 0 0 1 1 0 0 1 0 0 0 1 1 0])))
+    (is (= "ac" (decode [1 0 0 0 0 1 1 0 1 1 0 0 0 1 1 0])))
     )
   )
 
 (deftest encode-test
   (testing
-      (is (= (encode "ab") [1 0 0 0 0 1 1 0 0 1 0 0 0 1 1 0]))
-    (is (= (encode "ac") [1 0 0 0 0 1 1 0 1 1 0 0 0 1 1 0]))
+      (is (= [1 0 0 0 0 1 1 0 0 1 0 0 0 1 1 0] (encode "ab")))
+    (is (= [1 0 0 0 0 1 1 0 1 1 0 0 0 1 1 0] (encode "ac")))
     )
   )
 

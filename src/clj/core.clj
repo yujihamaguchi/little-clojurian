@@ -653,15 +653,9 @@
 ;;       all (==1) []            = True
 (defn my-all
   [p [x & xs' :as xs]]
-  (if-not (seq xs)
-    true
-    (and (p x)
-         (my-all p xs'))))
-#_(defn my-all
-    [p [x & xs' :as xs]]
-    (or (not (seq xs))
-        (and (p x)
-             (my-all p xs'))))
+  (or (empty? xs)
+      (and (p x)
+           (my-all p xs'))))
 
 ;; Q064: 関数 any を自作せよ。( my-any )
 ;;       any :: (a -> Bool) -> [a] -> Bool
