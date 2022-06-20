@@ -667,10 +667,9 @@
 ;;       any (== 1) [5, 4, 3, 2]      = False
 (defn my-any
   [p [x & xs' :as xs]]
-  (if-not (seq xs)
-    false
-    (or (p x)
-        (my-any p xs'))))
+  (and (not (empty? xs))
+       (or (p x)
+           (my-any p xs'))))
 
 ;; Q065: 暗号化された文字列は手に入れたが、シフト数は分からないとしよう。
 ;;       暗号文を解読するためにシフト数を推測したい。
