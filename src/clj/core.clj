@@ -777,7 +777,7 @@
 ;; Q069: compositions を　:name で射影せよ。（ set3 関数の戻り値として）
 (defn set3
   []
-  (project compositions [:name]))
+  (project  compositions [:name]))
 
 ;; Q070: compositions と composers を自然結合せよ。（ set4 関数の戻り値として）
 (defn set4
@@ -824,6 +824,49 @@
   (if-not (next coll)
     []
     (lazy-seq (cons (take 2 coll) (by-pairs (rest coll))))))
+
+;; Q075-1: 関数の返り値として、非ゼロ値の順番を保ったまま、 ゼロ値を末尾に移動しする関数 move-zeros-2-back を書け
+;;  　　  　[0,1,2,3] -> [1,2,3,0]
+;;         [4,1,0,0,5] -> [4,1,5,0,0]
+(defn move-zeros-2-back
+  [arr]
+  (concat (filter (fn [n] (not (= 0 n))) arr)
+          (filter #(= 0 %) arr)))
+
+;; Q075-2: 空配列ではなく、さらに1つの要素を除いて同じ要素が必ず2度現れるリストの中で1度しか現れない唯一の要素を返す関数 unique-attribute を書け
+;;         [1,2,2] -> 1
+;;         [1,2,2,3,1] -> 3
+;;         [1] -> 1
+(defn unique-attribute
+  [nums]
+  (->> (frequencies nums)
+       (filter (fn [[k v]] (= 1 v)))
+       (map (fn [[k v]] k))
+       first))
+
+;; Q075-3: 間隔が重複しないように間隔同士を組み合わせる関数 merge-all-intervals を書け
+;;         [[1,2],[2,3],[3,4]] -> [[1,4]]
+;;         [[1,3],[1,3],[4,5]] -> [[1,3],[4,5]]
+;;         [[1,3],[0,3],[4,5]] -> [[0,3],[4,5]]
+;;         [[1,6],[2,5],[3,4]] -> [[1,6]]
+;;         [[1,3],[4,6],[7,9]] -> [[1,3],[4,6],[7,9]]
+(defn overlap?
+  [[s1 e1] [s2 e2]]
+  (or (and (<= s1 s2)
+           (>= e1 s2))
+      (and (<= s2 s1)
+           (>= e2 s1))))
+
+(defn merge-intervals
+  [acc [s2 e2 :as i2]]
+  (let [[s1 e1 :as i1] (last acc)]
+    (if (overlap? i1 i2)
+      [[(min s1 s2) (max e1 e2)]]
+      (conj acc i2))))
+
+(defn merge-all-intervals
+  [intervals]
+  (reduce merge-intervals [(first intervals)] (rest intervals)))
 
 ;; Q076: ホフスタッタの男女シーケンスを書け。( f, m )
 ;;
