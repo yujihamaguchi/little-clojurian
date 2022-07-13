@@ -2488,3 +2488,5 @@
   (go (>! c "hello"))
   (println (class (<!! (go (<! c)))))
   (close! c))
+
+#_(require '[clojure.core.async :as async :refer :all])
