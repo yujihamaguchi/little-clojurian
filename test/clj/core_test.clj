@@ -677,11 +677,11 @@
 (deftest by-pairs-test
   (testing
       (is (= (by-pairs []) '()))
-    (is (= (by-pairs [:t]) '()))
-    (is (= (by-pairs [:t :t]) '((:t :t))))
-    (is (= (by-pairs [:t :t :t]) '((:t :t) (:t :t))))
-    (is (= (by-pairs [:t :t :t :t]) '((:t :t) (:t :t) (:t :t))))
-    (is (= (by-pairs [:h :t :t :h :h :h]) '((:h :t) (:t :t) (:t :h) (:h :h) (:h :h))))
+    (is (=  '() (by-pairs [:t])))
+    (is (=  '((:t :t)) (by-pairs [:t :t])))
+    (is (=  '((:t :t) (:t :t)) (by-pairs [:t :t :t])))
+    (is (=  '((:t :t) (:t :t) (:t :t)) (by-pairs [:t :t :t :t])))
+    (is (=  '((:h :t) (:t :t) (:t :h) (:h :h) (:h :h)) (by-pairs [:h :t :t :h :h :h])))
     )
   )
 
