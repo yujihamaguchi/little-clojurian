@@ -2,6 +2,17 @@
   (:require [clojure.test :refer :all]
             [clj.core :refer :all]))
 
+(deftest unique-attribute-test
+  (testing
+      (is (= 1 (unique-attribute [1 2 2])))
+    (is (= 3 (unique-attribute [1 2 2 3 1])))
+    (is (= 1 (unique-attribute [1])))))
+
+(deftest move-zeros-2-back-test
+  (testing
+      (is (= [1,2,3,0] (move-zeros-2-back [0,1,2,3])))
+    (is (= [4,1,5,0,0] (move-zeros-2-back [4,1,0,0,5])))))
+
 (deftest my-zip-test
   (testing
       (is (=  '((1 \x \a) (2 \y \b)) (my-zip [1 2] "xy" "ab")))

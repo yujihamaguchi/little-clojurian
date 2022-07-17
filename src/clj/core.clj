@@ -829,19 +829,18 @@
 ;;  　　  　[0,1,2,3] -> [1,2,3,0]
 ;;         [4,1,0,0,5] -> [4,1,5,0,0]
 (defn move-zeros-2-back
-  [arr]
-  (concat (filter (fn [n] (not (= 0 n))) arr)
-          (filter #(= 0 %) arr)))
+  [ns]
+  (concat (filter (complement zero?) ns)
+          (filter zero? ns)))
 
 ;; Q075-2: 空配列ではなく、さらに1つの要素を除いて同じ要素が必ず2度現れるリストの中で1度しか現れない唯一の要素を返す関数 unique-attribute を書け
 ;;         [1,2,2] -> 1
 ;;         [1,2,2,3,1] -> 3
 ;;         [1] -> 1
 (defn unique-attribute
-  [nums]
-  (->> (frequencies nums)
-       (filter (fn [[k v]] (= 1 v)))
-       (map (fn [[k v]] k))
+  [xs]
+  (->> (frequencies xs)
+       (keep (fn [[k v]] (if (= 1 v) k)))
        first))
 
 ;; Q075-3: 間隔が重複しないように間隔同士を組み合わせる関数 merge-all-intervals を書け
