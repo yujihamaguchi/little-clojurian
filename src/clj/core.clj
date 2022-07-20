@@ -843,7 +843,7 @@
        (keep (fn [[k v]] (if (= 1 v) k)))
        first))
 
-;; Q075-3: 間隔が重複しないように間隔同士を組み合わせる関数 merge-all-intervals を書け
+;; Q075-3: 間隔が重複しないように間隔同士を組み合わせる関数 merge-intervals を書け
 ;;         [[1,2],[2,3],[3,4]] -> [[1,4]]
 ;;         [[1,3],[1,3],[4,5]] -> [[1,3],[4,5]]
 ;;         [[1,3],[0,3],[4,5]] -> [[0,3],[4,5]]
@@ -851,21 +851,19 @@
 ;;         [[1,3],[4,6],[7,9]] -> [[1,3],[4,6],[7,9]]
 (defn overlap?
   [[s1 e1] [s2 e2]]
-  (or (and (<= s1 s2)
-           (>= e1 s2))
-      (and (<= s2 s1)
-           (>= e2 s1))))
+  (and (>= e1 s2)
+       (<= s1 e2)))
+
+(defn merge-interval
+  [is [s2 e2 :as i2]]
+  (let [[s1 e1 :as i1] (last is)]
+    (if (overlap? i1 i2)
+      (conj (vec (drop-last is)) [(min s1 s2) (max e1 e2)])
+      (conj is i2))))
 
 (defn merge-intervals
-  [acc [s2 e2 :as i2]]
-  (let [[s1 e1 :as i1] (last acc)]
-    (if (overlap? i1 i2)
-      [[(min s1 s2) (max e1 e2)]]
-      (conj acc i2))))
-
-(defn merge-all-intervals
-  [intervals]
-  (reduce merge-intervals [(first intervals)] (rest intervals)))
+  [is]
+  (reduce merge-interval [(first is)] (rest is)))
 
 ;; Q076: ホフスタッタの男女シーケンスを書け。( f, m )
 ;;
