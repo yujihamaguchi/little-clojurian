@@ -706,11 +706,25 @@
 
 (deftest f-test
   (testing
-      (is (< (elapsed-time (nth f-seq 250)) 100))))
+      (is (= 1 (f 0)))
+    (is (= 1 (f 1)))
+    (is (= 2 (f 2)))
+    (is (= 2 (f 3)))))
 
 (deftest m-test
   (testing
-      (is (< (elapsed-time (nth m-seq 250)) 100))))
+      (is (= 0 (m 0)))
+    (is (= 0 (m 1)))
+    (is (= 1 (m 2)))
+    (is (= 2 (m 3)))))
+
+(deftest f-seq-test
+  (testing
+      (is (> 100 (elapsed-time (nth f-seq 250))))))
+
+(deftest m-seq-test
+  (testing
+      (is (> 100 (elapsed-time (nth m-seq 250))))))
 
 (deftest replace-symbol-test
   (is (=  [] (replace-symbol [] 'a 'b')))
