@@ -741,8 +741,8 @@
 
 (deftest make-greeter-test
   (testing
-      (is (= ((make-greeter "Hello") "Yuji") "Hello, Yuji"))
-    (is (= ((make-greeter "Aloha") "Yuji") "Aloha, Yuji"))
+      (is (= "Hello, Yuji" ((make-greeter "Hello") "Yuji")))
+    (is (= "Aloha, Yuji" ((make-greeter "Aloha") "Yuji")))
     )
   )
 
