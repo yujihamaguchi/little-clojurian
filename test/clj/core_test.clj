@@ -748,13 +748,13 @@
 
 (deftest ut-recur-fibo
   (testing
-      (is (= (recur-fibo 0) 0))
-    (is (= (recur-fibo 1) 1))
-    (is (= (recur-fibo 2) 1))
-    (is (= (recur-fibo 3) 2))
-    (is (= (recur-fibo 4) 3))
-    (is (= (recur-fibo 5) 5))
-    (is (= (recur-fibo 6) 8))
+      (is (=  0 (recur-fibo 0)))
+    (is (=  1 (recur-fibo 1)))
+    (is (=  1 (recur-fibo 2)))
+    (is (=  2 (recur-fibo 3)))
+    (is (=  3 (recur-fibo 4)))
+    (is (=  5 (recur-fibo 5)))
+    (is (=  8 (recur-fibo 6)))
     #_(is (> (recur-fibo 1000000) 1))))
 
 (deftest ut-lazy-seq-fibo
