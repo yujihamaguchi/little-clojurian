@@ -755,7 +755,7 @@
     (is (=  3 (recur-fibo 4)))
     (is (=  5 (recur-fibo 5)))
     (is (=  8 (recur-fibo 6)))
-    #_(is (> (recur-fibo 1000000) 1))))
+    #_(is (< 1 (recur-fibo 1000000)))))
 
 (deftest ut-lazy-seq-fibo
   (is (= (take 10 (lazy-seq-fibo)) [0 1 1 2 3 5 8 13 21 34]))
