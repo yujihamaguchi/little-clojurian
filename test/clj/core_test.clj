@@ -758,7 +758,7 @@
     #_(is (< 1 (recur-fibo 1000000)))))
 
 (deftest ut-lazy-seq-fibo
-  (is (= (take 10 (lazy-seq-fibo)) [0 1 1 2 3 5 8 13 21 34]))
+  (is (=  [0 1 1 2 3 5 8 13 21 34] (take 10 (lazy-seq-fibo))))
   #_(is (= (rem (nth (lazy-seq-fibo) 1000000) 1000) 875N)))
 
 (deftest ut-clojure-loc
@@ -767,8 +767,8 @@
   (is (= 0 (clojure-loc (clojure.java.io/file (clojure.java.io/resource "clojure-loc/foo.txt"))))))
 
 (deftest index-filter-test
-  (is (= (set (index-filter #{\a \b} "abcdbbb")) #{0 1 4 5 6}))
-  (is (= (index-filter #{\a \b} "xyz") []))
+  (is (=  #{0 1 4 5 6} (set (index-filter #{\a \b} "abcdbbb"))))
+  (is (=  [] (index-filter #{\a \b} "xyz")))
   )
 
 (deftest get-composer-test

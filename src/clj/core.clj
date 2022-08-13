@@ -994,7 +994,7 @@
   []
   (letfn [(lazy-seq-fibo'
             [n m]
-            (lazy-seq (cons n (lazy-seq-fibo' m (+ n m)))))]
+            (lazy-seq (cons n (lazy-seq-fibo' m (+' n m)))))]
     (lazy-seq-fibo' 0 1)))
 
 ;; Q081: 指定したディレクトリ、またはファイル以下にある Clojure のソースファイル（ *.clj ）の（空行を除いた）行数の合計をカウントする関数 clojure-loc を書け。
@@ -1048,10 +1048,9 @@
 ;;         ;;= ()
 ;;
 (defn index-filter
-  [cs s]
-  (for [[i c'] (zipmap (range) s)
-        :when (cs c')]
-    i))
+  [s cs]
+  (->> (map vector cs (range))
+       (keep (fn [[k v]] (if (s k) v)))))
 
 ;; Q083: 以下の ./resources/compositions.xml から、作曲家（ composer ）の名前だけを抜き出す関数（ get-composer )を書け。
 ;;
