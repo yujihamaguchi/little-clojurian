@@ -1069,15 +1069,9 @@
 (require '[clojure.xml :as xml])
 (defn get-composer
   [f]
-  (->> f
-       xml/parse
-       xml-seq
-       (filter #(-> %
-                    :tag
-                    (= :composition)))
-       (map #(-> %
-                 :attrs
-                 :composer))))
+  (->> (xml/parse f)
+       :content
+       (map (comp :composer :attrs))))
 
 ;; Q083-2: マクロ and、 or を my-and、 my-or として自作せよ。
 (defmacro my-and
