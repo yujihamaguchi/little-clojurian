@@ -1073,7 +1073,21 @@
        :content
        (map (comp :composer :attrs))))
 
-;; Q083-2: マクロ and、 or を my-and、 my-or として自作せよ。
+;; Q083-2: 相互再帰を使って、 my-odd? および my-even? を定義せよ。
+(declare my-odd2?)
+(defn my-even2?
+  [n]
+  (if (zero? n)
+    true
+    #(my-odd2? (dec n))))
+
+(defn my-odd2?
+  [n]
+  (if (zero? n)
+    false
+    #(my-even2? (dec n))))
+
+;; Q083-3: マクロ and、 or を my-and、 my-or として自作せよ。
 (defmacro my-and
   ([] true)
   ([b] b)
@@ -1089,20 +1103,6 @@
    `(if ~b
       true
       (my-or ~@bs))))
-
-;; Q083-3: 相互再帰を使って、 my-odd? および my-even? を定義せよ。
-(declare my-odd2?)
-(defn my-even2?
-  [n]
-  (if (zero? n)
-    true
-    #(my-odd2? (dec n))))
-
-(defn my-odd2?
-  [n]
-  (if (zero? n)
-    false
-    #(my-even2? (dec n))))
 
 ;; Q084: 任意のディレクトリ以下のファイル、ディレクトリ名をシーケンスとして取得する関数list-filesを書け。
 ;; A
