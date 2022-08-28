@@ -1073,19 +1073,19 @@
        :content
        (map (comp :composer :attrs))))
 
-;; Q083-2: 相互再帰を使って、 my-odd? および my-even? を定義せよ。
-(declare my-odd2?)
-(defn my-even2?
-  [n]
-  (if (zero? n)
-    true
-    #(my-odd2? (dec n))))
-
+;; Q083-2: 相互再帰を使って、 my-odd2? および my-even2? を定義せよ。
+;; refer: https://qiita.com/Haar/items/6f46dcf8ef58d16ec4aa
+(declare my-even2?)
 (defn my-odd2?
   [n]
   (if (zero? n)
     false
     #(my-even2? (dec n))))
+(defn my-even2?
+  [n]
+  (if (zero? n)
+    true
+    #(my-odd2? (dec n))))
 
 ;; Q083-3: マクロ and、 or を my-and、 my-or として自作せよ。
 (defmacro my-and
