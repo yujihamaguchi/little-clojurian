@@ -1074,7 +1074,6 @@
        (map (comp :composer :attrs))))
 
 ;; Q083-2: 相互再帰を使って、 my-odd2? および my-even2? を定義せよ。
-;; refer: https://qiita.com/Haar/items/6f46dcf8ef58d16ec4aa
 (declare my-even2?)
 (defn my-odd2?
   [n]
