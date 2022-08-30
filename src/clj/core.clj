@@ -1103,6 +1103,23 @@
       true
       (my-or ~@bs))))
 
+;; 2022/08/31
+;; (defmacro my-and
+;;   [& bs]
+;;   (if-not (seq bs)
+;;     true
+;;     `(if-not ~(first bs)
+;;        false
+;;        (my-and ~@(rest bs)))))
+
+;; (defmacro my-or
+;;   [& bs]
+;;   (if-not (seq bs)
+;;     false
+;;     `(if ~(first bs)
+;;        true
+;;        (my-or ~@(rest bs)))))
+
 ;; Q084: 任意のディレクトリ以下のファイル、ディレクトリ名をシーケンスとして取得する関数list-filesを書け。
 ;; A
 (defn list-files
