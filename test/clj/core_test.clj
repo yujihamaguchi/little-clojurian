@@ -813,8 +813,8 @@
   )
 
 (deftest chain-test
-  (is (= (chain " abc " trim) "abc"))
-  (is (= (chain " abc " trim length) 3))
+  (is (= "abc" (chain " abc " trim)))
+  (is (= 3 (chain " abc " trim length)))
   )
 
 (deftest tail-fibo-test
