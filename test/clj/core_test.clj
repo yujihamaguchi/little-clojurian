@@ -818,18 +818,18 @@
   )
 
 (deftest tail-fibo-test
-  (is (= (tail-fibo 0) 0))
-  (is (= (tail-fibo 1) 1))
-  (is (= (tail-fibo 2) 1))
-  (is (= (tail-fibo 3) 2))
-  (is (= (tail-fibo 4) 3))
-  (is (= (tail-fibo 5) 5))
-  (is (= (tail-fibo 6) 8))
-  (is (= (tail-fibo 7) 13))
+  (is (= 0 (tail-fibo 0)))
+  (is (= 1 (tail-fibo 1)))
+  (is (= 1 (tail-fibo 2)))
+  (is (= 2 (tail-fibo 3)))
+  (is (= 3 (tail-fibo 4)))
+  (is (= 5 (tail-fibo 5)))
+  (is (= 8 (tail-fibo 6)))
+  (is (= 13 (tail-fibo 7)))
   )
 
 (deftest my-with-out-str-test
-  (is (= (my-with-out-str (print "hello, ") (print "world!")) "hello, world!"))
+  (is (= "hello, world!" (my-with-out-str (print "hello, ") (print "world!"))))
   )
 
 (deftest count-not-empty-line-test

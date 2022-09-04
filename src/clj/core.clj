@@ -1144,7 +1144,7 @@
   ([x form] `(. ~x ~form))
   ([x form & more] `(chain (. ~x ~form) ~@more)))
 
-;; Q085: n番目のフィボナッチ数を返す、末尾再帰を用いたtail-fibo関数を書け。
+;; Q085: n番目のフィボナッチ数を返す、末尾再帰を用いた tail-fibo 関数を書け。
 ;; A
 ;; user=> (tail-fibo 1000000)
 ;; StackOverflowError   java.math.BigInteger.add (:-1)
@@ -1165,10 +1165,23 @@
               (recur (dec i) m (+ n m))))]
     (tail-fibo- i 0 1)))
 
-;; Q086: *out*を一時的に新たなStringWriterに束縛し、exprsを評価して、評価中に*out*へ出力されたものを文字列にして返すwith-out-strマクロを自作せよ。(my-with-out-str)
+;; 2022/09/04
+;; (defn tail-fibo
+;;   [n]
+;;   (case n
+;;     0 0
+;;     1 1
+;;     (loop [i 2 n1 0 n2 1]
+;;      (if (= n i)
+;;        (+ n1 n2)
+;;        (recur (inc i) n2 (+ n1 n2))))))
+
+;; Q086: *out* を一時的に新たな StringWriter に束縛し、 exprs を評価して、評価中に *out* へ出力されたものを文字列にして返す my-with-out-str マクロを自作せよ。
 ;; (my-with-out-str (print "hello, ") (print "world"))
 ;; ;;= "hello, world"
+;; 
 ;; refer: [Let vs. Binding in Clojure](http://stackoverflow.com/questions/1523240/let-vs-binding-in-clojure)
+;;
 (defmacro my-with-out-str
   [& exprs]
   `(binding [*out* (java.io.StringWriter.)]
