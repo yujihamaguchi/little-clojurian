@@ -833,20 +833,20 @@
   )
 
 (deftest count-not-empty-line-test
-  (is (= (count-not-empty-line (java.io.File. "./resources/ut-count-not-empty-line/01.txt")) 3))
-  (is (= (count-not-empty-line (java.io.File. "./resources/ut-count-not-empty-line/02.txt")) 0))
-  (is (= (count-not-empty-line (java.io.File. "./resources/ut-count-not-empty-line/03.txt")) 0))
-  (is (= (count-not-empty-line (java.io.File. "./resources/ut-count-not-empty-line/04.txt")) 0))
-  (is (= (count-not-empty-line (java.io.File. "./resources/ut-count-not-empty-line/05.txt")) 1))
-  (is (= (count-not-empty-line (java.io.File. "./resources/ut-count-not-empty-line/06.txt")) 1))
-  (is (= (count-not-empty-line (java.io.File. "./resources/ut-count-not-empty-line/07.txt")) 1))
-  (is (= (count-not-empty-line (java.io.File. "./resources/ut-count-not-empty-line/08.txt")) 1))
+  (is (=  3 (count-not-empty-line (java.io.File. "./resources/ut-count-not-empty-line/01.txt"))))
+  (is (=  0 (count-not-empty-line (java.io.File. "./resources/ut-count-not-empty-line/02.txt"))))
+  (is (=  0 (count-not-empty-line (java.io.File. "./resources/ut-count-not-empty-line/03.txt"))))
+  (is (=  0 (count-not-empty-line (java.io.File. "./resources/ut-count-not-empty-line/04.txt"))))
+  (is (=  1 (count-not-empty-line (java.io.File. "./resources/ut-count-not-empty-line/05.txt"))))
+  (is (=  1 (count-not-empty-line (java.io.File. "./resources/ut-count-not-empty-line/06.txt"))))
+  (is (=  1 (count-not-empty-line (java.io.File. "./resources/ut-count-not-empty-line/07.txt"))))
+  (is (=  1 (count-not-empty-line (java.io.File. "./resources/ut-count-not-empty-line/08.txt"))))
   )
 
 (deftest count-runs-test
-  (is (= (count-runs 2 #(= :h %) [:h :t :t :h :h :h]) 2))
-  (is (= (count-runs 2 #(= :t %) [:h :t :t :h :h :h]) 1))
-  (is (= (count-runs 3 #(= :h %) [:h :t :t :h :h :h]) 1))
+  (is (=  2 (count-runs 2 #(= :h %) [:h :t :t :h :h :h])))
+  (is (=  1 (count-runs 2 #(= :t %) [:h :t :t :h :h :h])))
+  (is (=  1 (count-runs 3 #(= :h %) [:h :t :t :h :h :h])))
   )
 
 (deftest fibo-test

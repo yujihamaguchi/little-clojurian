@@ -1,5 +1,6 @@
 (ns clj.core
-  (:require [clojure.core.match :refer [match]])
+  (:require [clojure.core.match :refer [match]]
+            [clojure.string :as str])
   (:require [clojure.core.async :as async :refer [chan >!! <!! close! thread go >! <! alts!! timeout alts!]]))
 
 (def table [8.2 1.5 2.8 4.3 12.7 2.2 2.0 6.1 7.0 0.2 0.8 4.0 2.4 6.7 7.5 1.9 0.1 6.0 6.3 9.1 2.8 1.0 2.4 0.2 2.0 0.1])
@@ -1180,36 +1181,42 @@
 ;; (my-with-out-str (print "hello, ") (print "world"))
 ;; ;;= "hello, world"
 ;; 
-;; refer: [Let vs. Binding in Clojure](http://stackoverflow.com/questions/1523240/let-vs-binding-in-clojure)
+;; refer: https://gist.github.com/thash/5844523)
 ;;
 (defmacro my-with-out-str
   [& exprs]
   `(binding [*out* (java.io.StringWriter.)]
-     (do ~@exprs)
-     (str *out*)))
+    ~@exprs
+    (str *out*)))
 
 ;; Q087: 任意のファイルの空行を除いた行数を表示する関数count-not-empty-lineを書け。
 ;; ex) (= (count-not-empty-line (java.io.File. "./resources/ut-count-not-empty-line/01.txt")) 3)
-;; A
 (defn count-not-empty-line
   [f]
-  (with-open [r (clojure.java.io/reader f)]
-    (->> (line-seq r)
-         (filter #(not (clojure.string/blank? %)))
-         count)))
+  (->> (slurp f)
+       str/split-lines
+       (filter (complement str/blank?))
+       count))
 
 ;; Q088: 以下の動作をする関数count-runsをpartitionを用いて書け。
-;;       （先立って、filterしてcountするcount-if関数を書け。また、関数合成と部分適用も使用せよ。）
+;;
 ;; (count-runs 2 #(= :h %) [:h :t :t :h :h :h])
 ;; ;;= 2
 ;; (count-runs 2 #(= :t %) [:h :t :t :h :h :h])
 ;; ;;= 1
 ;; (count-runs 3 #(= :h %) [:h :t :t :h :h :h])
 ;; ;;= 1
+;;
 (def count-if (comp count filter))
 (defn count-runs
   [n p coll]
   (count-if (partial every? p) (partition n 1 coll)))
+;; 2022/09/11
+;; (defn count-runs
+;;   [n p xs]
+;;   (->> (partition n 1 xs)
+;;        (filter #(every? p %))
+;;        count))
 
 ;; Q089: シーケンスライブラリの関数であるiterateを用いてフィボナッチ数列を生成する関数fiboを書け。
 ;; この関数は以下のように大きな値に対しても動作する。
