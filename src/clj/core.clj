@@ -1228,6 +1228,13 @@
 (defn fibo
   []
   (map first (iterate (fn [[n m]] [m (+' n m)]) [0 1])))
+;; 2022/09/18
+#_(defn fibo
+  []
+  (letfn [(fibo' [[n m]]
+            [m (+ n m)])]
+    (->> (iterate fibo' [0 1])
+         (map first))))
 
 ;; Q090: n番目のフィボナッチ数を返す、単純な再帰を使ったstack-consuming-fibo関数を書け。
 ;; (stack-consuming-fibo 9)
