@@ -1206,7 +1206,6 @@
 ;; ;;= 1
 ;; (count-runs 3 #(= :h %) [:h :t :t :h :h :h])
 ;; ;;= 1
-;;
 (def count-if (comp count filter))
 (defn count-runs
   [n p coll]
@@ -1224,7 +1223,6 @@
 ;; ;;= (0 1 1 2 3 5 8 13 21 34)
 ;; (rem (nth (fibo) 1000000) 1000)
 ;; ;;= 875N
-;; A
 (defn fibo
   []
   (map first (iterate (fn [[n m]] [m (+' n m)]) [0 1])))
@@ -1241,12 +1239,11 @@
 ;; ;;= 34
 ;; (stack-consuming-fibo 1000000N)
 ;; ;;= StackOverflowError   clojure.lang.Numbers.toBigInt (Numbers.java:249)
-;; *再帰のせいで、 n>1 に対する stack-consuming-fibo 1回の呼び出しはさらに stack-consuming-fibo 2回の呼び出しを引き起こす。
-;; JVMレベルではこれらの呼び出しはJavaのメソッド呼び出しになり、各呼び出しごとにスタックフレームというデータ構造がアロケートされる。
-;; stack-consuming-fibo は n に比例したスタックフレームを作り、いずれJVMスタックを使い尽くして先の例で見られた StackOverflowError を引き起こす。
-;; Clojure の関数呼び出しは常にスタックフレームを作りスタック領域を使うのでスタック消費型と呼ばれる。
-;; Clojure では、 stack-consuming-fibo がやっているようなスタックを消費する再帰はほぼ常に避けるべきだ。
-;; A
+;; * 再帰のせいで、 n > 1 に対する stack-consuming-fibo 1回の呼び出しはさらに stack-consuming-fibo 2回の呼び出しを引き起こす。
+;;   JVMレベルではこれらの呼び出しはJavaのメソッド呼び出しになり、各呼び出しごとにスタックフレームというデータ構造がアロケートされる。
+;;   stack-consuming-fibo は n に比例したスタックフレームを作り、いずれJVMスタックを使い尽くして先の例で見られた StackOverflowError を引き起こす。
+;;   Clojure の関数呼び出しは常にスタックフレームを作りスタック領域を使うのでスタック消費型と呼ばれる。
+;;   Clojure では、 stack-consuming-fibo がやっているようなスタックを消費する再帰はほぼ常に避けるべきだ。
 (defn stack-consuming-fibo
   [n]
   (case n
@@ -1262,6 +1259,10 @@
 #_(defn blank?
     [cs]
     (empty? (re-seq #"\w" cs)))
+;; my answer 2022/09/23
+#_(defn blank?
+  [s]
+  (not (re-find #"[^\s　]" s)))
 
 ;; Q092: timeマクロの変種で、何回もの実行結果を後で集めやすいようにしたbenchというマクロを書け。
 ;; ;; (bench (str "a" "b"))
