@@ -1265,12 +1265,8 @@
   (not (re-find #"[^\s　]" s)))
 
 ;; Q092: timeマクロの変種で、何回もの実行結果を後で集めやすいようにしたbenchというマクロを書け。
-;; ;; (bench (str "a" "b"))
-;; {:result "ab", :elapsed 53026}
-;; ;; は次のとおり展開される
-;; (let [start (System/nanoTime)
-;;       result (str "a" "b")]
-;;   {:result result :elapsed (- (System/nanoTime) start)})
+;; (bench (str "a" "b"))
+;; => {:result "ab", :elapsed 53026}
 (defmacro bench
   [expr]
   `(let [start# (System/nanoTime)
