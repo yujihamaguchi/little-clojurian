@@ -1303,10 +1303,13 @@
 ;; (= (__ 3) '(1 1 2))
 ;; (= (__ 6) '(1 1 2 3 5 8))
 ;; (= (__ 8) '(1 1 2 3 5 8 13 21))
-;; A:
 (defn p26
   [n]
-  (take n (map first (iterate (fn [[n m]] [m (+ n m)]) [1 1]))))
+  (->> (iterate (fn [[n m]]
+                  [m (+ n m)])
+                [1 1])
+       (map first)
+       (take n)))
 
 ;; Q096: Write a function which returns true if the given sequence is a palindrome.(p27)
 ;; Hint: "racecar" does not equal '(\r \a \c \e \c \a \r)
