@@ -1327,15 +1327,24 @@
 ;; (= (__ '((1 2) 3 [4 [5 6]])) '(1 2 3 4 5 6))
 ;; (= (__ ["a" ["b"] "c"]) '("a" "b" "c"))
 ;; (= (__ '((((:a))))) '(:a))
-;; A:
 (defn p28
-  [xs]
-  (when (seq xs)
-    (let [x (first xs)
-          xs' (rest xs)]
+  [coll]
+  (when (seq coll)
+    (let [x (first coll)
+          xs (rest coll)]
       (if (coll? x)
-        (concat (p28 x) (p28 xs'))
-        (cons x (p28 xs'))))))
+        (concat (p28 x) (p28 xs))
+        (cons x (p28 xs))))))
+;; 2022/09/29
+#_(defn p28
+  [coll]
+  (when (seq coll)
+    (let [x (first coll)]
+      (concat
+       (if-not (coll? x)
+         [x]
+         (p28 x))
+       (p28 (rest coll))))))
 
 ;; Q098: Write a function which removes consecutive duplicates from a sequence.(p30)
 ;;       一つは再帰、一つは reduce を用いて解いてみること
