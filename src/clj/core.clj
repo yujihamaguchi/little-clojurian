@@ -1351,29 +1351,41 @@
 ;; (= (apply str (__ "Leeeeeerrroyyy")) "Leroy")
 ;; (= (__ [1 1 2 3 3 2 2 3]) '(1 2 3 2 3))
 ;; (= (__ [[1 2] [1 2] [3 4] [1 2]]) '([1 2] [3 4] [1 2]))
-;; A:
+;; recursion
 (defn p30
   [xs]
-  (when (seq xs)
-    (let [x (first xs)
-          xs' (rest xs)]
-      (cons x (p30 (drop-while #(= x %) xs'))))))
-
-#_(defn p30
-    [coll]
-    (reduce
-     (fn [acc x]
-       (if (= (last acc) x)
-         acc
-         (conj acc x)))
-     [] coll))
+  (letfn [(p30' [acc xs]
+            (if-not (seq xs)
+              acc
+              (let [x (first xs)
+                    xs' (rest xs)]
+                (if (= (last acc) x)
+                 (p30' acc xs')
+                 (p30' (conj acc x) xs')))))]
+    (p30' [] xs)))
+;; recursion
+;; bk 2022/10/02
+;; (defn p30
+;;   [xs]
+;;   (when (seq xs)
+;;     (let [x (first xs)
+;;           xs' (rest xs)]
+;;       (cons x (p30 (drop-while #(= x %) xs'))))))
+;; reduce
+;; #_(defn p30
+;;     [coll]
+;;     (reduce
+;;      (fn [acc x]
+;;        (if (= (last acc) x)
+;;          acc
+;;          (conj acc x)))
+;;      [] coll))
 
 ;; Q099: Write a function which packs consecutive duplicates into sub-lists.(p31)
 ;;       一つは再帰、一つはパーティション関数を使って
 ;; (= (__ [1 1 2 1 1 1 3 3]) '((1 1) (2) (1 1 1) (3 3)))
 ;; (= (__ [:a :a :b :b :c]) '((:a :a) (:b :b) (:c)))
 ;; (= (__ [[1 2] [1 2] [3 4]]) '(([1 2] [1 2]) ([3 4])))
-;; A:
 (defn p31 [coll]
   (when (seq coll)
     (let [x (first coll)]
@@ -1405,6 +1417,12 @@
 (defn p33
   [coll n]
   (mapcat #(repeat n %) coll))
+;; 2022/10/07 recursion
+#_(defn p33
+  [xs n]
+  (when (seq xs)
+    (concat (repeat n (first xs))
+            (p33 (rest xs) n))))
 
 ;; Q102: Write a function which creates a list of all integers in a given range.(p34)
 ;; Special Restrictions
