@@ -1430,11 +1430,14 @@
 ;; (= (__ 1 4) '(1 2 3))
 ;; (= (__ -2 2) '(-2 -1 0 1))
 ;; (= (__ 5 8) '(5 6 7))
-(defn p34 [n m]
+(defn p34
+  [n m]
   (when (< n m)
     (cons n (p34 (inc n) m))))
 
 ;; Q103: Write a function which takes a variable number of parameters and returns the maximum value.(p38)
+;; Special Restrictions
+;; max
 ;; (= (__ 1 8 3 4) 8)
 ;; (= (__ 30 20) 30)
 ;; (= (__ 45 67 11) 67)
