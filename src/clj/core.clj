@@ -1452,6 +1452,7 @@
 ;; (= (__ [1 2] [3 4 5 6]) '(1 3 2 4))
 ;; (= (__ [1 2 3 4] [5]) [1 5])
 ;; (= (__ [30 20] [25 15]) [30 25 20 15])
+;; recursion
 (defn p39
   [xs ys]
   (when (and (seq xs) (seq ys))
@@ -1468,6 +1469,7 @@
 ;; (= (__ 0 [1 2 3]) [1 0 2 0 3])
 ;; (= (apply str (__ ", " ["one" "two" "three"])) "one, two, three")
 ;; (= (__ :z [:a :b :c :d]) [:a :z :b :z :c :z :d])
+;; (= (__ 0 []) ?)
 (defn p40
   [c xs]
   (rest (mapcat #(list c %) xs)))
@@ -1482,9 +1484,11 @@
 ;; (= (__ [1 2 3 4 5 6 7 8] 3) [1 2 4 5 7 8])
 ;; (= (__ [:a :b :c :d :e :f] 2) [:a :c :e])
 ;; (= (__ [1 2 3 4 5 6] 4) [1 2 3 5 6])
-(defn p41 [coll n]
-  (when (seq coll)
-    (concat (take (dec n) coll) (p41 (drop n coll) n))))
+(defn p41
+  [xs n]
+  (when (seq xs)
+    (concat (take (dec n) xs)
+            (p41 (drop n xs) n))))
 
 ;; Q107: Write a function which calculates factorials.(p42)
 ;; (= (__ 1) 1)
