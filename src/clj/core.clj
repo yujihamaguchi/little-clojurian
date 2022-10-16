@@ -1506,8 +1506,8 @@
 ;; (= (__ (range 9) 3) '((0 3 6) (1 4 7) (2 5 8)))
 ;; (= (__ (range 10) 5) '((0 5) (1 6) (2 7) (3 8) (4 9)))
 (defn p43
-  [xs n]
-  (apply map list (partition n xs)))
+  [coll n]
+  (apply map list (partition n coll)))
 
 ;; Q109: Write a function which can rotate a sequence in either direction.(p44)
 ;; (= (__ 2 [1 2 3 4 5]) '(3 4 5 1 2))
