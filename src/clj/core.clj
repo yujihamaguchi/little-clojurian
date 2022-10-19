@@ -1515,17 +1515,9 @@
 ;;       (= (__ 6 [1 2 3 4 5]) '(2 3 4 5 1))
 ;;       (= (__ 1 '(:a :b :c)) '(:b :c :a))
 ;;       (= (__ -4 '(:a :b :c)) '(:c :a :b))
-;;       Write using `take and drop` version and `recursion` one.
-;; take and drop
 (defn p44 [n coll]
   (let [n' (mod n (count coll))]
     (concat (drop n' coll) (take n' coll))))
-;; recursion
-;; (defn p44 [n coll]
-;;   (cond
-;;     (= n 0) coll
-;;     (< n 0) (p44 (inc n) (cons (last coll) (drop-last coll)))
-;;     :else   (p44 (dec n) (conj (vec (rest coll)) (first coll)))))
 
 ;; Q110: Write a function which takes a sequence consisting of items with different types
 ;;       and splits them up into a set of homogeneous sub-sequences.
@@ -1546,7 +1538,18 @@
 ;; (= (__ [2 3 3 4 5]) [3 4 5])
 ;; (= (__ [7 6 5 4]) [])
 ;; Rewrite using funcitons "continuous?" and "take-while".
-(defn p53 [coll]
+(defn p53
+  [ns]
+  (first (reduce (fn [[max-length-acc acc] n]
+                   (if (= (last acc) (dec n))
+                     (let [acc' (conj (vec acc) n)]
+                       (if (< (count max-length-acc) (count acc'))
+                         [acc' acc']
+                         [max-length-acc acc']))
+                     [max-length-acc [n]])
+                   ) [[] []] ns)))
+
+#_(defn p53 [coll]
   (letfn [(continuous? [[n m]] (= (inc n) m))]
     (loop [coll coll result []]
       (if-not (seq coll)
