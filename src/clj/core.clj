@@ -1537,7 +1537,7 @@
 ;; (= (__ [5 6 1 3 2 7]) [5 6])
 ;; (= (__ [2 3 3 4 5]) [3 4 5])
 ;; (= (__ [7 6 5 4]) [])
-;; Rewrite using funcitons "continuous?" and "take-while".
+;; using reduce
 (defn p53
   [ns]
   (first (reduce (fn [[max-length-acc acc] n]
@@ -1549,6 +1549,27 @@
                      [max-length-acc [n]])
                    ) [[] []] ns)))
 
+;; using funcitons "continuous?" and "take-while".
+#_(defn p53
+  [xs]
+  (letfn [(continuous?
+            [[n m]]
+            (= (inc n) m))
+          (p53'
+            [result xs]
+            (if-not (seq xs)
+              result
+              (let [ps (partition 2 1 xs)
+                    ps' (take-while continuous? ps)
+                    result' (sort (vec (union (set (map first ps'))
+                                              (set (map second ps')))))]
+                (p53' (if (< (count result) (count result')) result' result)
+                      (rest xs)))))]
+    (p53' [] xs)))
+
+
+
+
 #_(defn p53 [coll]
   (letfn [(continuous? [[n m]] (= (inc n) m))]
     (loop [coll coll result []]
@@ -1557,21 +1578,6 @@
         (let [ps (partition 2 1 coll)
               result' (vec (set (apply concat (take-while continuous? ps))))]
           (recur (rest coll) (if (< (count result) (count result')) result' result)))))))
-;; my answer 2016/12/24
-;;(defn p53 [xs]
-;;  (letfn [(continuous? [[n m]] (= (inc n) m))
-;;          (concat-linked-pairs [ps]
-;;            (if-not (seq (next ps))
-;;              (first ps)
-;;              (cons (first (first ps)) (concat-linked-pairs (rest ps)))))
-;;          (p53' [xs]
-;;            (if-not (seq xs)
-;;              []
-;;              (let [ps' (partition 2 1 xs)
-;;                    ps'' (drop-while (complement continuous?) ps')]
-;;                (letfn [(continuous? [[n m]] (= (inc n) m))]
-;;                  (cons (concat-linked-pairs (take-while continuous? ps'')) (p53' (concat-linked-pairs (drop-while continuous? ps''))))))))]
-;;    (reduce (fn [xs ys] (if (>= (count xs) (count ys)) xs ys)) '() (p53' xs))))
 
 ;; Q112: Write a function which returns a sequence of lists of x items each. Lists of less than x items should not be returned.(p54)
 ;; Special Restrictions
