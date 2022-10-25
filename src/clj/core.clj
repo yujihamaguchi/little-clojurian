@@ -1538,7 +1538,7 @@
 ;; (= (__ [2 3 3 4 5]) [3 4 5])
 ;; (= (__ [7 6 5 4]) [])
 ;; using reduce
-(defn p53
+#_(defn p53
   [ns]
   (first (reduce (fn [[max-length-acc acc] n]
                    (if (= (last acc) (dec n))
@@ -1549,35 +1549,26 @@
                      [max-length-acc [n]])
                    ) [[] []] ns)))
 
-;; using funcitons "continuous?" and "take-while".
-#_(defn p53
-  [xs]
+;; using funcitons "continuous?"(you have to create yourself) and "take-while".
+(defn p53
+  [coll]
   (letfn [(continuous?
             [[n m]]
-            (= (inc n) m))
-          (p53'
-            [result xs]
-            (if-not (seq xs)
-              result
-              (let [ps (partition 2 1 xs)
-                    ps' (take-while continuous? ps)
-                    result' (sort (vec (union (set (map first ps'))
-                                              (set (map second ps')))))]
-                (p53' (if (< (count result) (count result')) result' result)
-                      (rest xs)))))]
-    (p53' [] xs)))
-
-
-
-
-#_(defn p53 [coll]
-  (letfn [(continuous? [[n m]] (= (inc n) m))]
-    (loop [coll coll result []]
-      (if-not (seq coll)
-        result
-        (let [ps (partition 2 1 coll)
-              result' (vec (set (apply concat (take-while continuous? ps))))]
-          (recur (rest coll) (if (< (count result) (count result')) result' result)))))))
+            (= n (dec m)))]
+    (letfn [(p53'
+              [result coll]
+              (if-not (seq coll)
+                (-> (apply concat result)
+                    set
+                    vec
+                    sort)
+                (let [ps (partition 2 1 coll)
+                      result' (take-while continuous? ps)
+                      coll' (rest coll)]
+                  (if (< (count result) (count result'))
+                    (p53' result' coll')
+                    (p53' result coll')))))]
+      (p53' [] coll))))
 
 ;; Q112: Write a function which returns a sequence of lists of x items each. Lists of less than x items should not be returned.(p54)
 ;; Special Restrictions
