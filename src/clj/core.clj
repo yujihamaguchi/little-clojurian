@@ -1571,16 +1571,18 @@
       (p53' [] coll))))
 
 ;; Q112: Write a function which returns a sequence of lists of x items each. Lists of less than x items should not be returned.(p54)
-;; Special Restrictions
-;; partition
-;; partition-all
+;;       [ Special Restrictions ]
+;;       - partition
+;;       - partition-all
 ;; (= (__ 3 (range 9)) '((0 1 2) (3 4 5) (6 7 8)))
 ;; (= (__ 2 (range 8)) '((0 1) (2 3) (4 5) (6 7)))
 ;; (= (__ 3 (range 8)) '((0 1 2) (3 4 5)))
-(defn p54 [n coll]
-  (if (< (count coll) n)
+(defn p54
+  [n xs]
+  (if (> n (count xs))
     []
-    (cons (take n coll) (p54 n (drop n coll)))))
+    (cons (take n xs)
+          (p54 n (drop n xs)))))
 
 ;; Q113: Write a function which returns a map containing the number of occurences of each distinct item in a sequence.(p55)
 ;; Special Restrictions
