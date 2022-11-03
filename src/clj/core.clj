@@ -1585,25 +1585,21 @@
           (p54 n (drop n xs)))))
 
 ;; Q113: Write a function which returns a map containing the number of occurences of each distinct item in a sequence.(p55)
-;; Special Restrictions
-;; frequencies
+;;       [ Special Restrictions ]
+;;       - frequencies
 ;; (= (__ [1 1 2 3 2 1 1]) {1 4, 2 2, 3 1})
 ;; (= (__ [:b :a :b :a :b]) {:a 2, :b 3})
 ;; (= (__ '([1 2] [1 3] [1 3])) {[1 2] 1, [1 3] 2})
-;; my answer 2019/05/02
 (defn p55
   [xs]
-  (reduce (fn [acc [k vs]] (assoc acc k (count vs)))
+  (reduce (fn [acc [k v]]
+            (assoc acc k (count v)))
           {}
           (group-by identity xs)))
+
 #_(defn p55 [coll]
     (let [coll' (group-by identity coll)]
       (zipmap (keys coll') (map count (vals coll')))))
-;; my naive solution 2014/12/26
-;; (defn p55 [coll]
-;;   (let [coll' (group-by identity coll)
-;;         ks (keys coll')]
-;;     (reduce merge (map (fn [n] (hash-map n (count (coll' n)))) ks))))
 
 ;; Q114: Write a function which removes the duplicates from a sequence. Order of the items must be maintained.(p56)
 ;;       1. Use recursion.
@@ -1612,8 +1608,8 @@
 ;; (= (__ [:a :a :b :b :c :c]) [:a :b :c])
 ;; (= (__ '([2 4] [1 2] [1 3] [1 3])) '([2 4] [1 2] [1 3]))
 ;; (= (__ (range 50)) (range 50))
-;; Special Restrictions
-;; distinct
+;; [ Special Restrictions ]
+;; - distinct
 ;; A.1
 (defn p56
   [xs]
@@ -1622,8 +1618,12 @@
       (cons x (p56 (filter #(not (= x %)) xs))))))
 ;; A.2
 #_(defn p56
-    [xs]
-    (reduce (fn [acc x] (if (some #{x} acc) acc (conj acc x))) [] xs))
+  [xs]
+  (reduce (fn [acc x]
+            (if (some #(= x %) acc)
+              acc
+              (conj acc x)))
+          [] xs))
 
 ;; Q115: Write a function which allows you to create function compositions.
 ;;       The parameter list should take a variable number of functions,
