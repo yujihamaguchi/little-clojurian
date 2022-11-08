@@ -1628,16 +1628,30 @@
 ;; Q115: Write a function which allows you to create function compositions.
 ;;       The parameter list should take a variable number of functions,
 ;;       and create a function applies them from right-to-left.(p58)
-;; Special Restrictions
-;; comp
+;; [ Special Restrictions ]
+;; - comp
 ;; (= [3 2 1] ((__ rest reverse) [1 2 3 4]))
 ;; (= 5 ((__ (partial + 3) second) [1 2 3 4]))
 ;; (= true ((__ zero? #(mod % 8) +) 3 5 7 9))
 ;; (= "HELLO" ((__ #(.toUpperCase %) #(apply str %) take) 5 "hello world"))
+;; using reduce
 (defn p58 [& fs]
   (let [[f & fs] (reverse fs)]
     (fn [& xs]
       (reduce (fn [acc f] (f acc)) (apply f xs) fs))))
+
+;; using recursion
+#_(defn p58
+  [& fs]
+  (let [fs' (reverse fs)]
+    (fn [& xs]
+      (letfn [(p58' [acc fs]
+                (if-not (seq fs)
+                  acc
+                  (p58' ((first fs) acc)
+                        (rest fs))))]
+        (p58' (apply (first fs') xs)
+              (rest fs'))))))
 
 ;; Q116: Take a set of functions and return a new function that takes a variable number of arguments
 ;;       and returns a sequence containing the result of applying
