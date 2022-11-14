@@ -1639,19 +1639,17 @@
   (let [[f & fs] (reverse fs)]
     (fn [& xs]
       (reduce (fn [acc f] (f acc)) (apply f xs) fs))))
-
 ;; using recursion
 #_(defn p58
   [& fs]
-  (let [fs' (reverse fs)]
-    (fn [& xs]
-      (letfn [(p58' [acc fs]
+  (fn [& xs]
+    (let [[f & fs] (reverse fs)]
+      (letfn [(p58' [acc [f & fs' :as fs]]
                 (if-not (seq fs)
                   acc
-                  (p58' ((first fs) acc)
-                        (rest fs))))]
-        (p58' (apply (first fs') xs)
-              (rest fs'))))))
+                  (p58' (f acc)
+                        (rest fs'))))]
+        (p58' (apply f xs) fs)))))
 
 ;; Q116: Take a set of functions and return a new function that takes a variable number of arguments
 ;;       and returns a sequence containing the result of applying
