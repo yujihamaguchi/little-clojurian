@@ -1668,11 +1668,11 @@
 ;;       but returns each intermediate value of the reduction.
 ;;       Your function must accept either two or three arguments,
 ;;       and the return sequence must be lazy.(p60)
-;; Special Restrictions
-;; reductions
-;; (= (take 5 (__ + (range))) [0 1 3 6 10])
-;; (= (__ conj [1] [2 3 4]) [[1] [1 2] [1 2 3] [1 2 3 4]])
-;; (= (last (__ * 2 [3 4 5])) (reduce * 2 [3 4 5]) 120)
+;;       [ Special Restrictions ]
+;;       - reductions
+;; (= [0 1 3 6 10] (take 5 (__ + (range))))
+;; (= [[1] [1 2] [1 2 3] [1 2 3 4]] (__ conj [1] [2 3 4]))
+;; (= 120 (reduce * 2 [3 4 5]) (last (__ * 2 [3 4 5])))
 (defn p60
   ([f init args]
    (if-not (seq args)
