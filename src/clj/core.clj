@@ -1674,11 +1674,16 @@
 ;; (= [[1] [1 2] [1 2 3] [1 2 3 4]] (__ conj [1] [2 3 4]))
 ;; (= 120 (reduce * 2 [3 4 5]) (last (__ * 2 [3 4 5])))
 (defn p60
-  ([f init args]
-   (if-not (seq args)
-     [init]
-     (lazy-seq (cons init (p60 f (f init (first args)) (rest args))))))
-  ([f args] (p60 f (first args) (rest args))))
+  ([f xs]
+   (p60 f (first xs) (rest xs)))
+  ([f acc xs]
+   (if-not (seq xs)
+     [acc]
+     (lazy-seq
+      (cons acc
+            (p60 f
+                 (f acc (first xs))
+                 (rest xs)))))))
 
 ;; Q118: Write a function which returns the first x number of prime numbers.(p67)
 ;; (= (__ 2) [2 3])
