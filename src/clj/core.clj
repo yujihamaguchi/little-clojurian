@@ -1693,10 +1693,14 @@
 ;; (= (last (__ 100))
 (defn p67
   [n]
-  (letfn [(factors [n] (filter #(= 0 (mod n %)) (range 1 (inc n))))
-          (prime? [n] (= [1 n] (factors n)))
-          (primes [] (filter prime? (iterate inc 2)))]
-    (take n (primes))))
+  (letfn [(factors
+            [n]
+            (filter #(zero? (mod n %))
+                    (range 1 (inc n))))
+          (prime?
+            [n]
+            (= [1 n] (factors n)))])
+  (take n (filter prime? (range))))
 
 ;; Q119: Write a function which takes a function f and a variable number of maps.
 ;;       Your function should return a map that consists of the rest of the maps conj-ed onto the first.
