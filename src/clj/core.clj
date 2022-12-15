@@ -1707,8 +1707,9 @@
 ;;       If a key occurs in more than one map,
 ;;       the mapping(s) from the latter (left-to-right) should be combined with the mapping in the result by calling
 ;;       (f val-in-result val-in-latter)(p69)
-;; Special Restrictions
-;; merge-with
+;;
+;;       [ Special Restrictions ]
+;;       - merge-with
 ;;
 ;; (= (__ * {:a 2, :b 3, :c 4} {:a 2} {:b 2} {:c 5})
 ;;    {:a 4, :b 6, :c 20})
@@ -1718,27 +1719,33 @@
 ;;    {:a [3 4 5], :b [6 7], :c [8 9]})
 (defn p69
   [f m & ms]
-  (reduce (fn [acc [k v]]
-            (assoc acc k (if-let [v' (acc k)]
-                           (f v' v)
-                           v)))
+  (reduce (fn [acc m]
+            (reduce (fn [acc [k v]]
+                      (assoc acc
+                             k
+                             (if-let [v' (acc k)]
+                               (f v' v)
+                               v)))
+                    acc
+                    m))
           m
-          (apply merge {} ms)))
-;; my answer 2017/02/18
-;; (defn p69 [f & ms]
-;;   (letfn [(merge-by-key [m1 m2 k]
-;;                         {k (f (k m1) (k m2))})
-;;           (merge-m [m1 m2]
-;;                   (let [ks (clojure.set/union (keys m1) (kyes m2))]
-;;                         (map (partial merge-by-key m1 m2) ks)))]
-;;     (reduce merge-m (first ms) (rest ms))))
+          ms))
 
 ;; Q120: Given a string of comma separated integers,
 ;;       write a function which returns a new comma separated string that
 ;;       only contains the numbers which are perfect squares.(p74)
 ;; (= (__ "4,5,6,7,8,9") "4,9")
 ;; (= (__ "15,16,25,36,37") "16,25,36")
-(defn p74 [s]
+(defn p74
+  [s]
+  (->> s
+       (re-seq #"\d+")
+       (map #(Integer/parseInt %))
+       (filter #(some (fn [n] (= % (* n n))) (my-factors %)))
+       (str/join ",")))
+
+;; bk 2022/12/16
+#_(defn p74 [s]
   (->> s
        (re-seq #"\d+")
        (filter (fn [n] (zero? (mod (Math/sqrt (Integer/parseInt n)) 1))))
