@@ -1,6 +1,7 @@
 (ns clj.core
   (:require [clojure.core.match :refer [match]]
-            [clojure.string :as str])
+            [clojure.string :as str]
+            [clojure.set :as set])
   (:require [clojure.core.async :as async :refer [chan >!! <!! close! thread go >! <! alts!! timeout alts!]]))
 
 (def table [8.2 1.5 2.8 4.3 12.7 2.2 2.0 6.1 7.0 0.2 0.8 4.0 2.4 6.7 7.5 1.9 0.1 6.0 6.3 9.1 2.8 1.0 2.4 0.2 2.0 0.1])
@@ -1773,12 +1774,14 @@
                      :else (gcd m (mod n m))))
             (coprime? [n m] (= 1 (gcd n m)))]
       (count (filter (partial coprime? n) (range 1 n))))))
-;; (defn p75 [n]
-;;   (letfn [(gcd [n m]
-;;               (clojure.set/intersection (set (factors n)) (set (factors m))))
-;;           (coprime? [n m]
-;;               (= #{1} (gcd n m)))]
-;;     (count (filter (fn [m] ((partial coprime? n) m)) (range 1 (inc n))))))
+
+;; 2022/12/20
+#_(defn p75
+  [n]
+  (letfn [(coprime? [n m]
+            (= #{1} (set/intersection (set (my-factors n)) (set (my-factors m)))))]
+    (count (filter (partial coprime? n) (range 1 (inc n))))))
+
 
 ;; Q122: Write a function which finds all the anagrams in a vector of words.
 ;;       A word x is an anagram of word y if all the letters in x can be rearranged in a different order to form y.
