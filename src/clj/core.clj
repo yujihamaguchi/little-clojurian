@@ -1775,6 +1775,15 @@
             (coprime? [n m] (= 1 (gcd n m)))]
       (count (filter (partial coprime? n) (range 1 n))))))
 
+;; 2022/12/21
+#_(defn p75
+  [n]
+  (letfn [(gcd [n m]
+            (apply max (set/intersection
+              (set (my-factors n))
+              (set (my-factors m)))))]
+    (count (filter #(= 1 ((partial gcd n) %)) (range 1 (inc n))))))
+
 ;; 2022/12/20
 #_(defn p75
   [n]
