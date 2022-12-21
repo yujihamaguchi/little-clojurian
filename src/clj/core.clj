@@ -1764,7 +1764,18 @@
 ;; refer:
 ;;   [Euler's totient function](https://ja.wikipedia.org/wiki/%E3%82%AA%E3%82%A4%E3%83%A9%E3%83%BC%E3%81%AE%CF%86%E9%96%A2%E6%95%B0)
 ;;   [GCD](http://en.wikipedia.org/wiki/Greatest_common_divisor#Using_Euclid.27s_algorithm)
+;; 2022/12/22 Euclid's algorithm
 (defn p75
+  [n]
+  (letfn [(gcd [n m]
+            (cond
+              (= n m) n
+              (> n m) (gcd (- n m) n)
+              :else (gcd n (- m n))))]
+    (count (filter #(= 1 (gcd n %)) (range 1 (inc n))))))
+
+;; Euclidean algorithm
+#_(defn p75
   [n]
   (if (= n 1)
     1
