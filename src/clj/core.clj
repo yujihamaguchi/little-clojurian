@@ -1812,6 +1812,32 @@
 ;;    #{#{"veer" "ever"} #{"lake" "kale"} #{"mite" "item"}})
 (defn p77
   [xs]
+  (set (map set (filter #(< 1 (count %)) (set (map (fn [x] (filter #(= (set x) (set %)) xs)) xs))))))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#_(defn p77
+  [xs]
   (->> (group-by sort xs)
        vals
        (filter #(< 1 (count %)))

@@ -1074,10 +1074,10 @@
   )
 
 (deftest p77-test
-  (is (= (p77 ["meat" "mat" "team" "mate" "eat"])
-         #{#{"meat" "team" "mate"}}))
-  (is (= (p77 ["veer" "lake" "item" "kale" "mite" "ever"])
-         #{#{"veer" "ever"} #{"lake" "kale"} #{"mite" "item"}}))
+  (is (= #{#{"meat" "team" "mate"}}
+         (p77 ["meat" "mat" "team" "mate" "eat"])))
+  (is (= #{#{"veer" "ever"} #{"lake" "kale"} #{"mite" "item"}}
+         (p77 ["veer" "lake" "item" "kale" "mite" "ever"])))
   )
 
 (deftest p78-test
