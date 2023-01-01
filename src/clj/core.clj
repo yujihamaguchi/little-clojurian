@@ -1819,8 +1819,8 @@
        set))
 
 ;; Q123: Reimplement the function described in "Intro to Trampoline".(p78)
-;; Special Restrictions
-;; trampoline
+;;       [ Special Restrictions ]
+;;       - trampoline
 ;; (= (letfn [(triple [x] #(sub-two (* 3 x)))
 ;;           (sub-two [x] #(stop? (- x 2)))
 ;;           (stop? [x] (if (> x 50) x #(triple x)))]
@@ -1830,11 +1830,12 @@
 ;;           (my-odd? [x] (if (zero? x) false #(my-even? (dec x))))]
 ;;     (map (partial __ my-even?) (range 6)))
 ;;   [true false true false true false])
-(defn p78 [f & args]
-  (let [f' (apply f args)]
-    (if-not (fn? f')
-      f'
-      (p78 f'))))
+(defn p78
+  [f & args]
+  (let [result (apply f args)]
+    (if (fn? result)
+      (p78 result)
+      result)))
 
 ;; Q124: A number is "perfect" if the sum of its divisors equal the number itself.
 ;;       6 is a perfect number because 1+2+3=6.
