@@ -1093,11 +1093,11 @@
   )
 
 (deftest p80-test
-  (is (= (p80 6) true))
-  (is (= (p80 7) false))
-  (is (= (p80 496) true))
-  (is (= (p80 500) false))
-  (is (= (p80 8128) true))
+  (is (=  true (p80 6)))
+  (is (=  false (p80 7)))
+  (is (=  true (p80 496)))
+  (is (=  false (p80 500)))
+  (is (=  true (p80 8128)))
   )
 
 (deftest p86-test

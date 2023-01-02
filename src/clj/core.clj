@@ -1845,12 +1845,9 @@
 ;; (= (__ 496) true)
 ;; (= (__ 500) false)
 ;; (= (__ 8128) true)
-(defn p80 [n]
-  (let [factors (for [n' (range 1 n) :when (zero? (mod n n'))] n')]
-    (= n (reduce + factors))))
-;; my answer 2017/04/07
-;; (defn p80 [n]
-;;   (= n (reduce + (drop-last (factors n)))))
+(defn p80
+  [n]
+  (= n (reduce + (drop-last (my-factors n)))))
 
 ;; Q125: Happy numbers are positive integers that follow a particular formula:
 ;;       take each individual digit, square it, and then sum the squares to get a new number.
