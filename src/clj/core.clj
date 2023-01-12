@@ -1859,27 +1859,21 @@
 ;; (= (__ 986543210) true)
 ;; (= (__ 2) false)
 ;; (= (__ 3) false)
-(defn p86 [n]
-  (letfn [(_ [acc n]
-            (let [ns (map #(Integer/parseInt (str %)) (str n))
-                  n (reduce + (map #(* % %) ns))]
-              (if (= 1 n)
-                true
-                (if (some #(= n %) acc)
-                  false
-                  (_ (cons n acc) n)))))]
-    (_ [] n)))
-;; my answer 2017/04/15
-;; (defn p86 [n]
-;;   (letfn [(convert-digits [n]
-;;                           (map #(Character/digit % 10) (str n)))
-;;           (sum-sq [ns]
-;;                   (reduce + (map #(* % %) ns)))
-;;           (is-happy [ns n]
-;;             (let [n (sum-sq (convert-digits n))]
-;;               (or (= n 1)
-;;                   (and (not (contains? ns n)) (is-happy (conj ns n) n)))))]
-;;     (is-happy #{} n)))
+(defn p86
+  [n]
+  (letfn [(p86' [s n]
+            (if (s n)
+              false
+              (let [n' (->> n
+                            str
+                            (map #(Character/getNumericValue %))
+                            (map #(Math/pow % 2))
+                            (reduce +)
+                            int)]
+                (if (= 1 n')
+                  true
+                  (p86' (conj s n) n')))))]
+    (p86' #{} n)))
 
 ;; Q126: Write a predicate which checks whether or not a given sequence represents a binary tree.
 ;;       (Bottom leaf node's value is always nil)
@@ -1899,13 +1893,12 @@
 ;; (= (__ '(:a nil ()))
 ;;    false)
 (defn p95
-  ([] false)
-  ([t]
-   (if (and (coll? t) (= (count t) 3))
-     (let [[v l r] t]
-       (and (or (nil? l) (p95 l)) (or (nil? r) (p95 r))))
-     false))
-  ([a b & rest] false))
+  [t]
+  (if (and (coll? t) (= (count t) 3))
+    (let [[v l r] t]
+      (and (or (nil? l) (p95 l)) (or (nil? r) (p95 r))))
+    false))
+
 #_(defn p95 [n]
     (or (nil? n)
         (and (coll? n)

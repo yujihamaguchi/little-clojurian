@@ -1101,27 +1101,34 @@
   )
 
 (deftest p86-test
-  (is (= (p86 7) true))
-  (is (= (p86 986543210) true))
-  (is (= (p86 2) false))
-  (is (= (p86 3) false))
+  (is (=  true (p86 7)))
+  (is (=  true (p86 986543210)))
+  (is (=  false (p86 2)))
+  (is (=  false (p86 3)))
   )
 
 (deftest p95-test
-  (is (= (p95 '(:a (:b nil nil) nil))
-         true))
-  (is (= (p95 '(:a (:b nil nil)))
-         false))
-  (is (= (p95 [1 nil [2 [3 nil nil] [4 nil nil]]])
-         true))
-  (is (= (p95 [1 [2 nil nil] [3 nil nil] [4 nil nil]])
-         false))
-  (is (= (p95 [1 [2 [3 [4 nil nil] nil] nil] nil])
-         true))
-  (is (= (p95 [1 [2 [3 [4 false nil] nil] nil] nil])
-         false))
-  (is (= (p95 '(:a nil ()))
-         false))
+  (is (= 
+       true
+       (p95 '(:a (:b nil nil) nil))))
+  (is (= 
+       false
+       (p95 '(:a (:b nil nil)))))
+  (is (= 
+       true
+       (p95 [1 nil [2 [3 nil nil] [4 nil nil]]])))
+  (is (= 
+       false
+       (p95 [1 [2 nil nil] [3 nil nil] [4 nil nil]])))
+  (is (= 
+       true
+       (p95 [1 [2 [3 [4 nil nil] nil] nil] nil])))
+  (is (= 
+       false
+       (p95 [1 [2 [3 [4 false nil] nil] nil] nil])))
+  (is (= 
+       false
+       (p95 '(:a nil ()))))
   )
 
 (deftest p96-test
