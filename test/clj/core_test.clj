@@ -1110,10 +1110,10 @@
 (deftest p95-test
   (is (= 
        true
-       (p95 '(:a (:b nil nil) nil))))
+       (p95 [:a [:b nil nil] nil])))
   (is (= 
        false
-       (p95 '(:a (:b nil nil)))))
+       (p95 [:a [:b nil nil]])))
   (is (= 
        true
        (p95 [1 nil [2 [3 nil nil] [4 nil nil]]])))

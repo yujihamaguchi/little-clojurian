@@ -1,8 +1,9 @@
 (ns clj.core
   (:require [clojure.core.match :refer [match]]
             [clojure.string :as str]
-            [clojure.set :as set])
-  (:require [clojure.core.async :as async :refer [chan >!! <!! close! thread go >! <! alts!! timeout alts!]]))
+            [clojure.set :as set]
+            [clojure.core.async :as async :refer [chan >!! <!! close! thread go >! <! alts!! timeout alts!]]
+            [defun.core :refer [defun]]))
 
 (def table [8.2 1.5 2.8 4.3 12.7 2.2 2.0 6.1 7.0 0.2 0.8 4.0 2.4 6.7 7.5 1.9 0.1 6.0 6.3 9.1 2.8 1.0 2.4 0.2 2.0 0.1])
 
@@ -1892,7 +1893,14 @@
 ;;    false)
 ;; (= (__ '(:a nil ()))
 ;;    false)
-(defn p95
+;; use defun
+(defun p95
+  ([[n l r]] (and (p95 l)
+                  (p95 r)))
+  ([nil] true)
+  ([_] false))
+
+#_(defn p95
   [t]
   (if (and (coll? t) (= (count t) 3))
     (let [[v l r] t]
