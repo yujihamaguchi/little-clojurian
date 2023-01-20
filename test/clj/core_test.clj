@@ -1132,18 +1132,24 @@
   )
 
 (deftest p96-test
-  (is (= (p96 '(:a (:b nil nil) (:b nil nil))) true))
-  (is (= (p96 '(:a (:b nil nil) nil)) false))
-  (is (= (p96 '(:a (:b nil nil) (:c nil nil))) false))
-  (is (= (p96 [1 [2 nil [3 [4 [5 nil nil] [6 nil nil]] nil]]
-               [2 [3 nil [4 [6 nil nil] [5 nil nil]]] nil]])
-         true))
-  (is (= (p96 [1 [2 nil [3 [4 [5 nil nil] [6 nil nil]] nil]]
-               [2 [3 nil [4 [5 nil nil] [6 nil nil]]] nil]])
-         false))
-  (is (= (p96 [1 [2 nil [3 [4 [5 nil nil] [6 nil nil]] nil]]
-               [2 [3 nil [4 [6 nil nil] nil]] nil]])
-         false))
+  (is (=  true
+          (p96 [:a [:b nil nil] [:b nil nil]])))
+  (is (=  false 
+          (p96 [:a [:b nil nil] nil])))
+  (is (=  false 
+          (p96 [:a [:b nil nil] [:c nil nil]])))
+  (is (= 
+       true
+       (p96 [1 [2 nil [3 [4 [5 nil nil] [6 nil nil]] nil]]
+             [2 [3 nil [4 [6 nil nil] [5 nil nil]]] nil]])))
+  (is (= 
+       false
+       (p96 [1 [2 nil [3 [4 [5 nil nil] [6 nil nil]] nil]]
+             [2 [3 nil [4 [5 nil nil] [6 nil nil]]] nil]])))
+  (is (= 
+       false
+       (p96 [1 [2 nil [3 [4 [5 nil nil] [6 nil nil]] nil]]
+             [2 [3 nil [4 [6 nil nil] nil]] nil]])))
   )
 
 (deftest p97-test

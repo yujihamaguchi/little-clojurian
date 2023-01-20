@@ -1919,6 +1919,11 @@
 ;; Q127: Let us define a binary tree as "symmetric" if the left half of the tree is the mirror image of the right half of the tree.
 ;;       Write a predicate to determine whether or not a given binary tree is symmetric.
 ;;       (see To Tree, or not to Tree for a reminder on the tree representation we're using).(p96)
+;;       [ mirror tree ]
+;;         a   a
+;;        / | / |
+;;        b c c b
+;;
 ;; (= (__ '(:a (:b nil nil) (:b nil nil))) true)
 ;; (= (__ '(:a (:b nil nil) nil)) false)
 ;; (= (__ '(:a (:b nil nil) (:c nil nil))) false)
