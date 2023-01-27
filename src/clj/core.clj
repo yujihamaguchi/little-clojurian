@@ -1957,16 +1957,19 @@
 ;;      [1 4 6 4 1]])
 ;; (= (__ 11)
 ;;    [1 10 45 120 210 252 210 120 45 10 1])
-(defn p97 [n]
-  (letfn [(p-triangle [coll]
-            (lazy-seq (cons coll (p-triangle (concat [1] (map (partial reduce +) (partition 2 1 coll)) [1])))))]
-    (nth (p-triangle [1]) (dec n))))
-;; my answer 2017/05/14
+(defn p97
+  [n]
+  (case n
+    1 [1]
+    2 [1 1]
+    (concat [1]
+            (map #(apply + %) (partition 2 1 (p97 (dec n))))
+            [1])))
+
 ;; (defn p97 [n]
-;;   (case n
-;;         1 [1]
-;;         2 [1 1]
-;;         (concat [1] (map (fn [[n m]] (+ n m)) (partition 2 1 (p97 (dec n)))) [1])))
+;;   (letfn [(p-triangle [coll]
+;;             (lazy-seq (cons coll (p-triangle (concat [1] (map (partial reduce +) (partition 2 1 coll)) [1])))))]
+;;     (nth (p-triangle [1]) (dec n))))
 ;;
 ;; my answer 2019/07/03
 ;; (defn p97
