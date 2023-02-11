@@ -1990,8 +1990,12 @@
 ;;    #{#{0} #{1} #{2} #{3} #{4}})
 ;; (= (__ (constantly true) #{0 1 2 3 4})
 ;;    #{#{0 1 2 3 4}})
-(defn p98 [f coll]
-  (set (map set (vals (group-by f coll)))))
+(defn p98
+  [f s]
+  (->> (group-by f s)
+       vals
+       (map set)
+       set))
 
 ;; Q130: Write a function which calculates the least common multiple.
 ;;       Your function should accept a variable number of positive integers or ratios.(p100)
