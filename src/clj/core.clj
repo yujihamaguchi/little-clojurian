@@ -2023,6 +2023,14 @@
 ;; (= (__ "multi-word-key") "multiWordKey")
 ;; (= (__ "leaveMeAlone") "leaveMeAlone")
 (defn p102
+  [cs]
+  (letfn [(p102'
+            ([x] x)
+            ([x & xs] (apply str (cons x (map clojure.string/capitalize xs)))))]
+    (apply p102' (re-seq #"[^-]+" cs))))
+
+;; bk 2023-02-17
+#_(defn p102
   [s]
   (letfn [(_p102
             ([c] [c])

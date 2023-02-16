@@ -1190,9 +1190,9 @@
   )
 
 (deftest p102-test
-  (is (= (p102 "something") "something"))
-  (is (= (p102 "multi-word-key") "multiWordKey"))
-  (is (= (p102 "leaveMeAlone") "leaveMeAlone"))
+  (is (=  "something" (p102 "something")))
+  (is (=  "multiWordKey" (p102 "multi-word-key")))
+  (is (=  "leaveMeAlone" (p102 "leaveMeAlone")))
   )
 
 (deftest p115-test
