@@ -2056,38 +2056,12 @@
 ;; (= true (__ 89089))
 ;; (= (take 20 (filter __ (range)))
 ;;    [0 1 2 3 4 5 6 7 8 9 11 22 33 44 55 66 77 88 99 101])
-(defn p115 [n]
+(defn p115
+  [n]
   (let [ns (str n)
-        m (Math/ceil (/ (count ns) 2))]
-    (= (reduce + (map int (take m ns)))
-       (reduce + (map int (take m (reverse ns)))))))
-
-(defn map-sum
-  [acc tr]
-  (when (seq tr)
-    (let [n (first tr)
-          ns (rest tr)]
-      (if (coll? n)
-        (cons (map-sum acc n) (map-sum acc ns))
-        (cons {(+ acc n) n} (map-sum (+ acc n) ns))))))
-
-(defn filter-sum
-  [m tr]
-  (println tr)
-  (when (seq tr)
-    (let [n (first tr)
-          ns (rest tr)]
-      (println "n: " n)
-      (println "ns: " ns)
-      (if (map? n)
-        (let [acc (first (keys n))
-              v (first (vals n))]
-          (println "acc: " acc)
-          (println "v: " v)
-          (if (<= acc m)
-            (cons v (filter-sum m ns))
-            (filter-sum m ns)))
-        (cons (filter-sum m n) (filter-sum m ns))))))
+        m (quot (count ns) 2)]
+    (= (sum (map int (take m ns)))
+       (sum (map int (take m (reverse ns)))))))
 
 ;; Q133: Your friend Joe is always whining about Lisps using the prefix notation for math.
 ;;       Show him how you could easily write a function that does math using the infix notation.
