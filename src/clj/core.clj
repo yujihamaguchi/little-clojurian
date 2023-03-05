@@ -2072,7 +2072,19 @@
 ;; (= 42 (__ 38 + 48 - 2 / 2))
 ;; (= 8  (__ 10 / 2 - 1 * 2))
 ;; (= 72 (__ 20 / 2 + 2 + 4 + 8 - 6 - 10 * 9))
+;; write two patterns, using recursion and using reduction
+;; using recurtion
 (defn p135
+  [& xs]
+  (letfn [(p135' [acc xs]
+            (if-not (seq xs)
+              acc
+              (p135' ((first xs) acc (second xs))
+                     (drop 2 xs))))]
+    (p135' (first xs) (rest xs))))
+
+;; using reduction
+#_(defn p135
   [n & coll]
   (reduce (fn [acc [f n]]
             (f acc n))
