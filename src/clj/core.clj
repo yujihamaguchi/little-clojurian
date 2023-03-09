@@ -2116,6 +2116,7 @@
         (for [[k v] coll
               [k' v] v]
           [[k k'] v])))
+
 ;; (defn p146 [coll]
 ;;   (apply hash-map
 ;;     (mapcat
