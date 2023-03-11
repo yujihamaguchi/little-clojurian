@@ -2111,10 +2111,11 @@
 ;;            [[2] u] v, [[2] w] x})
 ;;       (= (__ '{m {1 [a b c] 3 nil}})
 ;;          '{[m 1] [a b c], [m 3] nil})
-(defn p146 [coll]
+(defn p146
+  [m]
   (into {}
-        (for [[k v] coll
-              [k' v] v]
+        (for [[k vs] m
+              [k' v] vs]
           [[k k'] v])))
 
 ;; (defn p146 [coll]
