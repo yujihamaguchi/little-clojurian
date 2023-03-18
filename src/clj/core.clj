@@ -2173,21 +2173,23 @@
 ;; ※ reduce を使ったパターンと 再帰 を使ったパターン両方書くこと。
 (defn p105
   [xs]
+  (if-not (seq xs)
+    {}
+    (let [[k & xs] xs
+          xs' (drop-while (complement keyword?) xs)
+          vs (take-while (complement keyword?) xs)]
+      (assoc (p105 xs')
+             k vs))))
+
+#_(defn p105
+  [xs]
   (reduce (fn [acc x]
             (if (keyword? x)
               (assoc acc x [])
               (let [[k _] (last acc)]
-                (merge-with conj acc {k x}))))
+                (update acc k conj x))))
           {}
           xs))
-
-#_(defn p105
-    [[x & xs]]
-    (if-not (keyword? x)
-      {}
-      (assoc
-       (p105 (drop-while (complement keyword?) xs))
-       x (take-while (complement keyword?) xs))))
 
 ;; Q138: Write a function which returns a sequence of digits of a non-negative number (first argument) in numerical system
 ;;       with an arbitrary base (second argument). Digits should be represented with their integer values,
