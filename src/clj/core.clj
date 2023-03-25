@@ -2200,6 +2200,7 @@
 ;; (= [1 0 0 1] (__ 9 2))
 ;; (= [1 0] (let [n (rand-int 100000)](__ n n)))
 ;; (= [16 18 5 24 15 1] (__ Integer/MAX_VALUE 42))
+
 (defn p137
   [n base]
   (let [result (rem n base)
@@ -2207,6 +2208,17 @@
     (if (zero? n')
       [result]
       (conj (p137 n' base) result))))
+
+;; my answer: 2023-03-26
+;; (defn p137
+;;   [n m]
+;;   (letfn [(p137' [n]
+;;             (let [q (quot n m)
+;;                   m' (mod n m)]
+;;               (if (zero? q)
+;;                 [m']
+;;                 (conj (p137' q) m'))))]
+;;     (p137' n)))
 
 ;;(defn p137 [n m]
 ;;  (if (zero? n)
