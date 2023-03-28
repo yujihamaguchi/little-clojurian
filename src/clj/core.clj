@@ -2200,7 +2200,6 @@
 ;; (= [1 0 0 1] (__ 9 2))
 ;; (= [1 0] (let [n (rand-int 100000)](__ n n)))
 ;; (= [16 18 5 24 15 1] (__ Integer/MAX_VALUE 42))
-
 (defn p137
   [n base]
   (let [result (rem n base)
