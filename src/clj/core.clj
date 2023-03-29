@@ -2240,6 +2240,12 @@
 ;; (= [1 1 1 3 2 1 3 2 1 1] (nth (__ [1]) 6))
 ;; (= 338 (count (nth (__ [3 2]) 15)))
 (defn p110
+  [ns]
+  (let [ns' (mapcat (fn [vs] [(count vs) (first vs)])
+                    (partition-by identity ns))]
+    (lazy-seq (cons ns' (p110 ns')))))
+
+#_(defn p110
   [coll]
   (let [e (->> coll
                (partition-by identity)
