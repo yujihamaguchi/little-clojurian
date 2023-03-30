@@ -2260,7 +2260,9 @@
 ;; (= (take 12 (__ 0 inc dec inc dec inc)) [0 1 0 1 0 1 2 1 2 1 2 3])
 (defn p144
   [n & fs]
-  (reductions (fn [n f] (f n)) n (cycle fs)))
+  (reductions (fn [acc f] (f acc))
+              n
+              (cycle fs)))
 
 #_(defn p144
     [n & fs]
