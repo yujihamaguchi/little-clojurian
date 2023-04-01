@@ -2263,6 +2263,10 @@
   (reductions (fn [acc f] (f acc))
               n
               (cycle fs)))
+#_(defn p144
+  [n & fs]
+  (let [[f & fs'] (cycle fs)]
+    (lazy-seq (cons n (apply (partial p144 (f n)) fs')))))
 
 #_(defn p144
     [n & fs]
