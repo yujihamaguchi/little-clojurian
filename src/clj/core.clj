@@ -2288,7 +2288,7 @@
   [& nss]
   (let [ns (map first nss)
         n (apply min ns)]
-    (if (= n (apply max ns))
+    (if (apply = ns)
       n
       (apply p108 (map (fn [ns] (drop-while #(<= % n) ns)) nss)))))
 
