@@ -2301,15 +2301,14 @@
 ;; (= (__ [[[[:a :b]]] [[:c :d]] [:e :f]])
 ;;    [[:a :b] [:c :d] [:e :f]])
 (defn p93
-  [coll]
-  (when (seq coll)
-    (letfn [(nested-coll? [coll]
-              (coll? (first coll)))]
-      (let [x (first coll)
-            xs (rest coll)]
-        (if (nested-coll? x)
-          (concat (p93 x) (p93 xs))
-          (cons x (p93 xs)))))))
+  [xs]
+  (if-not (seq xs)
+    []
+    (let [x (first xs)
+          xs' (rest xs)]
+      (if-not (coll? (first x))
+        (cons x (p93 xs'))
+        (concat (p93 x) (p93 xs'))))))
 
 ;; Q143: Write a function that accepts a curried function of unknown arity n. Return an equivalent function of n arguments.
 ;;       You may wish to read this.(p158)
