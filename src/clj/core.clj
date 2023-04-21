@@ -2332,7 +2332,10 @@
 (defn p158
   [f]
   (fn [& xs]
-    (reduce (fn [f x] (f x)) f xs)))
+    (reduce (fn [f x]
+              (f x))
+            f
+            xs)))
 ;; (defn p158 [f]
 ;;   (fn [& coll]
 ;;     (letfn [(_ [f coll]
