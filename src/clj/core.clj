@@ -2364,16 +2364,16 @@
 ;; (= [2 3 5 7 11 13]
 ;;    (__ 4 #(= 2 (mod % 3))
 ;;          [2 3 5 7 11 13 17 19 23]))
-(defn p114 [n p coll]
-  (letfn [(_ [acc n coll]
+(defn p114
+  [n p xs]
+  (letfn [(p114' [acc n [x & xs]]
             (if (zero? n)
               (reverse (rest acc))
-              (let [x (first coll)
-                    xs (rest coll)]
-                (_ (cons x acc)
-                   (if (p x) (dec n) n)
-                   xs))))]
-    (_ [] n coll)))
+              (p114' (cons x acc)
+                     (if (p x) (dec n) n)
+                     xs)))]
+    (p114' [] n xs)))
+
 ;; my answer 2017/10/30
 #_(defn p114
     [n p coll]
