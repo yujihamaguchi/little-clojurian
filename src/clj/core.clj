@@ -2403,6 +2403,42 @@
 ;;                  (__ (fn [a b] ;; both even or both odd
 ;;                        (= (mod a 2) (mod b 2)))
 ;;                      :same))))
+(defn p132
+  [p s xs]
+  (letfn [(p132' [acc xs]
+            (if-not (seq (next xs))
+              (concat acc xs)
+              (let [x1 (first xs)
+                    x2 (second xs)
+                    xs' (rest xs)]
+                (if (p x1 x2)
+                  (p132' (concat acc [x1 s]) xs')
+                  (p132' (concat acc [x1]) xs')))))]
+    (p132' [] xs)))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #_(defn p132
     [p a coll]
     (if-not (seq (rest coll))
@@ -2412,7 +2448,7 @@
             xs' (map rest (rest coll'))]
         (reduce concat x' xs'))))
 ;;; 上記では integer overflow を起こすので、明示的遅延評価を使えるように再帰で書き直す
-(defn p132 [p v coll]
+#_(defn p132 [p v coll]
   (when (seq coll)
     (let [[x y] (take 2 coll)]
       (if (nil? y)
