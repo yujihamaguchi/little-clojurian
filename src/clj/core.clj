@@ -2434,6 +2434,7 @@
 ;; Q146: This is the inverse of Problem 92, but much easier. Given an integer smaller than 4000,
 ;;    return the corresponding roman numeral in uppercase, adhering to the subtractive principle.(p104)
 ;;    http://www.numericana.com/answer/roman.htm#valid
+;;    https://ja.wikipedia.org/wiki/%E3%83%AD%E3%83%BC%E3%83%9E%E6%95%B0%E5%AD%97
 ;; (= "I" (__ 1))
 ;; (= "XXX" (__ 30))
 ;; (= "IV" (__ 4))
@@ -2441,7 +2442,54 @@
 ;; (= "DCCCXXVII" (__ 827))
 ;; (= "MMMCMXCIX" (__ 3999))
 ;; (= "XLVIII" (__ 48))
-(defn p104 [n]
+(defn p104
+  [n]
+  (letfn [(_ [n m]
+              (if (= 1 m)
+                [n]
+                (cons (quot n m)
+                      (_ (mod n m) (quot m 10)))))]
+    (let [ds (_ n 1000)]
+      (clojure.string/join [(case (nth ds 0)
+                              1 "M"
+                              2 "MM"
+                              3 "MMM"
+                              nil)
+                            (case (nth ds 1)
+                              1 "C"
+                              2 "CC"
+                              3 "CCC"
+                              4 "CD"
+                              5 "D"
+                              6 "DC"
+                              7 "DCC"
+                              8 "DCCC"
+                              9 "CM"
+                              nil)
+                            (case (nth ds 2)
+                              1 "X"
+                              2 "XX"
+                              3 "XXX"
+                              4 "XL"
+                              5 "L"
+                              6 "LX"
+                              7 "LXX"
+                              8 "LXXX"
+                              9 "XC"
+                              nil)
+                            (case (nth ds 3)
+                              1 "I"
+                              2 "II"
+                              3 "III"
+                              4 "IV"
+                              5 "V"
+                              6 "VI"
+                              7 "VII"
+                              8 "VIII"
+                              9 "IX"
+                              nil)]))))
+
+#_(defn p104 [n]
   (letfn [(_ [n c1 c2 c3]
             (cond
               (< n 4) (repeat n c1)
