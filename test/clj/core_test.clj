@@ -44,6 +44,7 @@
 (deftest qsort01-test
   (testing
       (is (=  (qsort01 [3 2 1]) [1 2 3] ))
+    (is (=  (qsort01 [3 2 3 1]) [1 2 3 3] ))
     (is (=  (qsort01 [2 3 1]) [1 2 3] ))
     (is (=  (qsort01 [1 2 3]) [1 2 3] ))
     (is (=  (qsort01 "cba") '(\a \b \c) ))
