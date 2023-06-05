@@ -61,9 +61,9 @@
 ;; =================================
 ;; A: Using recursion.
 (defn product [ns]
-  (if-not (seq ns)
-    1
-    (* (first ns) (product (rest ns)))))
+    (if-not (seq ns)
+      1
+      (* (first ns) (product (rest ns)))))
 ;; A: Using reduce.
 ;; (defn product [ns]
 ;;   (reduce * ns))

@@ -59,9 +59,9 @@
 
 (deftest product-test
   (testing
-      (is (= (product [1 2 3]) 6))
-    (is (= (product [1]) 1))
-    (is (= (product []) 1))
+      (is (= 6 (product [1 2 3])))
+    (is (= 1 (product [1])))
+    (is (= 1 (product [])))
     )
   )
 
