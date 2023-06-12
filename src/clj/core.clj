@@ -73,14 +73,14 @@
 
 ;; Q005: リストを逆順に整列する関数 rqsort を書け
 (defn rqsort
-  [xs]
-  (if-not (seq xs)
-    []
-    (let [x (first xs)
-          xs' (rest xs)
-          gt (for [x' xs' :when (< (int x) (int x'))] x')
-          lt (for [x' xs' :when (> (int x) (int x'))] x')]
-      (concat (rqsort gt) [x] (rqsort lt)))))
+    [xs]
+    (if-not (seq xs)
+      []
+      (let [x (first xs)
+            xs' (rest xs)
+            gt (for [x' xs' :when (< (int x) (int x'))] x')
+            lt (for [x' xs' :when (> (int x) (int x'))] x')]
+        (concat (rqsort gt) [x] (rqsort lt)))))
 
 ;; Q007: Haskell の last と同様の機能の関数 my-last を書け(再帰を用いるバージョンも書くこと)
 ;; last :: [a] -> a

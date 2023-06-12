@@ -67,16 +67,16 @@
 
 (deftest rqsort-test
   (testing
-      (is (= (rqsort [3 2 1]) [3 2 1]))
-    (is (= (rqsort [2 3 1]) [3 2 1]))
-    (is (= (rqsort [1 2 3]) [3 2 1]))
-    (is (= (rqsort "cba") '(\c \b \a)))
-    (is (= (rqsort "bca") '(\c \b \a)))
-    (is (= (rqsort "abc") '(\c \b \a)))
-    (is (= (rqsort '(1)) '(1)))
-    (is (= (rqsort "a") '(\a)))
-    (is (= (rqsort "") ()))
-    (is (= (rqsort ()) ()))
+      (is (=  [3 2 1] (rqsort [3 2 1])))
+    (is (=  [3 2 1] (rqsort [2 3 1])))
+    (is (=  [3 2 1] (rqsort [1 2 3])))
+    (is (=  '(\c \b \a) (rqsort "cba")))
+    (is (=  '(\c \b \a) (rqsort "bca")))
+    (is (=  '(\c \b \a) (rqsort "abc")))
+    (is (=  '(1) (rqsort '(1))))
+    (is (=  '(\a) (rqsort "a")))
+    (is (=  () (rqsort "")))
+    (is (=  () (rqsort ())))
     )
   )
 
