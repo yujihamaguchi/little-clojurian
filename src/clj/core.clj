@@ -88,22 +88,21 @@
 ;;         last [1,2,3]   = 3
 ;;         last []        = エラー
 (defn my-last
-  [xs]
-  (if-not (seq xs)
-    (throw (java.util.NoSuchElementException.))
-    (-> xs
-        reverse
-        first)))
+    [xs]
+    (if-not (seq xs)
+      (throw (java.util.NoSuchElementException.))
+      (-> xs
+          reverse
+          first)))
 ;; A: Using recursion.
 #_(defn my-last
   [xs]
   (if-not (seq xs)
     (throw (java.util.NoSuchElementException.))
-    (letfn [(my-last' [xs]
-              (if-not (seq (next xs))
-                (first xs)
-                (my-last' (rest xs))))]
-      (my-last' xs))))
+    (let [xs' (rest xs)]
+      (if-not (seq xs')
+        (first xs)
+        (my-last xs')))))
 ;; or
 #_(defn my-last
   [xs]
