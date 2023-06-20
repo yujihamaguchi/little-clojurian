@@ -101,9 +101,9 @@
 
 (deftest concat-test
   (testing
-      (is (= (my-concat [[1 2] [3 4]]) [1 2 3 4]))
-    (is (= (my-concat [[1 2] [3]]) [1 2 3]))
-    (is (= (my-concat [[1 2]]) [1 2]))
+      (is (=  [1 2 3 4] (my-concat [[1 2] [3 4]])))
+    (is (=  [1 2 3] (my-concat [[1 2] [3]])))
+    (is (=  [1 2] (my-concat [[1 2]])))
     )
   )
 

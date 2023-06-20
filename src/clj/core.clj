@@ -113,12 +113,12 @@
 
 ;; Q008: 偶数の長さを持つリストを半分ずつに分割する関数 halve を書け。
 (defn halve
-  [xs]
-  (let [n (count xs)]
-    (if (or (zero? n) (not (zero? (rem n 2))))
-      (throw (java.lang.IllegalArgumentException.))
-      (let [n' (quot n 2)]
-        [(take n' xs) (drop n' xs)]))))
+    [xs]
+    (let [n (count xs)]
+      (if (or (zero? n) (not (zero? (rem n 2))))
+        (throw (java.lang.IllegalArgumentException.))
+        (let [n' (quot n 2)]
+          [(take n' xs) (drop n' xs)]))))
 
 ;; Q009: concat をリスト内包表記で実装した my-concat を書け。
 ;; concat :: [[a]] -> [a]
