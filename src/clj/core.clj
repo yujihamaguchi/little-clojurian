@@ -135,17 +135,17 @@
 ;; Q010: 正の整数に対し、すべての約数を計算する関数 my-factors を書け
 (defn my-factors
   [n]
-  (for [n' (range 1 (inc n)) :when (zero? (rem n n'))] n'))
+  (for [n' (range 1 (inc n)) :when (zero? (mod n n'))] n'))
 
 ;; Q011: 対( pair )のリストを検索キーで探索し、対応する値を取り出してリストにする関数 my-find をリスト内包表記と分配束縛を用いて書け。
 (defn my-find
-  [k m]
-  (for [[k' v] m :when (= k k')] v))
+    [k m]
+    (for [[k' v] m :when (= k k')] v))
 
 ;; Q012: 対のリストから、対の先頭の要素を取り出してリストを生成する firsts をリスト内包表記と分配束縛を用いて書け。
 (defn firsts
-  [ps]
-  (for [[k _] ps] k))
+    [ps]
+    (for [[k _] ps] k))
 
 ;; Q013: haskell の length を、 sum とリスト内包表記で書け。
 ;; length :: [a] -> Int
