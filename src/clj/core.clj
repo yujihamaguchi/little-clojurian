@@ -156,8 +156,8 @@
 ;;         length []        = 0
 ;;         length ""        = 0
 (defn length
-  [xs]
-  (sum (for [_ xs] 1)))
+    [xs]
+    (sum (for [_ xs] 1)))
 
 ;; Q014: my-factors を用いて、整数が素数か判定する関数 prime? を書け。
 (defn prime?
