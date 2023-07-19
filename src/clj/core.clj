@@ -162,8 +162,7 @@
 ;; Q014: my-factors を用いて、整数が素数か判定する関数 prime? を書け。
 (defn prime?
   [n]
-  (and (> n 1)
-       (= [1 n] (my-factors n))))
+  (= [1 n] (my-factors n)))
 
 ;; Q015: prime? を用いて与えられた上限数までの全ての素数を生成する関数 primes を書け。
 (defn primes
