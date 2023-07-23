@@ -167,7 +167,7 @@
 ;; Q015: prime? を用いて与えられた上限数までの全ての素数を生成する関数 primes を書け。
 (defn primes
   [n]
-  (for [n' (range 2 (inc n)) :when (prime? n')] n'))
+  (for [n' (range 2 (inc n)):when (prime? n')] n'))
 
 ;; Q016: リストから隣り合う要素をマップにして返す関数 pairs を zipmap を用いて書け。
 ;; ex)
