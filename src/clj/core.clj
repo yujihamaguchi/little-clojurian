@@ -189,16 +189,22 @@
 ;; Q018: 目的とする値がリストのどの位置にあるかを調べて、その位置全てをリストとして返す関数 positions を書け。(index は 0 から開始される事)
 (defn positions
   [x xs]
-  (for [[i x'] (zipmap (range) xs) :when (= x' x)] i))
+  (for [[i x'] (map vector (range) xs) :when (= x x')] i))
+
+#_(defn positions
+    [x xs]
+    (for [[i x'] (zipmap (range) xs) :when (= x' x)] i))
 
 ;; Q019: 指定した特定の文字がいくつ含まれているか数える関数 char-count を書け。
 (defn char-count [c cs]
   (count (filter #(= c %) cs)))
+
 #_(defn char-count
     [c cs]
     (sum (for [c' cs :when (= c' c)] 1)))
+
 #_(defn char-count
-  [c cs]
+    [c cs]
     (apply + (for [c' cs :when (= c c')] 1)))
 
 ;; Q020: 文字列から小文字を数える関数 lower-count を書け。（正規表現を用いたパターンも）
