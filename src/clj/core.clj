@@ -207,10 +207,16 @@
     [c cs]
     (apply + (for [c' cs :when (= c c')] 1)))
 
-;; Q020: 文字列から小文字を数える関数 lower-count を書け。（正規表現を用いたパターンも）
+;; Q020: 文字列から小文字を数える関数 lower-count を書け。（Java のメソッドを用いるパターン、正規表現を用いたパターンも）
 (defn lower-count
   [cs]
-  (count (filter #(Character/isLowerCase %) cs)))
+  (let [ls (set (range (int \a) (inc (int \z))))]
+    (count (for [c' cs :when (ls (int c'))] 1))))
+
+#_(defn lower-count
+    [cs]
+    (count (filter #(Character/isLowerCase %) cs)))
+
 #_(defn lower-count
     [cs]
     (count (re-seq #"[a-z]" cs)))
