@@ -223,8 +223,8 @@
 
 ;; Q021: Unicode コードポイント（整数、 0 を 'a' とする）を文字に変換する関数 int2let を書け。
 (defn int2let
-    [n]
-    (char (+ n (int \a))))
+  [n]
+  (char (+ n (int \a))))
 
 ;; Q022: 文字を Unicode のコードポイント（整数）に変換する関数 let2int を書け。（ 'a' を 0 とする）
 (defn let2int
