@@ -234,11 +234,14 @@
 ;; Q023: 小文字をシフト数だけずらす my-shift を書け。 (循環すること。 'z' に対し、 1 ならば 'a' となる）
 (defn my-shift
   [n c]
-  (if-not (Character/isLowerCase c)
-    c
-    (let [alphabet-letter-count (count (range (let2int \a) (inc (let2int \z))))
-          n' (rem (+ n (let2int c)) alphabet-letter-count)]
-      (int2let n'))))
+  (let [alphabet-len 26]
+    (if (not (Character/isLowerCase c))
+      c
+      (-> c
+          let2int
+          (+ n)
+          (rem alphabet-len)
+          int2let))))
 
 ;; Q024: 与えられたシフト数で文字列を暗号化する関数 my-encode を書け。
 (defn my-encode
