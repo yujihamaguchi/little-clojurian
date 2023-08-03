@@ -246,7 +246,9 @@
 ;; Q024: 与えられたシフト数で文字列を暗号化する関数 my-encode を書け。
 (defn my-encode
   [n cs]
-  (apply str (map (partial my-shift n) cs)))
+  (->> cs
+       (map (partial my-shift n))
+       (apply str)))
 
 ;; Q025: 百分率を算出する関数 percent を書け。
 (defn percent
