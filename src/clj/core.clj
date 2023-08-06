@@ -253,7 +253,7 @@
 ;; Q025: 百分率を算出する関数 percent を書け。
 (defn percent
   [n m]
-  (* (/ n m) 100))
+  (* 100 (/ n m)))
 
 ;; Q026: 任意の文字列に対して小文字アルファベットの出現頻度表を返す関数 freqs を書け。（ lower-count と char-count を用いる）
 (defn freqs
