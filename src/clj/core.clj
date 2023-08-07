@@ -255,13 +255,13 @@
   [n m]
   (* 100 (/ n m)))
 
-;; Q026: 任意の文字列に対して小文字アルファベットの出現頻度表を返す関数 freqs を書け。（ lower-count と char-count を用いる）
+;; Q026: 任意の文字列に対して小文字アルファベットの出現頻度表を返す関数 freqs を書け。（ lower-count と char-count を用いる ）
 (defn freqs
-  [cs]
-  (let [tbl (map int2let (range (let2int \a) (inc (let2int \z))))
-        cnt (lower-count cs)]
-    (for [c tbl]
-      (percent (char-count c cs) cnt))))
+    [cs]
+    (let [tbl (map int2let (range (let2int \a) (inc (let2int \z))))
+          cnt (lower-count cs)]
+      (for [c tbl]
+        (percent (char-count c cs) cnt))))
 
 ;; Q027: カイ二乗検定を行う関数 chisqr （期待値のリストが第一引数）を書け。
 (defn chisqr
