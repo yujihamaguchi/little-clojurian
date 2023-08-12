@@ -270,8 +270,10 @@
 
 (deftest chisqr-test
   (testing
-      (is (= (chisqr [1 2 3] [4 5 6]) 5.549999952316284))
-    (is (= (chisqr [1 2 3] [4 5]) 4.049999952316284))))
+      (is (= (chisqr [1 2 3] [1 2 3]) 0.0))
+    (is (= (chisqr [1 2 3] [1 2]) 0.0))    
+    (is (= (chisqr [13 7 5 15] [9 11 9 11]) 6.464646577835083))
+    ))
 
 (deftest rotate-test
   (testing
