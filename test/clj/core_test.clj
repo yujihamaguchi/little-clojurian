@@ -278,9 +278,13 @@
 (deftest rotate-test
   (testing
       (is (=  "bca" (rotate 1 "abc")))
+    (is (=  "cab" (rotate -1 "abc")))
     (is (=  "cab" (rotate 2 "abc")))
+    (is (=  "bca" (rotate -2 "abc")))
     (is (=  "abc" (rotate 3 "abc")))
+    (is (=  "abc" (rotate -3 "abc")))
     (is (=  "bca" (rotate 4 "abc")))
+    (is (=  "cab" (rotate -4 "abc")))
     )
   )
 
