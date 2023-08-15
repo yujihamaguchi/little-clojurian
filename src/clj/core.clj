@@ -279,10 +279,10 @@
     (let [n (mod n (count cs))]
       (apply str (concat (drop n cs) (take n cs)))))
 
-;; Q029: 1 から 100 までの二乗の和を計算する関数 sum-square-1-to-100 をリスト内包表記を用いて書け。
+;; Q029: 1 から 100 までの二乗の和を計算する関数 sum-square-1-to-100 を書け。
 (defn sum-square-1-to-100
   []
-  (sum (for [n (range 1 101)] (* n n))))
+  (apply + (for [n (range 1 101)] (Math/pow n 2))))
 
 ;; Q030: 2つの生成器を持つリスト内包表記 [(x,y) | x <- [1,2,3], y <- [4,5,6]] は、
 ;;       1つの生成器を持つリスト内包表記2つでも表現出来る事を示せ。
