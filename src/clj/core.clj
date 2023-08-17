@@ -17,10 +17,10 @@
 
 ;; using recursion
 #_(defn my-zip
-  [& xss]
-  (when (and (seq xss) (every? seq xss))
-    (cons (map first xss)
-          (apply my-zip (map rest xss)))))
+    [& xss]
+    (when (and (seq xss) (every? seq xss))
+      (cons (map first xss)
+            (apply my-zip (map rest xss)))))
 
 ;; Q002: haskell の sum と同様の機能の関数 sum を書け。(再帰を用いるパターン, reduce を用いるパターン、 apply を用いるパターン)
 ;; sum :: (Num a) => [a] -> a
@@ -61,9 +61,9 @@
 ;; =================================
 ;; A: Using recursion.
 (defn product [ns]
-    (if-not (seq ns)
-      1
-      (* (first ns) (product (rest ns)))))
+  (if-not (seq ns)
+    1
+    (* (first ns) (product (rest ns)))))
 ;; A: Using reduce.
 ;; (defn product [ns]
 ;;   (reduce * ns))
@@ -73,14 +73,14 @@
 
 ;; Q005: リストを逆順に整列する関数 rqsort を書け
 (defn rqsort
-    [xs]
-    (if-not (seq xs)
-      []
-      (let [x (first xs)
-            xs' (rest xs)
-            gt (for [x' xs' :when (< (int x) (int x'))] x')
-            lt (for [x' xs' :when (> (int x) (int x'))] x')]
-        (concat (rqsort gt) [x] (rqsort lt)))))
+  [xs]
+  (if-not (seq xs)
+    []
+    (let [x (first xs)
+          xs' (rest xs)
+          gt (for [x' xs' :when (< (int x) (int x'))] x')
+          lt (for [x' xs' :when (> (int x) (int x'))] x')]
+      (concat (rqsort gt) [x] (rqsort lt)))))
 
 ;; Q007: Haskell の last と同様の機能の関数 my-last を書け(再帰を用いるバージョンも書くこと)
 ;; last :: [a] -> a
@@ -88,37 +88,37 @@
 ;;         last [1,2,3]   = 3
 ;;         last []        = エラー
 (defn my-last
-    [xs]
-    (if-not (seq xs)
-      (throw (java.util.NoSuchElementException.))
-      (-> xs
-          reverse
-          first)))
-;; A: Using recursion.
-#_(defn my-last
   [xs]
   (if-not (seq xs)
     (throw (java.util.NoSuchElementException.))
-    (let [xs' (rest xs)]
-      (if-not (seq xs')
-        (first xs)
-        (my-last xs')))))
+    (-> xs
+        reverse
+        first)))
+;; A: Using recursion.
+#_(defn my-last
+    [xs]
+    (if-not (seq xs)
+      (throw (java.util.NoSuchElementException.))
+      (let [xs' (rest xs)]
+        (if-not (seq xs')
+          (first xs)
+          (my-last xs')))))
 ;; or
 #_(defn my-last
-  [xs]
-  (cond
-    (not (seq xs)) (throw (java.util.NoSuchElementException.))
-    (= 1 (count xs)) (first xs)
-    :else (my-last (rest xs))))
+    [xs]
+    (cond
+      (not (seq xs)) (throw (java.util.NoSuchElementException.))
+      (= 1 (count xs)) (first xs)
+      :else (my-last (rest xs))))
 
 ;; Q008: 偶数の長さを持つリストを半分ずつに分割する関数 halve を書け。
 (defn halve
-    [xs]
-    (let [n (count xs)]
-      (if (or (zero? n) (not (zero? (rem n 2))))
-        (throw (java.lang.IllegalArgumentException.))
-        (let [n' (quot n 2)]
-          [(take n' xs) (drop n' xs)]))))
+  [xs]
+  (let [n (count xs)]
+    (if (or (zero? n) (not (zero? (rem n 2))))
+      (throw (java.lang.IllegalArgumentException.))
+      (let [n' (quot n 2)]
+        [(take n' xs) (drop n' xs)]))))
 
 ;; Q009: concat をリスト内包表記で実装した my-concat を書け。
 ;; concat :: [[a]] -> [a]
@@ -139,13 +139,13 @@
 
 ;; Q011: 対( pair )のリストを検索キーで探索し、対応する値を取り出してリストにする関数 my-find をリスト内包表記と分配束縛を用いて書け。
 (defn my-find
-    [k m]
-    (for [[k' v] m :when (= k k')] v))
+  [k m]
+  (for [[k' v] m :when (= k k')] v))
 
 ;; Q012: 対のリストから、対の先頭の要素を取り出してリストを生成する firsts をリスト内包表記と分配束縛を用いて書け。
 (defn firsts
-    [ps]
-    (for [[k _] ps] k))
+  [ps]
+  (for [[k _] ps] k))
 
 ;; Q013: haskell の length を、 sum とリスト内包表記で書け。
 ;; length :: [a] -> Int
@@ -156,8 +156,8 @@
 ;;         length []        = 0
 ;;         length ""        = 0
 (defn length
-    [xs]
-    (sum (for [_ xs] 1)))
+  [xs]
+  (sum (for [_ xs] 1)))
 
 ;; Q014: my-factors を用いて、整数が素数か判定する関数 prime? を書け。
 (defn prime?
@@ -181,10 +181,10 @@
 ;; Q017: 順序クラスに属する任意の型の要素を持つリストが、整列されているか調べる関数 sorted? を pairs 関数を用いて書け。
 ;;       （本来、 pairs のような処理を行いたい場合、 Clojure ではシーケンスライブラリの partition を使用する。）
 (defn sorted?
-    [xs]
-    (every?
-     (fn [[x y]] (<= x y))
-     (pairs xs)))
+  [xs]
+  (every?
+   (fn [[x y]] (<= x y))
+   (pairs xs)))
 
 ;; Q018: 目的とする値がリストのどの位置にあるかを調べて、その位置全てをリストとして返す関数 positions を書け。(index は 0 から開始される事)
 (defn positions
@@ -257,11 +257,11 @@
 
 ;; Q026: 任意の文字列に対して小文字アルファベットの出現頻度表を返す関数 freqs を書け。（ lower-count と char-count を用いる ）
 (defn freqs
-    [cs]
-    (let [tbl (map int2let (range (let2int \a) (inc (let2int \z))))
-          cnt (lower-count cs)]
-      (for [c tbl]
-        (percent (char-count c cs) cnt))))
+  [cs]
+  (let [tbl (map int2let (range (let2int \a) (inc (let2int \z))))
+        cnt (lower-count cs)]
+    (for [c tbl]
+      (percent (char-count c cs) cnt))))
 
 ;; Q027: カイ二乗検定を行う関数 chisqr （期待値のリストが第一引数）を書け。
 (defn chisqr
@@ -275,9 +275,9 @@
 
 ;; Q028: 文字列を任意の数 n だけ左に回転させる関数 rotate を書け。（先頭の文字は末尾に接続していると考える）
 (defn rotate
-    [n cs]
-    (let [n (mod n (count cs))]
-      (apply str (concat (drop n cs) (take n cs)))))
+  [n cs]
+  (let [n (mod n (count cs))]
+    (apply str (concat (drop n cs) (take n cs)))))
 
 ;; Q029: 1 から 100 までの二乗の和を計算する関数 sum-square-1-to-100 を書け。
 (defn sum-square-1-to-100
@@ -321,12 +321,12 @@
 
 ;; 末尾再帰
 #_(defn my-replicate
-  [n x]
-  (letfn [(my-replicate' [n acc]
-            (if (zero? n)
-              acc
-              (my-replicate' (dec n) (cons x acc))))]
-    (my-replicate' n [])))
+    [n x]
+    (letfn [(my-replicate' [n acc]
+              (if (zero? n)
+                acc
+                (my-replicate' (dec n) (cons x acc))))]
+      (my-replicate' n [])))
 
 ;; Q034: 二つの整数のリストの内積を求める関数　scalarproduct　を書け。
 ;; A
@@ -389,7 +389,7 @@
 (defn my-odd? [n]
   (and (not (zero? n))
        (my-even? (dec (Math/abs n)))))
- 
+
 ;; Q041: 0 以上の整数 n に対し、 n 番目のフィボナッチ数を求める関数 fibonacci を書け。（直接の再帰を用いて良い）
 (defn fibonacci
   [n]
@@ -523,14 +523,14 @@
 
 ;; recurを用いたパターン
 #_(defn my-map-recur
-  [f xs]
-  (letfn [(my-map-recur'
-            [acc xs]
-            (if-not (seq xs)
-              acc
-              (recur (conj acc (f (first xs)))
-                     (rest xs))))]
-    (my-map-recur' [] xs)))
+    [f xs]
+    (letfn [(my-map-recur'
+              [acc xs]
+              (if-not (seq xs)
+                acc
+                (recur (conj acc (f (first xs)))
+                       (rest xs))))]
+      (my-map-recur' [] xs)))
 
 ;; Q054: リストの先頭から述語を満たす連続した要素を取り除く関数 drop-while を自作せよ。( my-drop-while )
 (defn my-drop-while
@@ -1052,18 +1052,18 @@
 
 ;; using reader
 #_(defn clojure-loc
-  [f]
-  (->> f
-       file-seq
-       (filter (fn [f]
-                 (and (.isFile f)
-                      (re-seq #"\.clj" (.getName f)))))
-       (map #(with-open [r (clojure.java.io/reader %)]
-               (->> r
-                    line-seq
-                    (filter (complement empty?))
-                    count)))
-       (reduce +)))
+    [f]
+    (->> f
+         file-seq
+         (filter (fn [f]
+                   (and (.isFile f)
+                        (re-seq #"\.clj" (.getName f)))))
+         (map #(with-open [r (clojure.java.io/reader %)]
+                 (->> r
+                      line-seq
+                      (filter (complement empty?))
+                      count)))
+         (reduce +)))
 
 ;; Q082: 文字列中の文字で、探すべき文字のセットにマッチする文字のインデックスを得る関数 index-filter を書け。
 ;;       
@@ -1211,8 +1211,8 @@
 (defmacro my-with-out-str
   [& exprs]
   `(binding [*out* (java.io.StringWriter.)]
-    ~@exprs
-    (str *out*)))
+     ~@exprs
+     (str *out*)))
 
 ;; Q087: 任意のファイルの空行を除いた行数を表示する関数count-not-empty-lineを書け。
 ;; ex) (= (count-not-empty-line (java.io.File. "./resources/ut-count-not-empty-line/01.txt")) 3)
@@ -1253,11 +1253,11 @@
   (map first (iterate (fn [[n m]] [m (+' n m)]) [0 1])))
 ;; 2022/09/18
 #_(defn fibo
-  []
-  (letfn [(fibo' [[n m]]
-            [m (+ n m)])]
-    (->> (iterate fibo' [0 1])
-         (map first))))
+    []
+    (letfn [(fibo' [[n m]]
+              [m (+ n m)])]
+      (->> (iterate fibo' [0 1])
+           (map first))))
 
 ;; Q090: n番目のフィボナッチ数を返す、単純な再帰を使ったstack-consuming-fibo関数を書け。
 ;; (stack-consuming-fibo 9)
@@ -1286,8 +1286,8 @@
     (empty? (re-seq #"\w" cs)))
 ;; my answer 2022/09/23
 #_(defn blank?
-  [s]
-  (not (re-find #"[^\s　]" s)))
+    [s]
+    (not (re-find #"[^\s　]" s)))
 
 ;; Q092: timeマクロの変種で、何回もの実行結果を後で集めやすいようにしたbenchというマクロを書け。
 ;; (bench (str "a" "b"))
@@ -1362,14 +1362,14 @@
         (cons x (p28 xs))))))
 ;; 2022/09/29
 #_(defn p28
-  [coll]
-  (when (seq coll)
-    (let [x (first coll)]
-      (concat
-       (if-not (coll? x)
-         [x]
-         (p28 x))
-       (p28 (rest coll))))))
+    [coll]
+    (when (seq coll)
+      (let [x (first coll)]
+        (concat
+         (if-not (coll? x)
+           [x]
+           (p28 x))
+         (p28 (rest coll))))))
 
 ;; Q098: Write a function which removes consecutive duplicates from a sequence.(p30)
 ;;       一つは再帰、一つは reduce を用いて解いてみること
@@ -1385,8 +1385,8 @@
               (let [x (first xs)
                     xs' (rest xs)]
                 (if (= (last acc) x)
-                 (p30' acc xs')
-                 (p30' (conj acc x) xs')))))]
+                  (p30' acc xs')
+                  (p30' (conj acc x) xs')))))]
     (p30' [] xs)))
 ;; recursion
 ;; bk 2022/10/02
@@ -1444,10 +1444,10 @@
   (mapcat #(repeat n %) coll))
 ;; 2022/10/07 recursion
 #_(defn p33
-  [xs n]
-  (when (seq xs)
-    (concat (repeat n (first xs))
-            (p33 (rest xs) n))))
+    [xs n]
+    (when (seq xs)
+      (concat (repeat n (first xs))
+              (p33 (rest xs) n))))
 
 ;; Q102: Write a function which creates a list of all integers in a given range.(p34)
 ;; Special Restrictions
@@ -1564,15 +1564,15 @@
 ;; (= (__ [7 6 5 4]) [])
 ;; using reduce
 #_(defn p53
-  [ns]
-  (first (reduce (fn [[max-length-acc acc] n]
-                   (if (= (last acc) (dec n))
-                     (let [acc' (conj (vec acc) n)]
-                       (if (< (count max-length-acc) (count acc'))
-                         [acc' acc']
-                         [max-length-acc acc']))
-                     [max-length-acc [n]])
-                   ) [[] []] ns)))
+    [ns]
+    (first (reduce (fn [[max-length-acc acc] n]
+                     (if (= (last acc) (dec n))
+                       (let [acc' (conj (vec acc) n)]
+                         (if (< (count max-length-acc) (count acc'))
+                           [acc' acc']
+                           [max-length-acc acc']))
+                       [max-length-acc [n]])
+                     ) [[] []] ns)))
 
 ;; using funcitons "continuous?"(you have to create yourself) and "take-while".
 (defn p53
@@ -1643,12 +1643,12 @@
       (cons x (p56 (filter #(not (= x %)) xs))))))
 ;; A.2
 #_(defn p56
-  [xs]
-  (reduce (fn [acc x]
-            (if (some #(= x %) acc)
-              acc
-              (conj acc x)))
-          [] xs))
+    [xs]
+    (reduce (fn [acc x]
+              (if (some #(= x %) acc)
+                acc
+                (conj acc x)))
+            [] xs))
 
 ;; Q115: Write a function which allows you to create function compositions.
 ;;       The parameter list should take a variable number of functions,
@@ -1666,15 +1666,15 @@
       (reduce (fn [acc f] (f acc)) (apply f xs) fs))))
 ;; using recursion
 #_(defn p58
-  [& fs]
-  (fn [& xs]
-    (let [[f & fs] (reverse fs)]
-      (letfn [(p58' [acc [f & fs' :as fs]]
-                (if-not (seq fs)
-                  acc
-                  (p58' (f acc)
-                        (rest fs'))))]
-        (p58' (apply f xs) fs)))))
+    [& fs]
+    (fn [& xs]
+      (let [[f & fs] (reverse fs)]
+        (letfn [(p58' [acc [f & fs' :as fs]]
+                  (if-not (seq fs)
+                    acc
+                    (p58' (f acc)
+                          (rest fs'))))]
+          (p58' (apply f xs) fs)))))
 
 ;; Q116: Take a set of functions and return a new function that takes a variable number of arguments
 ;;       and returns a sequence containing the result of applying
@@ -1771,11 +1771,11 @@
 
 ;; bk 2022/12/16
 #_(defn p74 [s]
-  (->> s
-       (re-seq #"\d+")
-       (filter (fn [n] (zero? (mod (Math/sqrt (Integer/parseInt n)) 1))))
-       (interpose ",")
-       (apply str)))
+    (->> s
+         (re-seq #"\d+")
+         (filter (fn [n] (zero? (mod (Math/sqrt (Integer/parseInt n)) 1))))
+         (interpose ",")
+         (apply str)))
 
 ;; Q121: Two numbers are coprime if their greatest common divisor equals 1.
 ;;       Euler's totient function f(x) is defined as the number of positive integers less than x which are coprime to x.
@@ -1800,31 +1800,31 @@
 
 ;; Euclidean algorithm
 #_(defn p75
-  [n]
-  (if (= n 1)
-    1
-    (letfn [(gcd [n m]
-              (match [n m]
-                     [n 0] n
-                     :else (gcd m (mod n m))))
-            (coprime? [n m] (= 1 (gcd n m)))]
-      (count (filter (partial coprime? n) (range 1 n))))))
+    [n]
+    (if (= n 1)
+      1
+      (letfn [(gcd [n m]
+                (match [n m]
+                       [n 0] n
+                       :else (gcd m (mod n m))))
+              (coprime? [n m] (= 1 (gcd n m)))]
+        (count (filter (partial coprime? n) (range 1 n))))))
 
 ;; 2022/12/21
 #_(defn p75
-  [n]
-  (letfn [(gcd [n m]
-            (apply max (set/intersection
-              (set (my-factors n))
-              (set (my-factors m)))))]
-    (count (filter #(= 1 ((partial gcd n) %)) (range 1 (inc n))))))
+    [n]
+    (letfn [(gcd [n m]
+              (apply max (set/intersection
+                          (set (my-factors n))
+                          (set (my-factors m)))))]
+      (count (filter #(= 1 ((partial gcd n) %)) (range 1 (inc n))))))
 
 ;; 2022/12/20
 #_(defn p75
-  [n]
-  (letfn [(coprime? [n m]
-            (= #{1} (set/intersection (set (my-factors n)) (set (my-factors m)))))]
-    (count (filter (partial coprime? n) (range 1 (inc n))))))
+    [n]
+    (letfn [(coprime? [n m]
+              (= #{1} (set/intersection (set (my-factors n)) (set (my-factors m)))))]
+      (count (filter (partial coprime? n) (range 1 (inc n))))))
 
 ;; Q122: Write a function which finds all the anagrams in a vector of words.
 ;;       A word x is an anagram of word y if all the letters in x can be rearranged in a different order to form y.
@@ -1924,11 +1924,11 @@
   ([_] false))
 
 #_(defn p95
-  [t]
-  (if (and (coll? t) (= (count t) 3))
-    (let [[v l r] t]
-      (and (or (nil? l) (p95 l)) (or (nil? r) (p95 r))))
-    false))
+    [t]
+    (if (and (coll? t) (= (count t) 3))
+      (let [[v l r] t]
+        (and (or (nil? l) (p95 l)) (or (nil? r) (p95 r))))
+      false))
 
 #_(defn p95 [n]
     (or (nil? n)
@@ -2054,14 +2054,14 @@
 
 ;; bk 2023-02-17
 #_(defn p102
-  [s]
-  (letfn [(_p102
-            ([c] [c])
-            ([c c' & cs] (if (= \- c)
-                           (apply _p102 (cons (Character/toUpperCase c') cs))
-                           (cons c (apply _p102 (cons c' cs))))))]
-    (->> (apply _p102 s)
-         (apply str))))
+    [s]
+    (letfn [(_p102
+              ([c] [c])
+              ([c c' & cs] (if (= \- c)
+                             (apply _p102 (cons (Character/toUpperCase c') cs))
+                             (cons c (apply _p102 (cons c' cs))))))]
+      (->> (apply _p102 s)
+           (apply str))))
 ;; my answer 2017/06/10
 ;; (defn p102 [s]
 ;;   (clojure.string/replace s #"-([a-z])" #(clojure.string/upper-case (%1 1))))
@@ -2108,11 +2108,11 @@
 
 ;; using reduction
 #_(defn p135
-  [n & coll]
-  (reduce (fn [acc [f n]]
-            (f acc n))
-          n
-          (partition 2 coll)))
+    [n & coll]
+    (reduce (fn [acc [f n]]
+              (f acc n))
+            n
+            (partition 2 coll)))
 
 ;; Q134: Because Clojure's for macro allows you to "walk" over multiple sequences in a nested fashion,
 ;;       it is excellent for transforming all sorts of sequences.
@@ -2205,14 +2205,14 @@
              k vs))))
 
 #_(defn p105
-  [xs]
-  (reduce (fn [acc x]
-            (if (keyword? x)
-              (assoc acc x [])
-              (let [[k _] (last acc)]
-                (update acc k conj x))))
-          {}
-          xs))
+    [xs]
+    (reduce (fn [acc x]
+              (if (keyword? x)
+                (assoc acc x [])
+                (let [[k _] (last acc)]
+                  (update acc k conj x))))
+            {}
+            xs))
 
 ;; Q138: Write a function which returns a sequence of digits of a non-negative number (first argument) in numerical system
 ;;       with an arbitrary base (second argument). Digits should be represented with their integer values,
@@ -2269,11 +2269,11 @@
     (lazy-seq (cons ns' (p110 ns')))))
 
 #_(defn p110
-  [coll]
-  (let [e (->> coll
-               (partition-by identity)
-               (mapcat (fn [coll] [(count coll) (first coll)])))]
-    (lazy-seq (cons e (p110 e)))))
+    [coll]
+    (let [e (->> coll
+                 (partition-by identity)
+                 (mapcat (fn [coll] [(count coll) (first coll)])))]
+      (lazy-seq (cons e (p110 e)))))
 
 ;; Q140: Write an oscillating iterate: a function that takes an initial value and a variable number of functions.
 ;;       It should return a lazy sequence of the functions applied to the value in order,
@@ -2287,9 +2287,9 @@
               n
               (cycle fs)))
 #_(defn p144
-  [n & fs]
-  (let [[f & fs'] (cycle fs)]
-    (lazy-seq (cons n (apply (partial p144 (f n)) fs')))))
+    [n & fs]
+    (let [[f & fs'] (cycle fs)]
+      (lazy-seq (cons n (apply (partial p144 (f n)) fs')))))
 
 #_(defn p144
     [n & fs]
@@ -2445,14 +2445,14 @@
         (reduce concat x' xs'))))
 ;;; 上記では integer overflow を起こすので、明示的遅延評価を使えるように再帰で書き直す
 #_(defn p132 [p v coll]
-  (when (seq coll)
-    (let [[x y] (take 2 coll)]
-      (if (nil? y)
-        [x]
-        (lazy-seq
-         (concat
-          (if (p x y) [x v] [x])
-          (p132 p v (rest coll))))))))
+    (when (seq coll)
+      (let [[x y] (take 2 coll)]
+        (if (nil? y)
+          [x]
+          (lazy-seq
+           (concat
+            (if (p x y) [x v] [x])
+            (p132 p v (rest coll))))))))
 
 ;; Q146: This is the inverse of Problem 92, but much easier. Given an integer smaller than 4000,
 ;;    return the corresponding roman numeral in uppercase, adhering to the subtractive principle.(p104)
