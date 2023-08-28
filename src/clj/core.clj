@@ -333,8 +333,12 @@
 ;; Q034: 二つの整数のリストの内積を求める関数　scalarproduct　を書け。
 ;; A
 (defn scalarproduct
-  [ns ms]
-  (reduce + (map #(* %1 %2) ns ms)))
+  [xs ys]
+  (apply + (map #(* % %2) xs ys)))
+;; using reduce
+#_(defn scalarproduct
+    [ns ms]
+    (reduce + (map #(* %1 %2) ns ms)))
 
 ;; Q035: リストの順番を逆転する関数 my-reverse を直接の再帰を用いて書け。
 (defn my-reverse
