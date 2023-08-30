@@ -345,7 +345,8 @@
   [xs]
   (if-not (seq xs)
     []
-    (conj (my-reverse (rest xs)) (first xs))))
+    (conj (my-reverse (rest xs))
+          (first xs))))
 
 ;; Q036: ある要素を、整列されたリストに挿入する関数 my-insert を書け。
 (defn my-insert
