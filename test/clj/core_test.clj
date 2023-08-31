@@ -330,6 +330,7 @@
 (deftest insert-test
   (testing
       (is (=  [1 2 3 4 5] (my-insert 3 [1 2 4 5])))
+    (is (=  [1] (my-insert 1 [])))
     )
   )
 

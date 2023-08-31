@@ -351,10 +351,12 @@
 ;; Q036: ある要素を、整列されたリストに挿入する関数 my-insert を書け。
 (defn my-insert
   [x xs]
-  (if (or (not (seq xs))
-          (<= x (first xs)))
+  (if (or
+       (not (seq xs))
+       (<= x (first xs)))
     (cons x xs)
-    (cons (first xs) (my-insert x (rest xs)))))
+    (cons (first xs)
+          (my-insert x (rest xs)))))
 
 ;; Q037: 関数 my-insert を用いてリストのソートを"挿入ソート"で行う関数　isort　を書け。
 (defn isort
