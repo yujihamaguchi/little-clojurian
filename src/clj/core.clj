@@ -362,10 +362,9 @@
 (defn isort
   [xs]
   (if-not (seq xs)
-    xs
+    []
     (my-insert (first xs)
                (isort (rest xs)))))
-
 
 ;; Q038: drop を再帰を用いて自作( my-drop )せよ。
 (defn my-drop
