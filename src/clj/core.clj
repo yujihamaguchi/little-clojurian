@@ -376,10 +376,10 @@
 ;; Q039: Haskell の zip 関数を直接の再帰を用いて自作( my-zip2 )せよ。
 ;;       [a] -> [b] -> [(a,b)]
 (defn my-zip2
-  [xs ys]
-  (when (and (seq xs) (seq ys))
-    (cons [(first xs) (first ys)] (my-zip2 (rest xs) (rest ys)))))
-
+    [xs ys]
+    (when (and (seq xs) (seq ys))
+      (cons [(first xs) (first ys)]
+            (my-zip2 (rest xs) (rest ys)))))
 
 ;; Q040: Step.1 even と odd を相互再帰を用いて自作( my-even?, my-odd? )せよ。
 ;;       Step.2 declare を自作( my-declare )してそれを用いること。 if を使わないこと。
