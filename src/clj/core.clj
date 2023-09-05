@@ -373,7 +373,6 @@
     xs
     (my-drop (dec n) (rest xs))))
 
-
 ;; Q039: Haskell の zip 関数を直接の再帰を用いて自作( my-zip2 )せよ。
 ;;       [a] -> [b] -> [(a,b)]
 (defn my-zip2
