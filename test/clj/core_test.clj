@@ -369,8 +369,8 @@
     (is (=  false (my-even? 1)))
     (is (=  true (my-even? 2)))
     (is (=  false (my-even? 3)))
-    )
-  )
+    ) 
+ )
 
 (deftest my-odd?-test
   (testing
