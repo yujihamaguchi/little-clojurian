@@ -419,16 +419,19 @@
 
 ;; Q043: リストから偶数の位置の要素を取り出す関数 evens と、奇数の位置の要素を取り出す関数 odds を相互再帰を用いて書け。
 (declare evens odds)
+
 (defn evens
   [xs]
   (if-not (seq xs)
     []
     (odds (rest xs))))
+
 (defn odds
   [xs]
   (if-not (seq xs)
     []
-    (cons (first xs) (evens (rest xs)))))
+    (cons (first xs)
+          (evens (rest xs)))))
 
 ;; Q044: Haskell の init 関数を自作( my-init )せよ。(直接の再帰を用いたもの、遅延評価関数を用いたもの両方書くこと）
 ;; init :: [a] -> [a]
@@ -438,19 +441,18 @@
 ;;
 ;; 再帰版
 (defn my-init
-  [xs]
-  (-> xs
-      reverse
-      rest
-      reverse))
-
-;; 遅延評価関数版
-#_(defn my-init
     [xs]
-    (-> xs
-        reverse
-        rest
-        reverse))
+    (if-not (seq (next xs))
+      []
+      (cons (first xs)
+            (my-init (rest xs)))))
+;; ;; 遅延評価関数版
+;; #_(defn my-init
+;;     [xs]
+;;     (-> xs
+;;         reverse
+;;         rest
+;;         reverse))
 
 ;; Q045: Haskell の elem を直接の再帰を用いて自作( my-elem )せよ。
 ;;       elem :: Eq a => a -> [a] -> Bool
