@@ -463,7 +463,8 @@
     (or (= x (first xs))
         (my-elem x (rest xs)))))
 
-;; Q046: Haskell の !! の前置記法版である index 関数を直接の再帰を用いて自作せよ。( my-index )
+;; Q046: Haskell の !! の前置記法版である index 関数( my-index )を直接の再帰を用いて自作せよ。該当する要素がない場合は nil を返せ。
+;;       (!!) :: [a] -> Int -> a
 (defn my-index
   [xs n]
   (if (zero? n)
