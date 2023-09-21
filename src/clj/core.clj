@@ -481,7 +481,7 @@
     (not (seq ys)) xs
     :default (let [x (first xs)
                    y (first ys)]
-               (if (<= x y)
+               (if (< x y)
                  (cons x (my-merge (rest xs) ys))
                  (cons y (my-merge xs (rest ys)))))))
 
