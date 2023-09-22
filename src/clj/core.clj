@@ -492,6 +492,7 @@
   [xs]
   (let [n (quot (count xs) 2)]
     [(take n xs) (drop n xs)]))
+
 (defn msort
   [xs]
   (if-not (seq (next xs))
