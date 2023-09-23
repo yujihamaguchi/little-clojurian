@@ -511,10 +511,10 @@
 
 ;; Q050: 負でない整数に対する累乗演算を行う関数 my を直接の再帰を用いて定義せよ。
 (defn my
-  [a n]
-  (if (zero? n)
+  [n m]
+  (if (zero? m)
     1
-    (* a (my a (dec n)))))
+    (* n (my n (dec m)))))
 
 ;; Q051: map をリスト内包表記を用いて自作せよ( my-map )。
 (defn my-map
