@@ -527,10 +527,12 @@
   (for [x xs :when (p x)] x))
 
 ;; Q053: map を再帰を用いて自作せよ。( my-map-recur )
+;;       直接の再帰を用いたパターンと recur を用いたパターンを書け
 ;; 直接の再帰を用いたパターン
 (defn my-map-recur
   [f xs]
-  (when (seq xs)
+  (if-not (seq xs)
+    []
     (cons (f (first xs))
           (my-map-recur f (rest xs)))))
 
