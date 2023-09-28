@@ -529,7 +529,7 @@
 ;; Q053: map を再帰を用いて自作せよ。( my-map-recur )
 ;;       直接の再帰を用いたパターンと recur を用いたパターンを書け
 ;; 直接の再帰を用いたパターン
-(defn my-map-recur
+#_(defn my-map-recur
   [f xs]
   (if-not (seq xs)
     []
@@ -537,15 +537,14 @@
           (my-map-recur f (rest xs)))))
 
 ;; recurを用いたパターン
-#_(defn my-map-recur
-    [f xs]
-    (letfn [(my-map-recur'
-              [acc xs]
-              (if-not (seq xs)
-                acc
-                (recur (conj acc (f (first xs)))
-                       (rest xs))))]
-      (my-map-recur' [] xs)))
+(defn my-map-recur
+  [f xs]
+  (letfn [(my-map-recur' [acc xs]
+            (if-not (seq xs)
+              acc
+              (recur (conj acc (f (first xs)))
+                     (rest xs))))]
+    (my-map-recur' [] xs)))
 
 ;; Q054: リストの先頭から述語を満たす連続した要素を取り除く関数 drop-while を自作せよ。( my-drop-while )
 (defn my-drop-while
