@@ -549,10 +549,26 @@
 ;; Q054: リストの先頭から述語を満たす連続した要素を取り除く関数 drop-while を自作せよ。( my-drop-while )
 (defn my-drop-while
   [p xs]
-  (if (or (not (seq xs))
-          (not (p (first xs))))
+  (if-not (and (seq xs)
+               (p (first xs)))
     xs
     (my-drop-while p (rest xs))))
+
+;; cond で可読性を確保しようとしたもの
+#_(defn my-drop-while
+    [p xs]
+    (cond
+      (not (seq xs)) []
+      (p (first xs)) (my-drop-while p (rest xs))
+      :else xs))
+
+;; ド・モルガンの法則使った変換をあえて行わず、「意味の可読性」を確保しようとしたもの
+#_(defn my-drop-while
+    [p xs]
+    (if (or (not (seq xs))
+            (not (p (first xs))))
+      xs
+      (my-drop-while p (rest xs))))
 
 ;; Q055: filter を再帰を用いて自作せよ。( my-filter-recur )
 ;;       線形再帰、末尾再帰、 recur を用いた末尾再帰の 3 パターンを書くこと

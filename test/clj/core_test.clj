@@ -620,6 +620,7 @@
       (is (=  [2 3] (my-drop-while odd? [1 2 3])))
     (is (=  [4] (my-drop-while odd? [1 3 4])))
     (is (=  [] (my-drop-while odd? [1 3])))
+    (is (=  [2 4] (my-drop-while odd? [2 4])))
     )
   )
 
