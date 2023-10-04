@@ -605,13 +605,22 @@
               xs' (rest xs)]
           (recur (if (p x) (conj acc x) acc) xs')))))
 
-;; Q056: リストの先頭から述語を満たす連続した要素を取り出す関数 takeWhile を自作せよ。( my-take-while )
+;; Q056: リストの先頭から述語を満たす**連続した**要素を取り出す関数 takeWhile を自作せよ。( my-take-while )
+;; not use cond
 (defn my-take-while
   [p [x & xs' :as xs]]
-  (cond
-    (not (seq xs)) []
-    (not (p x)) []
-    :else (cons x (my-take-while p xs'))))
+  (if-not (and (seq xs)
+               (p x))
+    []
+    (cons x (my-take-while p xs'))))
+
+;; use cond
+#_(defn my-take-while
+    [p [x & xs' :as xs]]
+    (cond
+      (not (seq xs)) []
+      (not (p x)) []
+      :else (cons x (my-take-while p xs'))))
 
 ;; Q057: foldr を自作せよ。（ my-foldr ）
 ;;         以下のように、 foldr に部分適用して関数をつくることができる。
