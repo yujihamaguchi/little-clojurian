@@ -622,7 +622,7 @@
       (not (p x)) []
       :else (cons x (my-take-while p xs'))))
 
-;; Q057: foldr を自作せよ。（ my-foldr ）
+;; Q057-00: foldr を自作せよ。（ my-foldr ）
 ;;         以下のように、 foldr に部分適用して関数をつくることができる。
 ;;
 ;;         cons = foldr (:) []
