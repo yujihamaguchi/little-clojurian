@@ -653,6 +653,12 @@
   [f v [x & xs' :as xs]]
   (if-not (seq xs)
     v
+    (f v (my-foldl f x xs'))))
+
+#_(defn my-foldl
+  [f v [x & xs' :as xs]]
+  (if-not (seq xs)
+    v
     (my-foldl f (f v x) xs')))
 
 ;; Q057-02: ビットのリストで表現される二進表記を整数に変換する関数 bits->int を書け。
