@@ -662,18 +662,19 @@
     (my-foldl f (f v x) xs')))
 
 ;; Q057-02: ビットのリストで表現される二進表記を整数に変換する関数 bits->int を書け。
-;;    ・ iterateを用いること
-;;    ・ 二進表記は逆順であること
+;;          ・ iterateを用いること
+;;          ・ 二進表記は逆順であること
+;;
 ;; type Bit = Int
 ;; bit2int :: [Bit] -> Int
 ;; bit2int bits = sum [b * w | (b, w) <- zip bits weights]
 ;;                 where
 ;;                   weights = iterate (*2) 1
 (defn bits->int
-  [bs]
-  (reduce + (map #(* %1 %2)
-                 bs
-                 (iterate #(* 2 %) 1))))
+    [bs]
+    (reduce + (map #(* %1 %2)
+                   bs
+                   (iterate #(* 2 %) 1))))
 
 ;; Q057-03: core.async
 ;; https://github.com/clojure/core.async/blob/master/examples/walkthrough.clj
