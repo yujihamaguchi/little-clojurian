@@ -679,11 +679,11 @@
 ;; Q057-03: core.async
 ;; https://github.com/clojure/core.async/blob/master/examples/walkthrough.clj
 
-;; Q058: 負でない整数を二進表記へ変換する関数 int->bits を書け。( 0 は正の整数ではない)
+;; Q058: 負でない整数を二進表記へ変換する関数 int->bits を書け。( 0 は正の整数ではない )
 (defn int->bits
-  [n]
-  (when (>= n 1)
-    (cons (mod n 2) (int->bits (quot n 2)))))
+    [n]
+    (when (>= n 1)
+      (cons (mod n 2) (int->bits (quot n 2)))))
 
 ;; Q059: 二進表記が必ず 8 ビットになるように切り詰めたり適切な数の 0 を詰め込んだりする関数 make8 を書け。
 (defn make8
