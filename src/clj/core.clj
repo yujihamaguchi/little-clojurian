@@ -695,7 +695,14 @@
   [bs]
   (if-not (seq bs)
     []
-    (lazy-seq (cons (make8 (take 8 bs)) (chop8 (drop 8 bs))))))
+    (cons (make8 (take 8 bs))
+          (chop8 (drop 8 bs)))))
+
+#_(defn chop8
+    [bs]
+    (if-not (seq bs)
+      []
+      (lazy-seq (cons (make8 (take 8 bs)) (chop8 (drop 8 bs))))))
 
 ;; Q061: ビットのリストを文字列に復号する関数 decode を書け。
 ;;       リストを分割し、二進表記を Unicode のコードポイント（整数）へ変換し、文字へ直して、全体として文字列にする。
