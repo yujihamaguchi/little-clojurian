@@ -733,7 +733,7 @@
 ;;       all (==1) []            = True
 (defn my-all
   [p [x & xs' :as xs]]
-  (or (empty? xs)
+  (or (not (seq xs))
       (and (p x)
            (my-all p xs'))))
 
