@@ -514,9 +514,9 @@
 
 (deftest any-test
   (testing
-      (is (=  true (my-any odd? [1 3 5])))
-    (is (=  false (my-any odd? [2 4 6])))
-    (is (=  false (my-any odd? [])))))
+      (is (my-any odd? [1 3 5]))
+    (is (not (my-any odd? [2 4 6])))
+    (is (not (my-any odd? [])))))
 
 (deftest my-filter-recur-test
   (testing
@@ -610,9 +610,9 @@
 
 (deftest my-any-test
   (testing
-      (is (= (my-any #(= 1 %) [5,4,3,2,1]) true))
-    (is (= (my-any #(= 1 %) [1,1,1]) true))
-    (is (= (my-any #(= 1 %) []) false))
+      (is (my-any #(= 1 %) [5,4,3,2,1]))
+    (is (my-any #(= 1 %) [1,1,1]))
+    (is (not (my-any #(= 1 %) [])))
     )
   )
 

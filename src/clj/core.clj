@@ -732,10 +732,10 @@
 ;;       all (==1) [1,1,1]       = True
 ;;       all (==1) []            = True
 (defn my-all
-  [p [x & xs' :as xs]]
+  [p xs]
   (or (not (seq xs))
-      (and (p x)
-           (my-all p xs'))))
+      (and (p (first xs))
+           (my-all p (rest xs)))))
 
 ;; Q064: 関数 any を自作せよ。( my-any )
 ;;       any :: (a -> Bool) -> [a] -> Bool
@@ -746,10 +746,10 @@
 ;;       any (== 1) [5, 4, 1, 2, 3]   = True
 ;;       any (== 1) [5, 4, 3, 2]      = False
 (defn my-any
-  [p [x & xs' :as xs]]
-  (and (not (empty? xs))
-       (or (p x)
-           (my-any p xs'))))
+  [p xs]
+  (and (seq xs)
+       (or (p (first xs))
+           (my-any p (rest xs)))))
 
 ;; Q065: 暗号化された文字列は手に入れたが、シフト数は分からないとしよう。
 ;;       暗号文を解読するためにシフト数を推測したい。
