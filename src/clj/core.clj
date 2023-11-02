@@ -827,9 +827,8 @@
 ;;       （パラメータとして、 java.io.File オブジェクトが渡される想定）
 (defn recently-modified?
   [f]
-  (>= (* 1000 60 30)
-      (- (System/currentTimeMillis)
-         (.lastModified f))))
+  (>= (.lastModified f)
+      (- (System/currentTimeMillis) (* 30 60 1000))))
 
 ;; #{集合}
 (def compositions #{{:name "The Art of the Fugue", :composer "J. S. Bach"}
