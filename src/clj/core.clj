@@ -856,7 +856,7 @@
 ;; Q069: compositions を　:name で射影せよ。（ set3 関数の戻り値として）
 (defn set3
   []
-  (project  compositions [:name]))
+  (project compositions [:name]))
 
 ;; Q070: compositions と composers を自然結合せよ。（ set4 関数の戻り値として）
 (defn set4
