@@ -298,27 +298,27 @@
 ;; Q032: ピタゴラス数のリストを生成する関数 pyths をリスト内包表記を使って定義せよ。
 ;;       ただし、ピタゴラス数の要素は与えられた上限 n 以下であるとする。
 (defn pyths
-    [n]
-    (letfn [(pyth? [a b c]
-              (= (+ (Math/pow a 2) (Math/pow b 2))
-                 (Math/pow c 2)))]
-      (let [ns (range 1 (inc n))]
-        (for [a ns
-              b ns
-              c ns
-              :when (and (< a b)
-                         (pyth? a b c))]
-          [a b c]))))
+  [n]
+  (letfn [(pyth? [a b c]
+            (= (+ (Math/pow a 2) (Math/pow b 2))
+               (Math/pow c 2)))]
+    (let [ns (range 1 (inc n))]
+      (for [a ns
+            b ns
+            c ns
+            :when (and (< a b)
+                       (pyth? a b c))]
+        [a b c]))))
 
 ;; Q033: ある要素のみからなるリストを生成する関数 my-replicate を書け。(直接の再帰、末尾再帰のそれぞれを書け)
 ;;    ex) >replicate 3 True
 ;;        [True, True, True]
 ;; 直接の再帰
 #_(defn my-replicate
-  [n x]
-  (if (zero? n)
-    []
-    (cons x (my-replicate (dec n) x))))
+    [n x]
+    (if (zero? n)
+      []
+      (cons x (my-replicate (dec n) x))))
 ;; 末尾再帰
 (defn my-replicate
   [n x]
@@ -376,10 +376,10 @@
 ;; Q039: Haskell の zip 関数を直接の再帰を用いて自作( my-zip2 )せよ。
 ;;       [a] -> [b] -> [(a,b)]
 (defn my-zip2
-    [xs ys]
-    (when (and (seq xs) (seq ys))
-      (cons [(first xs) (first ys)]
-            (my-zip2 (rest xs) (rest ys)))))
+  [xs ys]
+  (when (and (seq xs) (seq ys))
+    (cons [(first xs) (first ys)]
+          (my-zip2 (rest xs) (rest ys)))))
 
 ;; Q040: Step.1 even と odd を相互再帰を用いて自作( my-even?, my-odd? )せよ。
 ;;       Step.2 declare を自作( my-declare )してそれを用いること。 if を使わないこと。
@@ -441,11 +441,11 @@
 ;;
 ;; 再帰版
 (defn my-init
-    [xs]
-    (if-not (seq (next xs))
-      []
-      (cons (first xs)
-            (my-init (rest xs)))))
+  [xs]
+  (if-not (seq (next xs))
+    []
+    (cons (first xs)
+          (my-init (rest xs)))))
 ;; ;; 遅延評価関数版
 ;; #_(defn my-init
 ;;     [xs]
@@ -530,11 +530,11 @@
 ;;       直接の再帰を用いたパターンと recur を用いたパターンを書け
 ;; 直接の再帰を用いたパターン
 #_(defn my-map-recur
-  [f xs]
-  (if-not (seq xs)
-    []
-    (cons (f (first xs))
-          (my-map-recur f (rest xs)))))
+    [f xs]
+    (if-not (seq xs)
+      []
+      (cons (f (first xs))
+            (my-map-recur f (rest xs)))))
 
 ;; recurを用いたパターン
 (defn my-map-recur
@@ -656,10 +656,10 @@
     (f v (my-foldl f x xs'))))
 
 #_(defn my-foldl
-  [f v [x & xs' :as xs]]
-  (if-not (seq xs)
-    v
-    (my-foldl f (f v x) xs')))
+    [f v [x & xs' :as xs]]
+    (if-not (seq xs)
+      v
+      (my-foldl f (f v x) xs')))
 
 ;; Q057-02: ビットのリストで表現される二進表記を整数に変換する関数 bits->int を書け。
 ;;          ・ iterateを用いること
@@ -671,19 +671,19 @@
 ;;                 where
 ;;                   weights = iterate (*2) 1
 (defn bits->int
-    [bs]
-    (reduce + (map #(* %1 %2)
-                   bs
-                   (iterate #(* 2 %) 1))))
+  [bs]
+  (reduce + (map #(* %1 %2)
+                 bs
+                 (iterate #(* 2 %) 1))))
 
 ;; Q057-03: core.async
 ;; https://github.com/clojure/core.async/blob/master/examples/walkthrough.clj
 
 ;; Q058: 負でない整数を二進表記へ変換する関数 int->bits を書け。( 0 は正の整数ではない )
 (defn int->bits
-    [n]
-    (when (>= n 1)
-      (cons (mod n 2) (int->bits (quot n 2)))))
+  [n]
+  (when (>= n 1)
+    (cons (mod n 2) (int->bits (quot n 2)))))
 
 ;; Q059: 二進表記が必ず 8 ビットになるように切り詰めたり適切な数の 0 を詰め込んだりする関数 make8 を書け。
 (defn make8
