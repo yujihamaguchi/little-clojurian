@@ -899,10 +899,10 @@
 ;;     変換前： [:h :t :t :h :h :h]
 ;;     変換後： ((:h :t) (:t :t) (:t :h) (:h :h) (:h :h))
 (defn by-pairs
-  [coll]
-  (if-not (next coll)
+  [rs]
+  (if-not (next (seq rs))
     []
-    (lazy-seq (cons (take 2 coll) (by-pairs (rest coll))))))
+    (lazy-seq (cons (take 2 rs) (by-pairs (rest rs))))))
 
 ;; Q075-1: 関数の返り値として、非ゼロ値の順番を保ったまま、 ゼロ値を末尾に移動しする関数 move-zeros-2-back を書け
 ;;  　　  　[0,1,2,3] -> [1,2,3,0]
