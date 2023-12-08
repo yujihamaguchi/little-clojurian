@@ -13,10 +13,26 @@
       (is (= [1,2,3,0] (move-zeros-2-back [0,1,2,3])))
     (is (= [4,1,5,0,0] (move-zeros-2-back [4,1,0,0,5])))))
 
+(deftest overlap?-test
+  (testing
+      (is (not (overlap? [1 2] [3 4])))
+    (is (overlap? [1 2] [2 3]))
+    (is (overlap? [1 2] [1 2]))
+    (is (overlap? [2 3] [1 2]))
+    (is (not (overlap? [1 2] [3 4])))
+    (is (not (overlap? [3 4] [1 2])))))
+
 (deftest merge-intervals-test
   (testing
-      (is (= [[1,4]] (merge-intervals [[1,2],[2,3],[3,4]])))
-    (is (= [[1,3],[4,5]] (merge-intervals [[1,3],[1,3],[4,5]])))
+      (is (= [[1 2] [3 4]] (merge-intervals [[1 2] [3 4]])))
+    (is (= [[1 3]] (merge-intervals [[1 2] [2 3]])))
+    (is (= [[1 2] [3 4]] (merge-intervals [[3 4] [1 2]])))
+    (is (= [[1 3]] (merge-intervals [[2 3] [1 2] ])))
+    (is (= [[1 2] [3 4] [5 6]] (merge-intervals [[1 2] [3 4] [5 6]])))
+    (is (= [[1 3] [4 5]] (merge-intervals [[1 2] [2 3] [4 5]])))
+    (is (= [[1 4]] (merge-intervals [[1 2] [2 3] [3 4]])))
+    (is (= [[1 2] [3 5]] (merge-intervals [[1 2] [3 4] [4 5]])))
+    (is (= [[1,3],[4,5]] (merge-intervals [[1,3],[4,5],[1,3]])))
     (is (= [[0,3],[4,5]] (merge-intervals [[1,3],[0,3],[4,5]])))
     (is (= [[1,6]] (merge-intervals [[1,6],[2,5],[3,4]])))
     (is (= [[1,3],[4,6],[7,9]] (merge-intervals [[1,3],[4,6],[7,9]])))))

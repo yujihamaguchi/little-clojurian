@@ -922,7 +922,7 @@
        (keep (fn [[k v]] (if (= 1 v) k)))
        first))
 
-;; Q075-3: 間隔が重複しないように間隔同士を組み合わせる関数 merge-intervals を書け
+;; Q075-3: 間隔が重複しないように間隔同士を組み合わせる関数 merge-intervals を書け。先立って overlap? 述語を書くと便利である。
 ;;         [[1,2],[2,3],[3,4]] -> [[1,4]]
 ;;         [[1,3],[1,3],[4,5]] -> [[1,3],[4,5]]
 ;;         [[1,3],[0,3],[4,5]] -> [[0,3],[4,5]]
@@ -934,15 +934,16 @@
        (<= s1 e2)))
 
 (defn merge-interval
-  [is [s2 e2 :as i2]]
-  (let [[s1 e1 :as i1] (last is)]
-    (if (overlap? i1 i2)
-      (conj (vec (drop-last is)) [(min s1 s2) (max e1 e2)])
-      (conj is i2))))
+  [intervals [s1 e1 :as interval]]
+  (let [[s2 e2 :as tail-interval] (last intervals)]
+    (if (overlap? tail-interval interval)
+      (conj (vec (drop-last intervals)) [(min s1 s2) (max e1 e2)])
+      (conj intervals interval))))
 
 (defn merge-intervals
-  [is]
-  (reduce merge-interval [(first is)] (rest is)))
+  [intervals]
+  (let [intervals (sort (fn [[_ e1] [_ e2]] (<= e1 e2)) intervals)]
+    (reduce merge-interval [(first intervals)] (rest intervals))))
 
 ;; Q076: ホフスタッタの男女シーケンスを書け。( f, m )
 ;;
