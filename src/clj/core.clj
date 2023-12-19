@@ -1050,8 +1050,8 @@
 ;;
 (defn make-greeter
   [greeting-prefix]
-  (fn [username]
-    (format "%s, %s" greeting-prefix username)))
+  #(format "%s, %s" greeting-prefix %))
+
 
 ;; Q079: n 番目のフィボナッチ数を返す、 recur で明示的な再帰を行う関数 recur-fibo を書け。
 ;;
