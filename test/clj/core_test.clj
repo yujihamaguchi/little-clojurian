@@ -796,6 +796,7 @@
 (deftest ut-clojure-loc
   (is (= 4 (clojure-loc (clojure.java.io/file (clojure.java.io/resource "clojure-loc")))))
   (is (= 2 (clojure-loc (clojure.java.io/file (clojure.java.io/resource "clojure-loc/baz.clj")))))
+  (is (= 2 (clojure-loc (clojure.java.io/file (clojure.java.io/resource "clojure-loc/bar/bar.clj")))))  
   (is (= 0 (clojure-loc (clojure.java.io/file (clojure.java.io/resource "clojure-loc/foo.txt"))))))
 
 (deftest index-filter-test

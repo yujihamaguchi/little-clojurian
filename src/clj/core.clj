@@ -1092,17 +1092,29 @@
 ;;
 ;; using slurp
 (defn clojure-loc
-  [f]
-  (->> f
-       file-seq
-       (filter (fn [f]
-                 (and (.isFile f)
-                      (re-seq #"\.clj" (.getName f)))))
-       (map #(->> %
-                  slurp
-                  (re-seq #"\S")
-                  count))
-       (reduce +)))
+  [path]
+  (->> (file-seq path)
+       (filter #(re-seq #"\.clj$" (.getName %)))
+       (map (fn [file](->> (slurp file)
+                           clojure.string/split-lines
+                           (filter #(not (empty? %)))
+                           count)))
+       (apply +)))
+
+;; old version
+#_(defn clojure-loc
+    [f]
+    (->> f
+         file-seq
+         (filter (fn [f]
+                   (and (.isFile f)
+                        (re-seq #"\.clj" (.getName f)))))
+         (map #(->> %
+                    slurp
+                    (re-seq #"\S")
+                    count))
+         (reduce +)))
+
 
 ;; using reader
 #_(defn clojure-loc
