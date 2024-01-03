@@ -1095,41 +1095,23 @@
   [path]
   (->> (file-seq path)
        (filter #(re-seq #"\.clj$" (.getName %)))
-       (map (fn [file](->> (slurp file)
-                           clojure.string/split-lines
-                           (filter #(not (empty? %)))
-                           count)))
-       (apply +)))
-
-;; old version
-#_(defn clojure-loc
-    [f]
-    (->> f
-         file-seq
-         (filter (fn [f]
-                   (and (.isFile f)
-                        (re-seq #"\.clj" (.getName f)))))
-         (map #(->> %
-                    slurp
-                    (re-seq #"\S")
-                    count))
-         (reduce +)))
-
+       (map #(->> (slurp %)
+                  clojure.string/split-lines
+                  (filter (complement empty?))
+                  count))
+       (reduce +)))
 
 ;; using reader
 #_(defn clojure-loc
-    [f]
-    (->> f
-         file-seq
-         (filter (fn [f]
-                   (and (.isFile f)
-                        (re-seq #"\.clj" (.getName f)))))
-         (map #(with-open [r (clojure.java.io/reader %)]
-                 (->> r
-                      line-seq
-                      (filter (complement empty?))
-                      count)))
-         (reduce +)))
+  [path]
+  (->> (file-seq path)
+       (filter #(re-seq #"\.clj$" (.getName %)))
+       (map #(with-open [rdr (clojure.java.io/reader %)]
+               (->> (line-seq rdr)
+                    (filter (complement empty?))
+                    count)))
+       (reduce +)))
+
 
 ;; Q082: 文字列中の文字で、探すべき文字のセットにマッチする文字のインデックスを得る関数 index-filter を書け。
 ;;       
