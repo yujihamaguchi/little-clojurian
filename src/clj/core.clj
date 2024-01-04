@@ -1122,6 +1122,12 @@
 ;;         ;;= ()
 ;;
 (defn index-filter
+  [cs s]
+  (->> (zipmap (range) s)
+       (keep (fn [[k v]] (if (cs v) k)))))
+
+
+#_(defn index-filter
   [s cs]
   (->> (map vector cs (range))
        (keep (fn [[k v]] (if (s k) v)))))
