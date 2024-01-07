@@ -1126,7 +1126,6 @@
   (->> (zipmap (range) s)
        (keep (fn [[k v]] (if (cs v) k)))))
 
-
 #_(defn index-filter
   [s cs]
   (->> (map vector cs (range))
@@ -1146,12 +1145,20 @@
 ;;   </composition>
 ;; </compositions>
 ;;
-(require '[clojure.xml :as xml])
+(require 'clojure.xml)
+;; xml-seq を用いない場合
 (defn get-composer
-  [f]
-  (->> (xml/parse f)
+  [path]
+  (->> (clojure.xml/parse path)
        :content
        (map (comp :composer :attrs))))
+
+;; xml-seq を用いる場合
+#_(defn get-composer
+  [path]
+  (->> (clojure.xml/parse path)
+       xml-seq
+       (keep (comp :composer :attrs))))
 
 ;; Q083-2: 相互再帰を使って、 my-odd2? および my-even2? を定義せよ。
 (declare my-even2?)
