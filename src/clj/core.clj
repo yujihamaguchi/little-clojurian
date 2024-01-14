@@ -1155,10 +1155,10 @@
 
 ;; xml-seq を用いる場合
 #_(defn get-composer
-  [path]
-  (->> (clojure.xml/parse path)
-       xml-seq
-       (keep (comp :composer :attrs))))
+    [path]
+    (->> (clojure.xml/parse path)
+         xml-seq
+         (keep (comp :composer :attrs))))
 
 ;; Q083-2: 相互再帰を使って、 my-odd2? および my-even2? を定義せよ。
 (declare my-even2?)
