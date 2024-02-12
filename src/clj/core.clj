@@ -1160,7 +1160,7 @@
          xml-seq
          (keep (comp :composer :attrs))))
 
-;; Q083-2: 相互再帰を使って、 my-odd2? および my-even2? を定義せよ。
+;; Q083-2: 相互再帰を使って、 my-odd2? および my-even2? を定義せよ。(引数 n は自然数とする)
 (declare my-even2?)
 (defn my-odd2?
   [n]
