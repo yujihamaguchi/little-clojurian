@@ -1176,7 +1176,6 @@
 ;; Q083-3: マクロ and、 or を my-and、 my-or として自作せよ。
 (defmacro my-and
   ([] true)
-  ([b] b)
   ([b & bs]
    `(if-not ~b
       false
@@ -1184,7 +1183,6 @@
 
 (defmacro my-or
   ([] false)
-  ([b] b)
   ([b & bs]
    `(if ~b
       true
