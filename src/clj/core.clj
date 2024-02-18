@@ -1206,10 +1206,12 @@
 ;;        (my-or ~@(rest bs)))))
 
 ;; Q084: 任意のディレクトリ以下のファイル、ディレクトリ名をシーケンスとして取得する関数list-filesを書け。
-;; A
 (defn list-files
   [d]
-  (map #(.getName %) (.listFiles (java.io.File. d))))
+  (->> d
+       java.io.File.
+       .listFiles
+       (map #(.getName %))))
 
 ;; Q084-2: Clojureの .. マクロを真似するchainマクロを書け。
 ;;
