@@ -1235,22 +1235,47 @@
 ;; A
 ;; user=> (tail-fibo 1000000)
 ;; StackOverflowError   java.math.BigInteger.add (:-1)
-;; *末尾再帰で書いたにも関わらず、大きなnを与えるとやはり落ちてしまう。
-;;  Haskellのような関数型言語は簡単にTCOを行えるのだが、JVMは関数型言語向けには設計されていないので、
-;;  JVM上で直接走る言語で、自動的にTCOを行える言語は存在しない。TCOが無いことは残念なことではあるが、
-;;  そのせいで関数型プログラミングが全くできなくなってしまうというわけではない。
-;;  Clojureは以下のいくつかの現実的な代替方法を用意している。
-;; - recurを使った明示的な自己再帰
-;; - 遅延シーケンス
-;; - trampolineを使った明示的な相互再帰
+;; * 末尾再帰で書いたにも関わらず、大きな n を与えるとやはり落ちてしまう。
+;;   Haskell のような関数型言語は簡単に TCO を行えるのだが、 JVM は関数型言語向けには設計されていないので、
+;;   JVM 上で直接走る言語で、自動的に TCO を行える言語は存在しない。 TCO が無いことは残念なことではあるが、
+;;   そのせいで関数型プログラミングが全くできなくなってしまうというわけではない。
+;;   Clojure は以下のいくつかの現実的な代替方法を用意している。
+;;   - recurを使った明示的な自己再帰
+;;   - 遅延シーケンス
+;;   - trampolineを使った明示的な相互再帰
+;; 普通に書いた末尾再帰
+#_(defn tail-fibo
+  [n]
+  (letfn [(tail-fibo'
+            [n' m l]
+            (if (= n n')
+              m
+              (tail-fibo' (inc n') l (+' m l))))]
+    (tail-fibo' 0 0 1)))
+;; recur を用いた明示的な自己再帰
+#_(defn tail-fibo
+  [n]
+  (letfn [(tail-fibo'
+            [n' m l]
+            (if (= n n')
+              m
+              (recur (inc n') l (+' m l))))]
+    (tail-fibo' 0 0 1)))
+;; 遅延シーケンス
 (defn tail-fibo
-  [i]
-  (letfn [(tail-fibo-
-            [i n m]
-            (if (zero? i)
-              n
-              (recur (dec i) m (+ n m))))]
-    (tail-fibo- i 0 1)))
+  [n]
+  (letfn [(tail-fibo'
+            [m l]
+            (lazy-seq
+             (cons m
+                   (tail-fibo' l
+                               (+' m l)))))]
+    (nth (tail-fibo' 0 1) n)))
+;; trampoline を使った明示的な相互再帰
+;; todo
+
+#_(tail-fibo 1000000)
+
 
 ;; 2022/09/04
 ;; (defn tail-fibo
