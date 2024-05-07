@@ -1295,10 +1295,10 @@
 ;; refer: https://gist.github.com/thash/5844523)
 ;;
 (defmacro my-with-out-str
-  [& exprs]
-  `(binding [*out* (java.io.StringWriter.)]
-     ~@exprs
-     (str *out*)))
+    [& exprs]
+    `(binding [*out* (java.io.StringWriter.)]
+       ~@exprs
+       (str *out*)))
 
 ;; Q087: 任意のファイルの空行を除いた行数を表示する関数count-not-empty-lineを書け。
 ;; ex) (= (count-not-empty-line (java.io.File. "./resources/ut-count-not-empty-line/01.txt")) 3)
