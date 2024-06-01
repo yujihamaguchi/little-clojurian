@@ -1316,7 +1316,7 @@
        (re-seq #"\w")
        (count)))
 
-;; Q088: 以下の動作をする関数count-runsをpartitionを用いて書け。
+;; Q088: 以下の動作をする関数 count-runs を partition を用いて書け。
 ;;
 ;; (count-runs 2 #(= :h %) [:h :t :t :h :h :h])
 ;; ;;= 2
