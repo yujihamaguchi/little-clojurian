@@ -1316,7 +1316,7 @@
        (re-seq #"\w")
        (count)))
 
-;; Q088: 以下の動作をする関数 count-runs を partition を用いて書け。
+;; Q088: 以下の動作をする関数 count-runs を partition を用いて書け。( 最初は素朴に書いて、その後 comp partial を用いてコードを簡潔にしてみる )
 ;;
 ;; (count-runs 2 #(= :h %) [:h :t :t :h :h :h])
 ;; ;;= 2
@@ -1326,9 +1326,10 @@
 ;; ;;= 1
 (def count-if (comp count filter))
 (defn count-runs
-  [n p coll]
-  (count-if (partial every? p) (partition n 1 coll)))
-;; 2022/09/11
+  [n p xs]
+  (count-if (partial every? p)
+            (partition n 1 xs)))
+;; 素朴
 ;; (defn count-runs
 ;;   [n p xs]
 ;;   (->> (partition n 1 xs)
