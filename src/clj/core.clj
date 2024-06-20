@@ -1336,7 +1336,7 @@
 ;;        (filter #(every? p %))
 ;;        count))
 
-;; Q089: シーケンスライブラリの関数であるiterateを用いてフィボナッチ数列を生成する関数fiboを書け。
+;; Q089: シーケンスライブラリの関数である iterateを 用いてフィボナッチ数列を生成する関数fiboを書け。
 ;; この関数は以下のように大きな値に対しても動作する。
 ;; (take 10 (fibo))
 ;; ;;= (0 1 1 2 3 5 8 13 21 34)
@@ -1345,13 +1345,6 @@
 (defn fibo
   []
   (map first (iterate (fn [[n m]] [m (+' n m)]) [0 1])))
-;; 2022/09/18
-#_(defn fibo
-    []
-    (letfn [(fibo' [[n m]]
-              [m (+ n m)])]
-      (->> (iterate fibo' [0 1])
-           (map first))))
 
 ;; Q090: n番目のフィボナッチ数を返す、単純な再帰を使ったstack-consuming-fibo関数を書け。
 ;; (stack-consuming-fibo 9)
