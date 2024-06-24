@@ -1346,7 +1346,7 @@
   []
   (map first (iterate (fn [[n m]] [m (+' n m)]) [0 1])))
 
-;; Q090: n番目のフィボナッチ数を返す、単純な再帰を使ったstack-consuming-fibo関数を書け。
+;; Q090: n 番目のフィボナッチ数を返す、単純な再帰を使った stack-consuming-fibo 関数を書け。
 ;; (stack-consuming-fibo 9)
 ;; ;;= 34
 ;; (stack-consuming-fibo 1000000N)
