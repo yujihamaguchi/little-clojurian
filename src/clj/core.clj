@@ -1376,7 +1376,7 @@
     [s]
     (not (re-find #"[^\s　]" s)))
 
-;; Q092: timeマクロの変種で、何回もの実行結果を後で集めやすいようにしたbenchというマクロを書け。
+;; Q092: time マクロの変種で、何回もの実行結果を後で集めやすいようにした bench というマクロを書け( 測定には nanoTime を用いること )。
 ;; (bench (str "a" "b"))
 ;; => {:result "ab", :elapsed 53026}
 (defmacro bench

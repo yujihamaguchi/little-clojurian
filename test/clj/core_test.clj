@@ -911,8 +911,10 @@
   )
 
 (deftest bench-test
-                                        ; (is (= (bench (str "a" "b")) {:result "ab", :elapsed 53026}))
-  )
+  (is (= "ab" (:result (bench (do (Thread/sleep 1)
+                                  "ab")))))
+  (is (= 1 (quot (:elapsed (bench (Thread/sleep 1)))
+                 1000000))))
 
 (deftest p22-test
   (is (=  5 (p22 '(1 2 3 3 1))))
