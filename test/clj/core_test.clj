@@ -339,7 +339,12 @@
 
 (deftest my-reverse-test
   (testing
-      (is (=  [3 2 1] (my-reverse [1 2 3])))
+      (is (= [] (my-reverse [])))
+    (is (= [1] (my-reverse [1])))
+    (is (= [2 1] (my-reverse [1 2])))
+    (is (=  [1 2 3] (my-reverse [3 2 1])))
+    (is (=  [3 2 1] (my-reverse [1 2 3])))
+
     )
   )
 
