@@ -499,7 +499,8 @@
   )
 
 (deftest my-test
-  (testing (is (=  8 (my 2 3)))
+  (testing
+      (is (=  8 (my 2 3)))
     (is (=  1 (my 1 3)))
     (is (=  1 (my 0 0)))))
 
@@ -565,7 +566,7 @@
       (is (= 10 (my-foldl + 0 [1 2 3 4])))
     (is (= "Qabcd" (apply str (my-foldl concat "Q" ["a" "b" "c" "d"]))))))
 
-(deftest bit2int-test
+(deftest bit->int-test
   (testing
       (is (==  0 (bits->int [0])))
     (is (==  1 (bits->int [1])))
