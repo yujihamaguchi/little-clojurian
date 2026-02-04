@@ -862,7 +862,7 @@
   []
   (join compositions composers))
 
-;; Q071: composers と nations を :country と :nation で結合せよ。（ set5 関数の戻り値として）
+;; Q072: composers と nations を :country と :nation で結合せよ。（ set5 関数の戻り値として）
 (defn set5
   []
   (join composers nations {:country :nation}))
@@ -903,96 +903,7 @@
     []
     (lazy-seq (cons (take 2 rs) (by-pairs (rest rs))))))
 
-;; Q075-1: 関数の返り値として、非ゼロ値の順番を保ったまま、 ゼロ値を末尾に移動しする関数 move-zeros-2-back を書け
-;;  　　  　[0,1,2,3] -> [1,2,3,0]
-;;         [4,1,0,0,5] -> [4,1,5,0,0]
-(defn move-zeros-2-back
-  [ns]
-  (concat (filter (complement zero?) ns)
-          (filter zero? ns)))
-
-;; Q075-2: 空配列ではなく、さらに1つの要素を除いて同じ要素が必ず2度現れるリストの中で1度しか現れない唯一の要素を返す関数 unique-attribute を書け
-;;         [1,2,2] -> 1
-;;         [1,2,2,3,1] -> 3
-;;         [1] -> 1
-(defn unique-attribute
-  [xs]
-  (->> (frequencies xs)
-       (keep (fn [[k v]] (if (= 1 v) k)))
-       first))
-
-;; Q075-3: 間隔が重複しないように間隔同士を組み合わせる関数 merge-intervals を書け。先立って overlap? 述語を書くと便利である。
-;;         [[1,2],[2,3],[3,4]] -> [[1,4]]
-;;         [[1,3],[1,3],[4,5]] -> [[1,3],[4,5]]
-;;         [[1,3],[0,3],[4,5]] -> [[0,3],[4,5]]
-;;         [[1,6],[2,5],[3,4]] -> [[1,6]]
-;;         [[1,3],[4,6],[7,9]] -> [[1,3],[4,6],[7,9]]
-(defn overlap?
-  [[s1 e1] [s2 e2]]
-  (and (>= e1 s2)
-       (<= s1 e2)))
-
-(defn merge-interval
-  [intervals [s1 e1 :as interval]]
-  (let [[s2 e2 :as tail-interval] (last intervals)]
-    (if (overlap? tail-interval interval)
-      (conj (vec (drop-last intervals)) [(min s1 s2) (max e1 e2)])
-      (conj intervals interval))))
-
-(defn merge-intervals
-  [intervals]
-  (let [intervals (sort (fn [[_ e1] [_ e2]] (<= e1 e2)) intervals)]
-    (reduce merge-interval [(first intervals)] (rest intervals))))
-
-;; Q076: ホフスタッタの男女シーケンスを書け。( f, m )
-;;
-;; F(0) = 1;; M(0) = 0
-;; F(n) = n - M(F(n-1)), n>0
-;; M(n) = n - F(M(n-1)), n>0
-;;
-;; 式の処理時間を計測するマクロを書き（ elapsed-time )、 f, m について n=150 の値を取得するための時間を計測せよ。
-;;
-;; その後、メモ化を行い性能が改善されたことを確認せよ。
-;;　
-;;   memoize:
-;;     シーケンス中の1つの値を計算するために、2つの値を最初から計算せねばならず、そのそれぞれについてまた2つずつの値を最初から計算することになる。
-;;     メモ化された関数を呼ぶと、それはまず与えられた引数を、過去に計算した入力と出力のマップと比べる。もし引数が過去に与えられていたものであれば、
-;;     再び計算をしなくても、直ちに結果を返すことが出来る。
-;;
-;; また、メモ化はキャッシュが既に作られていれば再帰を途中で止めることができるけれど、
-;; キャッシュが空の状態で大きな数に対する m や f を計算しようとすると、
-;; キャッシュが作られる前にスタックが溢れてしまう。
-;; それを防ぐ為に、関数ではなくシーケンスを見せることでキャッシュが頭から作られるのを保証し、以下を満たす性能を獲得すること。
-;;
-;;   (> 100 (elapsed-time (nth f-seq 250)))
-;;   (> 100 (elapsed-time (nth m-seq 250)))
-(declare f m)
-
-(defn f
-  [n]
-  (if (zero? n)
-    1
-    (- n (m (f (dec n))))))
-
-(defn m
-  [n]
-  (if (zero? n)
-    0
-    (- n (f (m (dec n))))))
-
-(defmacro elapsed-time
-  [expr]
-  `(let [start# (System/currentTimeMillis)]
-     ~expr
-     (- (System/currentTimeMillis) start#)))
-
-(def f (memoize f))
-(def m (memoize m))
-
-(def f-seq (map f (range)))
-(def m-seq (map m (range)))
-
-;; Q077-01: s-list （シンボルとシンボルのリスト両方を要素に出来るリスト）、 oldsym、 newsym を引数に取り
+;; Q076: s-list （シンボルとシンボルのリスト両方を要素に出来るリスト）、 oldsym、 newsym を引数に取り
 ;;          s-list の中の oldsym をすべて newsym に置き換える関数 replace-symbol を
 ;;          シンボル（と見られる要素）の置換を行う replace-symbol-expression 関数との相互再帰で書け。
 ;;          マルチメソッドを用いたパターンも書け。
@@ -1335,7 +1246,7 @@
 ;;        (filter #(every? p %))
 ;;        count))
 
-;; Q089: シーケンスライブラリの関数である iterateを 用いてフィボナッチ数列を生成する関数fiboを書け。
+;; Q089: シーケンスライブラリの関数である iterate を 用いてフィボナッチ数列を生成する関数fiboを書け。
 ;; この関数は以下のように大きな値に対しても動作する。
 ;; (take 10 (fibo))
 ;; ;;= (0 1 1 2 3 5 8 13 21 34)
@@ -2768,4 +2679,93 @@
   (close! c))
 
 #_(require '[clojure.core.async :as async :refer :all])
+
+;; Q201: 関数の返り値として、非ゼロ値の順番を保ったまま、 ゼロ値を末尾に移動しする関数 move-zeros-2-back を書け
+;;  　　  　[0,1,2,3] -> [1,2,3,0]
+;;         [4,1,0,0,5] -> [4,1,5,0,0]
+(defn move-zeros-2-back
+  [ns]
+  (concat (filter (complement zero?) ns)
+          (filter zero? ns)))
+
+;; Q202: 空配列ではなく、さらに1つの要素を除いて同じ要素が必ず2度現れるリストの中で1度しか現れない唯一の要素を返す関数 unique-attribute を書け
+;;         [1,2,2] -> 1
+;;         [1,2,2,3,1] -> 3
+;;         [1] -> 1
+(defn unique-attribute
+  [xs]
+  (->> (frequencies xs)
+       (keep (fn [[k v]] (if (= 1 v) k)))
+       first))
+
+;; Q203: 間隔が重複しないように間隔同士を組み合わせる関数 merge-intervals を書け。先立って overlap? 述語を書くと便利である。
+;;         [[1,2],[2,3],[3,4]] -> [[1,4]]
+;;         [[1,3],[1,3],[4,5]] -> [[1,3],[4,5]]
+;;         [[1,3],[0,3],[4,5]] -> [[0,3],[4,5]]
+;;         [[1,6],[2,5],[3,4]] -> [[1,6]]
+;;         [[1,3],[4,6],[7,9]] -> [[1,3],[4,6],[7,9]]
+(defn overlap?
+  [[s1 e1] [s2 e2]]
+  (and (>= e1 s2)
+       (<= s1 e2)))
+
+(defn merge-interval
+  [intervals [s1 e1 :as interval]]
+  (let [[s2 e2 :as tail-interval] (last intervals)]
+    (if (overlap? tail-interval interval)
+      (conj (vec (drop-last intervals)) [(min s1 s2) (max e1 e2)])
+      (conj intervals interval))))
+
+(defn merge-intervals
+  [intervals]
+  (let [intervals (sort (fn [[_ e1] [_ e2]] (<= e1 e2)) intervals)]
+    (reduce merge-interval [(first intervals)] (rest intervals))))
+
+;; Q204: ホフスタッタの男女シーケンスを書け。( f, m )
+;;
+;; F(0) = 1;; M(0) = 0
+;; F(n) = n - M(F(n-1)), n>0
+;; M(n) = n - F(M(n-1)), n>0
+;;
+;; 式の処理時間を計測するマクロを書き（ elapsed-time )、 f, m について n=150 の値を取得するための時間を計測せよ。
+;;
+;; その後、メモ化を行い性能が改善されたことを確認せよ。
+;;　
+;;   memoize:
+;;     シーケンス中の1つの値を計算するために、2つの値を最初から計算せねばならず、そのそれぞれについてまた2つずつの値を最初から計算することになる。
+;;     メモ化された関数を呼ぶと、それはまず与えられた引数を、過去に計算した入力と出力のマップと比べる。もし引数が過去に与えられていたものであれば、
+;;     再び計算をしなくても、直ちに結果を返すことが出来る。
+;;
+;; また、メモ化はキャッシュが既に作られていれば再帰を途中で止めることができるけれど、
+;; キャッシュが空の状態で大きな数に対する m や f を計算しようとすると、
+;; キャッシュが作られる前にスタックが溢れてしまう。
+;; それを防ぐ為に、関数ではなくシーケンスを見せることでキャッシュが頭から作られるのを保証し、以下を満たす性能を獲得すること。
+;;
+;;   (> 100 (elapsed-time (nth f-seq 250)))
+;;   (> 100 (elapsed-time (nth m-seq 250)))
+(declare f m)
+
+(defn f
+  [n]
+  (if (zero? n)
+    1
+    (- n (m (f (dec n))))))
+
+(defn m
+  [n]
+  (if (zero? n)
+    0
+    (- n (f (m (dec n))))))
+
+(defmacro elapsed-time
+  [expr]
+  `(let [start# (System/currentTimeMillis)]
+     ~expr
+     (- (System/currentTimeMillis) start#)))
+
+(def f (memoize f))
+(def m (memoize m))
+
+(def f-seq (map f (range)))
+(def m-seq (map m (range)))
 
