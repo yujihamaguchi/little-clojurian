@@ -128,8 +128,34 @@
 ;;         concat [[]]                     = []
 ;;         concat []                       = []
 (defn my-concat
-  [xss]
-  (for [xs xss, x xs] x))
+  [xs]
+  (if (empty? xs)
+    []
+    (concat (first xs)
+            (my-concat (rest xs)))))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+;; (defn my-concat
+;;   [xss]
+;;   (for [xs xss, x xs] x))
 
 ;; Q010: 正の整数に対し、すべての約数を計算する関数 my-factors を書け
 (defn my-factors
