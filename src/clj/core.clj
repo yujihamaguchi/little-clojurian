@@ -15,11 +15,12 @@
     (apply map vector colls)))
 
 ;; using recursion
-#_(defn my-zip
-    [& xss]
-    (when (and (seq xss) (every? seq xss))
-      (cons (map first xss)
-            (apply my-zip (map rest xss)))))
+;; (defn my-zip
+;;   [& colls]
+;;   (when (seq colls)
+;;     (conc (map first colls)
+;;           (apply my-zip (map rest colls)))))
+
 
 ;; Q002: haskell の sum と同様の機能の関数 sum を書け。(再帰を用いるパターン, reduce を用いるパターン、 apply を用いるパターン)
 ;; sum :: (Num a) => [a] -> a
@@ -127,13 +128,15 @@
 ;;         concat ["ab", "cd", "ef"]       = "abcdef"
 ;;         concat [[]]                     = []
 ;;         concat []                       = []
-(defn my-concat
+#_(defn my-concat
   [xs]
   (if (empty? xs)
     []
     (concat (first xs)
             (my-concat (rest xs)))))
-
+(defn my-concat
+  [xs]
+  (for [
 
 
 
