@@ -4,12 +4,23 @@
             [clojure.set :as set]
             [clojure.core.async :as async :refer [chan >!! <!! close! thread go >! <! alts!! timeout alts!]]
             [defun.core :refer [defun]]))
+
 (def table [8.2 1.5 2.8 4.3 12.7 2.2 2.0 6.1 7.0 0.2 0.8 4.0 2.4 6.7 7.5 1.9 0.1 6.0 6.3 9.1 2.8 1.0 2.4 0.2 2.0 0.1])
 
 ;; Q001: haskell の zip と同様の機能の関数 my-zip を書け （パラメータの数は可変であること）
 ;; zip :: [a] -> [b] -> [(a, b)]
-;; not using recursion
+;; using recursion
 (defn my-zip
+  [& colls]
+  (when (and (seq colls) (every? seq colls))
+    (cons (map first colls)
+          (apply my-zip (map rest colls)))))
+;; not using recursion
+#_(defn my-zip
+  [& colls]
+  (when (seq colls)
+    (apply map vector colls)))
+#_(defn my-zip
   [& colls]
   (when (seq colls)
     (apply map vector colls)))
@@ -29,58 +40,24 @@
 ;;     see also: product, foldl
 ;;         sum [1, 2, 3]  = 6
 ;;         sum []         = 0
+
+;; recursion
 (defn sum
   [ns]
-  (if-not (seq ns)
+  (if-not (seq ns) 
     0
     (+ (first ns)
        (sum (rest ns)))))
-;; (defn sum [ns]
-;;   (reduce + ns))
-;; (defn sum [ns]
-;;   (apply + ns))
 
-;; Q003: クイックソート関数 qsort01 を書け（リスト内包表記を使うこと）
-(defn qsort01
-  [xs]
-  (if-not (seq xs)
-    []
-    (let [x (first xs)
-          xs' (rest xs)
-          lt (for [x' xs' :when (< (int x') (int x))] x')
-          ge (for [x' xs' :when (>= (int x') (int x))] x')]
-      (concat (qsort01 lt) [x] (qsort01 ge)))))
+;; reduce
+#_(defn sum
+  [ns]
+  (reduce + ns))
 
-;; Q004: Haskell の product と同様の機能の関数を書け(再帰を用いるパターン、 reduce を用いるパターン、 apply を用いるパターン)
-;; product :: (Num a) => [a] -> a
-;; product ns
-;;     数値のリスト ns の全要素の積を返す。
-;;         product [2, 3, 4]   = 24
-;;         product [4, 5, 0]   = 0
-;;         product []          = 1
-;; =================================
-;; A: Using recursion.
-(defn product [ns]
-  (if-not (seq ns)
-    1
-    (* (first ns) (product (rest ns)))))
-;; A: Using reduce.
-;; (defn product [ns]
-;;   (reduce * ns))
-;; A: Using apply.
-;; (defn product [ns]
-;;   (apply * ns))
-
-;; Q005: リストを逆順に整列する関数 rqsort を書け
-(defn rqsort
-  [xs]
-  (if-not (seq xs)
-    []
-    (let [x (first xs)
-          xs' (rest xs)
-          gt (for [x' xs' :when (< (int x) (int x'))] x')
-          lt (for [x' xs' :when (> (int x) (int x'))] x')]
-      (concat (rqsort gt) [x] (rqsort lt)))))
+;; apply
+#_(defn sum
+  [ns]
+  (apply + ns))
 
 ;; Q007: Haskell の last と同様の機能の関数 my-last を書け(再帰を用いるバージョンも書くこと)
 ;; last :: [a] -> a
@@ -128,33 +105,12 @@
 ;;         concat ["ab", "cd", "ef"]       = "abcdef"
 ;;         concat [[]]                     = []
 ;;         concat []                       = []
-#_(defn my-concat
+(defn my-concat
   [xs]
   (if (empty? xs)
     []
     (concat (first xs)
             (my-concat (rest xs)))))
-(defn my-concat
-  [xs]
-  (for [
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ;; (defn my-concat
 ;;   [xss]
@@ -2797,4 +2753,3 @@
 
 (def f-seq (map f (range)))
 (def m-seq (map m (range)))
-

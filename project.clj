@@ -7,4 +7,5 @@
                  [org.clojure/core.match "0.3.0"]
                  [org.clojure/core.async "1.3.610"]
                  [ring "1.8.0"]
-                 [defun "0.3.1"]])
+                 [defun "0.3.1"]]
+  :repl-options {:init (require 'clj.core-test)})
