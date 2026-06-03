@@ -1,6 +1,7 @@
 (ns clj.core-test
   (:require [clojure.test :refer :all]
-            [clj.core :refer :all]))
+            [clj.core :refer :all])
+  (:import [clj.core TenantRec BuildingRec OfficeContract RetailContract]))
 
 (deftest unique-attribute-test
   (testing
@@ -1424,3 +1425,187 @@
 
 #_(deftest configured-city-test
     (is (= (configured-city) "Tokyo")))
+
+;; ============================================================
+;; 領域B: ネスト + 関連エンティティ操作のテスト (Q205-Q212)
+;; ============================================================
+
+(deftest vacant-area-by-building-test
+  (is (= {1 170 2 110 3 40}
+         (vacant-area-by-building sample-buildings-nested))))
+
+(deftest tenant-count-by-building-test
+  (is (= {1 3 2 1 3 1}
+         (tenant-count-by-building sample-buildings-nested))))
+
+(deftest building-name-for-contract-naive-test
+  (is (= "丸の内タワー"
+         (building-name-for-contract-naive
+           {:tenant-id 102 :rent 400000}
+           sample-tenants-flat sample-buildings-flat)))
+  (is (= "渋谷ビル"
+         (building-name-for-contract-naive
+           {:tenant-id 201 :rent 350000}
+           sample-tenants-flat sample-buildings-flat)))
+  (is (= "大阪センター"
+         (building-name-for-contract-naive
+           {:tenant-id 301 :rent 500000}
+           sample-tenants-flat sample-buildings-flat))))
+
+(deftest building-names-for-contracts-fast-test
+  (is (= ["丸の内タワー" "丸の内タワー" "丸の内タワー" "渋谷ビル" "大阪センター"]
+         (building-names-for-contracts-fast
+           sample-contracts-flat sample-tenants-flat sample-buildings-flat)))
+  ;; naive と fast が同じ答えを返すこと
+  (is (= (building-names-for-contracts-fast
+           sample-contracts-flat sample-tenants-flat sample-buildings-flat)
+         (mapv #(building-name-for-contract-naive % sample-tenants-flat sample-buildings-flat)
+               sample-contracts-flat))))
+
+(deftest flatten-buildings-test
+  (let [rows (flatten-buildings sample-buildings-nested)]
+    (is (= 5 (count rows)))
+    (is (= #{:building-id :building-name :building-area
+             :floor :tenant-id :tenant-name :tenant-area :rent}
+           (set (keys (first rows)))))
+    (is (= "丸の内タワー" (:building-name (first rows))))
+    (is (= 101 (:tenant-id (first rows))))
+    (is (= 500000 (:rent (last rows))))))
+
+(deftest nest-by-building-test
+  (let [flat   (flatten-buildings sample-buildings-nested)
+        nested (nest-by-building flat)]
+    (is (= 3 (count nested)))
+    (is (= "丸の内タワー" (:name (first nested))))
+    ;; 空フロア (B1 floor3, B2 floor2) はロスする
+    (is (= 2 (count (:floors (first nested)))))
+    ;; B1 floor 2 にはテナント 2 つ
+    (is (= 2 (count (get-in (first nested) [:floors 1 :tenants]))))
+    ;; B3 は 1 フロア 1 テナント
+    (is (= 1 (count (:floors (nth nested 2)))))))
+
+(deftest rent-totals-by-area-and-building-test
+  (is (= {"東京" {1 900000 2 350000} "大阪" {3 500000}}
+         (rent-totals-by-area-and-building sample-buildings-nested))))
+
+(deftest apply-rent-adjustment-test
+  (let [adjusted (apply-rent-adjustment sample-buildings-nested 1 2 0.1)]
+    ;; B1 floor 2 のテナントの賃料が 10% 上がる
+    (is (= 440000 (get-in adjusted [0 :floors 1 :tenants 0 :rent])))
+    (is (= 330000 (get-in adjusted [0 :floors 1 :tenants 1 :rent])))
+    ;; B1 floor 1 は変わらない
+    (is (= 200000 (get-in adjusted [0 :floors 0 :tenants 0 :rent])))
+    ;; B2 は変わらない
+    (is (= 350000 (get-in adjusted [1 :floors 0 :tenants 0 :rent])))
+    ;; 構造的に元データは破壊されない
+    (is (= 400000 (get-in sample-buildings-nested [0 :floors 1 :tenants 0 :rent])))))
+
+(deftest record-and-protocol-test
+  (let [t (->TenantRec 101 "カフェA" 30 200000)
+        b (->BuildingRec 1 "丸の内タワー" "東京" [])
+        office (->OfficeContract 100000)
+        retail (->RetailContract 100000 500000 0.05)]
+    (is (instance? TenantRec t))
+    (is (instance? BuildingRec b))
+    (is (= 100000 (monthly-rent office)))
+    (is (= 125000 (monthly-rent retail)))))
+
+;; ============================================================
+;; 領域A: ハッシュマップ高速化のテスト (Q213-Q217)
+;; ============================================================
+
+(deftest common-tenants-test
+  (is (= [{:id 102 :name "事務所B"} {:id 103 :name "事務所C"}]
+         (common-tenants-naive sample-tenants-A sample-tenants-B)))
+  (is (= (common-tenants-naive sample-tenants-A sample-tenants-B)
+         (common-tenants-fast  sample-tenants-A sample-tenants-B)))
+  (is (= [] (common-tenants-fast [] sample-tenants-B)))
+  (is (= [] (common-tenants-fast sample-tenants-A []))))
+
+(deftest find-rent-pair-test
+  (let [[a b] (find-rent-pair-naive sample-contracts-flat 750000)]
+    (is (= 750000 (+ (:rent a) (:rent b))))
+    (is (not= (:tenant-id a) (:tenant-id b))))
+  (let [[a b] (find-rent-pair-fast sample-contracts-flat 750000)]
+    (is (= 750000 (+ (:rent a) (:rent b))))
+    (is (not= (:tenant-id a) (:tenant-id b))))
+  (is (nil? (find-rent-pair-naive sample-contracts-flat 9999999)))
+  (is (nil? (find-rent-pair-fast  sample-contracts-flat 9999999))))
+
+(deftest join-listings-with-building-test
+  (let [naive (join-listings-with-building-naive sample-listings sample-buildings-flat)
+        fast  (join-listings-with-building-fast  sample-listings sample-buildings-flat)]
+    (is (= naive fast))
+    (is (= 4 (count fast)))
+    (is (= "丸の内タワー" (:building-name (first fast))))
+    (is (= "渋谷ビル"     (:building-name (nth fast 1))))
+    (is (= "大阪センター" (:building-name (nth fast 3))))))
+
+(deftest find-duplicate-listings-test
+  (is (= #{1 3} (find-duplicate-listings-naive sample-listings)))
+  (is (= #{1 3} (find-duplicate-listings-fast  sample-listings)))
+  (is (= #{} (find-duplicate-listings-fast [{:listing-id 1 :building-id 1 :floor 1}
+                                            {:listing-id 2 :building-id 2 :floor 1}]))))
+
+(deftest adjacent-floor-pairs-test
+  (is (= #{#{101 102} #{101 103}}
+         (adjacent-floor-pairs-naive sample-tenants-flat)))
+  (is (= #{#{101 102} #{101 103}}
+         (adjacent-floor-pairs-fast sample-tenants-flat))))
+
+;; ============================================================
+;; 領域C: グラフ探索のテスト (Q218-Q220)
+;; ============================================================
+
+(deftest connected-components-test
+  (let [cs (connected-components sample-zone-graph)]
+    (is (= 3 (count cs)))
+    (is (= #{#{1 2 3 4} #{10 11} #{20}} (set cs)))))
+
+(deftest path-exists?-test
+  (is (true?  (path-exists? sample-zone-graph 1 4)))
+  (is (true?  (path-exists? sample-zone-graph 1 1)))
+  (is (false? (path-exists? sample-zone-graph 1 10)))
+  (is (false? (path-exists? sample-zone-graph 1 20)))
+  (is (true?  (path-exists? sample-zone-graph 10 11))))
+
+(deftest zone-distances-test
+  (is (= {1 0 2 1 3 1 4 2}
+         (zone-distances sample-zone-graph 1)))
+  (is (= {10 0 11 1}
+         (zone-distances sample-zone-graph 10)))
+  (is (= {20 0}
+         (zone-distances sample-zone-graph 20))))
+
+;; ============================================================
+;; 領域D: DP のテスト (Q221-Q223)
+;; ============================================================
+
+(deftest max-value-knapsack-test
+  ;; 予算 100 では {area 40 + area 60} で value 700 + 1100 = 1800
+  (is (= 1800 (max-value-naive sample-lots 100)))
+  (is (= 1800 (max-value-memo  sample-lots 100)))
+  (is (= 1800 (max-value-dp    sample-lots 100)))
+  ;; 予算 70 では {30 + 40} で 500 + 700 = 1200
+  (is (= 1200 (max-value-naive sample-lots 70)))
+  (is (= 1200 (max-value-memo  sample-lots 70)))
+  (is (= 1200 (max-value-dp    sample-lots 70)))
+  ;; 予算 0 なら 0
+  (is (= 0 (max-value-dp sample-lots 0))))
+
+(deftest grid-paths-test
+  (is (= 1 (grid-paths-naive 1 1)))
+  (is (= 2 (grid-paths-naive 2 2)))
+  (is (= 6 (grid-paths-naive 3 3)))
+  (is (= 6 (grid-paths-memo  3 3)))
+  (is (= 6 (grid-paths-dp    3 3)))
+  (is (= 20 (grid-paths-memo 4 4)))
+  (is (= 20 (grid-paths-dp   4 4))))
+
+(deftest max-listings-value-test
+  ;; 期待値: 50 + 30 + 40 = 120 (区間 [1,4]+[5,7]+[8,9])
+  (is (= 120 (max-listings-value-naive sample-time-listings)))
+  (is (= 120 (max-listings-value-memo  sample-time-listings)))
+  (is (= 120 (max-listings-value-dp    sample-time-listings)))
+  (is (= 0 (max-listings-value-dp []))))
+

@@ -2753,3 +2753,725 @@
 
 (def f-seq (map f (range)))
 (def m-seq (map m (range)))
+
+;; ============================================================
+;; 領域B: ネストした・関連を持つエンティティ集合の操作
+;; ============================================================
+;; この領域で口頭説明できるべきこと:
+;;   ・ネストした永続データ構造の操作 (get-in / update-in / assoc-in) と
+;;     その計算量 (経路長 O(d), 構造的共有でコピー不要)
+;;   ・関連 (id参照) のたどり方: 線形検索 O(n*m) と id->entity マップ化 O(n+m) の対比
+;;   ・ネスト表現とフラット (関係) 表現の相互変換 (group-by の多段使用)
+;;   ・多段集約 (reduce / for / 多段 group-by) の判断基準
+;;   ・なぜ素のマップで十分か、いつ defrecord / defprotocol を使うか
+
+;; --- 領域Bで使うサンプルデータ ----------------------------------
+;; ネスト型: ビル → フロア → テナント (フロアごとに :capacity を持ち、空室面積を計算可能)
+(def sample-buildings-nested
+  [{:building/id 1 :name "丸の内タワー" :area "東京"
+    :floors [{:floor 1 :capacity 100 :tenants [{:tenant/id 101 :name "カフェA" :area 30 :rent 200000}]}
+             {:floor 2 :capacity 100 :tenants [{:tenant/id 102 :name "事務所B" :area 60 :rent 400000}
+                                               {:tenant/id 103 :name "事務所C" :area 40 :rent 300000}]}
+             {:floor 3 :capacity 100 :tenants []}]}
+   {:building/id 2 :name "渋谷ビル" :area "東京"
+    :floors [{:floor 1 :capacity 80 :tenants [{:tenant/id 201 :name "ショップD" :area 50 :rent 350000}]}
+             {:floor 2 :capacity 80 :tenants []}]}
+   {:building/id 3 :name "大阪センター" :area "大阪"
+    :floors [{:floor 1 :capacity 120 :tenants [{:tenant/id 301 :name "レストランE" :area 80 :rent 500000}]}]}])
+
+;; 関連型 (リレーショナル): id でつないだフラット三表
+(def sample-buildings-flat
+  [{:id 1 :name "丸の内タワー" :area "東京"}
+   {:id 2 :name "渋谷ビル"     :area "東京"}
+   {:id 3 :name "大阪センター" :area "大阪"}])
+
+(def sample-tenants-flat
+  [{:id 101 :building-id 1 :floor 1 :name "カフェA"     :area 30}
+   {:id 102 :building-id 1 :floor 2 :name "事務所B"     :area 60}
+   {:id 103 :building-id 1 :floor 2 :name "事務所C"     :area 40}
+   {:id 201 :building-id 2 :floor 1 :name "ショップD"   :area 50}
+   {:id 301 :building-id 3 :floor 1 :name "レストランE" :area 80}])
+
+(def sample-contracts-flat
+  [{:tenant-id 101 :rent 200000 :start "2024-04-01"}
+   {:tenant-id 102 :rent 400000 :start "2023-10-01"}
+   {:tenant-id 103 :rent 300000 :start "2024-01-01"}
+   {:tenant-id 201 :rent 350000 :start "2024-07-01"}
+   {:tenant-id 301 :rent 500000 :start "2024-05-01"}])
+
+;; Q205: 各ビルの全フロアの空室面積合計を返す関数 vacant-area-by-building を書け。
+;;       (空室面積 = floor の :capacity - そのフロアの全テナント :area の合計)
+;; signature: [buildings-nested] -> {building-id -> vacant-area}
+;; 方針: 2段の for / reduce でネストを舐める。素直版で十分。
+(defn vacant-area-by-building
+  [buildings]
+  (into {}
+        (map (fn [b]
+               [(:building/id b)
+                (reduce + (for [f (:floors b)]
+                            (- (:capacity f)
+                               (reduce + (map :area (:tenants f))))))]))
+        buildings))
+;; 計算量: 時間 O(N) (N=テナント総数を1度ずつ舐める), 空間 O(B)。
+;; 説明ポイント: フラットなマップなら 1段の reduce で済むが、ネストでは「外側で集約しつつ
+;;              内側でさらに集約」の二段構えが必要。for 内包は多段ループを宣言的に書け、
+;;              中間ベクタを作らず lazy seq を返すのでメモリ効率も良い。
+
+;; Q206: ビルごとのテナント数を返す関数 tenant-count-by-building を書け。
+;; signature: [buildings-nested] -> {building-id -> tenant-count}
+;; 方針: floors → tenants と二段で潜り、count を合計。
+(defn tenant-count-by-building
+  [buildings]
+  (into {}
+        (map (fn [b]
+               [(:building/id b)
+                (reduce + (map (comp count :tenants) (:floors b)))]))
+        buildings))
+;; 計算量: 時間 O(N), 空間 O(B)。永続ベクタの count はキャッシュされ O(1)。
+;; 説明ポイント: フラットな tenants なら (frequencies (map :building-id tenants)) で済む。
+;;              ネスト型では「下まで潜ってからまとめる」必要があり、(comp count :tenants) で
+;;              「テナント取り出し → 数える」を関数合成。
+
+;; Q207: 契約 (contract) からテナントを引き、さらにビル名を引いてくる関数を、
+;;       (1) 素直な線形検索版 / (2) id->entity マップを前処理する高速版 の2通りで書け。
+;; signature (1): (contract, tenants, buildings) -> building-name
+;; signature (2): (contracts, tenants, buildings) -> [building-name ...]
+;; 方針: 「複数契約をまとめて引く」ときに前処理コストがペイバックするか否かの境目を口頭で説明できること。
+(defn building-name-for-contract-naive
+  [contract tenants buildings]
+  (let [tenant   (some #(when (= (:id %) (:tenant-id contract)) %) tenants)
+        building (some #(when (= (:id %) (:building-id tenant)) %) buildings)]
+    (:name building)))
+;; 計算量: 1契約あたり時間 O(T + B), 空間 O(1)。
+;;        K契約をまとめて引くと O(K*(T+B))。線形検索が毎回走る。
+;; 説明ポイント: K=1 のスポット参照ならこれで十分。マップを作る方が前処理コストでむしろ高くつく。
+
+(defn building-names-for-contracts-fast
+  [contracts tenants buildings]
+  (let [tenants-by-id   (into {} (map (juxt :id identity)) tenants)
+        buildings-by-id (into {} (map (juxt :id identity)) buildings)]
+    (mapv (fn [c]
+            (let [t (tenants-by-id   (:tenant-id c))
+                  b (buildings-by-id (:building-id t))]
+              (:name b)))
+          contracts)))
+;; 計算量: 前処理 O(T + B), 1契約 O(1), K契約合計 O(K + T + B)。空間 O(T + B)。
+;; 改善理由: 線形検索 K*(T+B) を、id->entity マップの前処理で K + (T+B) に落とした。
+;;          K が大きい (= 契約をまとめて引く) ほどペイバック。 K=1 では逆に遅くなる。
+;; 説明ポイント: Clojure の PersistentHashMap の lookup は実質 O(1) (厳密には O(log32 N) の浅いトライ)。
+;;              「同じ辞書を何度も引く」場面では前処理が定石。
+
+;; Q208: ネストしたビル構造を、テナント単位のフラットな行のリストに変換する flatten-buildings を書け。
+;; signature: [buildings-nested] -> [{:building-id _ :building-name _ :building-area _
+;;                                    :floor _ :tenant-id _ :tenant-name _ :tenant-area _ :rent _}]
+;; 方針: 多段の for で「全ての (b, f, t) の組合せ」を生成。空フロアは自然に脱落する。
+(defn flatten-buildings
+  [buildings]
+  (vec
+    (for [b buildings
+          f (:floors b)
+          t (:tenants f)]
+      {:building-id   (:building/id b)
+       :building-name (:name b)
+       :building-area (:area b)
+       :floor         (:floor f)
+       :tenant-id     (:tenant/id t)
+       :tenant-name   (:name t)
+       :tenant-area   (:area t)
+       :rent          (:rent t)})))
+;; 計算量: 時間 O(N) (出力長), 空間 O(N)。
+;; 説明ポイント: for の多重生成器はネスト展開の素直な表現。
+;;              「行 (relation tuple) としての操作」が欲しい時の定石変換。
+;;              以降は普通の集合操作 (group-by/filter/reduce) で扱える。
+
+;; Q209: フラットな (Q208 形式の) 行のリストを、ビル→フロア→テナントのネスト構造に
+;;       組み直す関数 nest-by-building を書け。
+;; signature: [flat-rows] -> [{:building/id _ :name _ :area _ :floors [{:floor _ :tenants [...]}]}]
+;; 方針: group-by を2段。ビルでまとめてから、フロアでまとめる。
+;; 注意: フラット化の時点で「空フロア」や :capacity など元情報の一部は失われる (ロスあり変換)。
+(defn nest-by-building
+  [rows]
+  (->> (group-by :building-id rows)
+       (mapv (fn [[bid bid-rows]]
+               (let [first-row (first bid-rows)]
+                 {:building/id bid
+                  :name        (:building-name first-row)
+                  :area        (:building-area first-row)
+                  :floors      (->> (group-by :floor bid-rows)
+                                    (mapv (fn [[fl fl-rows]]
+                                            {:floor fl
+                                             :tenants (mapv (fn [r]
+                                                              {:tenant/id (:tenant-id r)
+                                                               :name      (:tenant-name r)
+                                                               :area      (:tenant-area r)
+                                                               :rent      (:rent r)})
+                                                            fl-rows)}))
+                                    (sort-by :floor)
+                                    vec)})))
+       (sort-by :building/id)
+       vec))
+;; 計算量: 時間 O(N log N) (sort のため; group-by 自体は O(N))、空間 O(N)。
+;; 説明ポイント: 「フラット → ネスト」は group-by の階層的適用が定番。
+;;              外側キー → 内側キーの順で適用。
+;;              結果安定性のため sort-by で並べ替え (group-by はキーの出現順を保つだけ)。
+
+;; Q210: エリア (area) × ビル (building) の2軸で、全テナントの賃料合計を集計せよ。
+;; signature: [buildings-nested] -> {area -> {building-id -> rent-sum}}
+;;       例: {"東京" {1 900000 2 350000} "大阪" {3 500000}}
+;; 方針: ビル単位の rent 合計を作り、その上でエリアで group-by。多段集計の典型。
+(defn rent-totals-by-area-and-building
+  [buildings]
+  (->> buildings
+       (group-by :area)
+       (into {}
+             (map (fn [[area bs]]
+                    [area
+                     (into {}
+                           (map (fn [b]
+                                  [(:building/id b)
+                                   (reduce + (for [f (:floors b)
+                                                   t (:tenants f)]
+                                               (:rent t)))]))
+                           bs)])))))
+;; 計算量: 時間 O(N), 空間 O(B)。group-by はハッシュテーブルでバケット分けする 1パス。
+;; 説明ポイント: (group-by (juxt :area :building/id) ...) でも書けるが、キーがタプル
+;;              {[area bid] -> ...} となり downstream で扱いづらい。ネストしたマップで返したい
+;;              場合は段階的に group-by する。
+
+;; Q211: ネストしたビル構造に対し、特定ビル・特定フロアの全テナントの賃料を rate (例 0.1)
+;;       だけ引き上げた新しい構造を返す apply-rent-adjustment を書け。元の構造は破壊しないこと。
+;; signature: (buildings-nested, building-id, floor-num, rate) -> buildings-nested
+;; 方針: 構造マッピング版 (mapv で丸ごと辿る) と、index 検索 + update-in の経路特化版 を併記。
+(defn apply-rent-adjustment
+  [buildings building-id floor-num rate]
+  (mapv (fn [b]
+          (if-not (= (:building/id b) building-id)
+            b
+            (update b :floors
+                    (fn [floors]
+                      (mapv (fn [f]
+                              (if-not (= (:floor f) floor-num)
+                                f
+                                (update f :tenants
+                                        (fn [ts]
+                                          (mapv (fn [t]
+                                                  (update t :rent
+                                                          (fn [r] (long (* r (+ 1 rate))))))
+                                                ts)))))
+                            floors)))))
+        buildings))
+;; 計算量: 時間 O(N) (全構造を1度走査), 空間 O(N) — ただし不変データの構造的共有 (path copy) で
+;;        変更されない枝はメモリ実体を元と共有するため、変更パス以外はコピー発生しない。
+;; 説明ポイント: マップ/ベクタはともに変更パスのみ O(log32 N) の浅いトライをコピー。
+;;              「不変なのに毎回作り直してメモリ食いそう」という直観は誤り。
+
+;; 別解: 経路特化版 (1ビル1フロアと分かっていれば全走査せずに済む)。
+#_(defn apply-rent-adjustment-by-index
+    [buildings building-id floor-num rate]
+    (let [find-idx (fn [coll pred]
+                     (some (fn [[i x]] (when (pred x) i))
+                           (map-indexed vector coll)))
+          b-idx (find-idx buildings #(= (:building/id %) building-id))]
+      (if (nil? b-idx)
+        buildings
+        (let [floors (get-in buildings [b-idx :floors])
+              f-idx (find-idx floors #(= (:floor %) floor-num))]
+          (if (nil? f-idx)
+            buildings
+            (update-in buildings [b-idx :floors f-idx :tenants]
+                       (fn [ts] (mapv #(update % :rent (fn [r] (long (* r (+ 1 rate))))) ts))))))))
+;; 改善理由: 該当ビル/フロアが各1つだけと確定しているなら、構造マッピング版は全走査するので余計。
+;;          update-in 版なら経路 (path) しか触らない。
+;; 説明ポイント: 「関数型らしさ重視で全件マッピング」 vs 「経路特化で pin-point update」の
+;;              トレードオフを言語化できることが重要。本番では「全ビル全フロア舐めれば良い小規模なら
+;;              前者、検索インデックスがあれば後者」と判断を述べる。
+
+;; Q212: 「いつ素のマップで十分か / いつ defrecord にすべきか / いつ defprotocol で多態化するか」
+;;       を不動産エンティティ例で示せ。
+;;
+;; 判断基準 (口頭で言える状態にしておく):
+;;   ・素のマップ : 短命/アドホックなクエリ結果、構造が変わりやすい、フィールドが少ない、
+;;                 型タグで分岐したくない。 → デフォルト選択。
+;;   ・defrecord : 中核ドメインエンティティで頻繁にフィールドアクセスがある、
+;;                 hot path で速度が要る、型タグ (instance?) で他の似たマップと区別したい、
+;;                 Java相互運用 (record はクラスになる) が必要。 → 「主役」エンティティに使う。
+;;   ・defprotocol: 同じ動詞 (例: 月額家賃計算) を複数の型で多態に分岐したい、
+;;                  将来新しい契約種別を「実装側で拡張」したい (open dispatch)。 → 動詞中心の設計。
+
+;; 例1: 素のマップで十分 — アドホックなクエリ結果
+;; (rent-totals-by-area-and-building sample-buildings-nested)
+;; => {"東京" {1 900000 ...}} のような短命構造。型タグ不要。record にする理由なし。
+
+;; 例2: 中核エンティティは defrecord
+(defrecord TenantRec [id name area rent])
+(defrecord BuildingRec [id name area floors])
+;; 理由: テナント・ビルはアプリ内で頻繁にやり取りする主役。型タグで instance? 判定ができ、
+;;       (defn area-of-tenant [^TenantRec t] (.-area t)) のようにフィールド直アクセスでき、
+;;       マップ lookup より速い。スキーマが安定している主役には適切。
+
+;; 例3: 契約の月額家賃を「契約種別ごとに違う式」で計算したい → defprotocol で多態化
+(defprotocol RentSource
+  (monthly-rent [this]))
+
+(defrecord OfficeContract [base-rent]
+  RentSource
+  (monthly-rent [_] base-rent))
+
+(defrecord RetailContract [base-rent sales sales-ratio]
+  RentSource
+  (monthly-rent [_] (+ base-rent (long (* sales sales-ratio)))))
+;; 理由: 「家賃を計算する」という同じ動詞に種別ごとの実装を持たせたい。
+;;       将来 ResidentialContract を足したくなったら、実装側で defrecord を増やすだけで
+;;       既存コードに触らずに済む (open for extension)。
+;;       これを cond/multimethod でも書けるが、protocol は JVM ディスパッチが速い。
+
+;; ============================================================
+;; 領域A: ハッシュマップによる O(n^2) → O(n) 高速化
+;; ============================================================
+;; この領域で口頭説明できるべきこと:
+;;   ・「二重ループに見えたら、片方をハッシュ集合/マップにする」反射神経
+;;   ・前処理コスト O(n) と、その後の O(1) ルックアップ k 回のトレードオフ
+;;     (= n + k vs n*k の境目を口頭で述べられる)
+;;   ・group-by / frequencies / set / juxt をキー作成にどう組み合わせるか
+;;   ・「ハッシュキーをどう選ぶか」(単一フィールドか juxt で複合か)
+
+;; --- 領域Aで使うサンプルデータ ----------------------------------
+(def sample-tenants-A
+  [{:id 101 :name "カフェA"} {:id 102 :name "事務所B"} {:id 103 :name "事務所C"}])
+(def sample-tenants-B
+  [{:id 102 :name "事務所B"} {:id 201 :name "ショップD"} {:id 103 :name "事務所C"}])
+
+(def sample-listings
+  [{:listing-id 1 :building-id 1 :floor 3 :rent 600000}
+   {:listing-id 2 :building-id 2 :floor 2 :rent 450000}
+   {:listing-id 3 :building-id 1 :floor 3 :rent 600000}    ;; (building-id, floor) で 1 と重複
+   {:listing-id 4 :building-id 3 :floor 1 :rent 500000}])
+
+;; Q213: 2つのテナントリスト ts1, ts2 から、:id が両方に存在するテナント (ts1 側の要素) を
+;;       返す関数 common-tenants-naive / common-tenants-fast を書け。
+;; signature: ([{:id _ :name _}], [{:id _ :name _}]) -> [{:id _ :name _}]
+(defn common-tenants-naive
+  [ts1 ts2]
+  (vec (for [t1 ts1
+             t2 ts2
+             :when (= (:id t1) (:id t2))]
+         t1)))
+;; 計算量: 時間 O(n*m), 空間 O(1) (出力除く)。二重 for は O(n*m)。
+
+(defn common-tenants-fast
+  [ts1 ts2]
+  (let [ids2 (into #{} (map :id) ts2)]
+    (filterv #(ids2 (:id %)) ts1)))
+;; 計算量: 時間 O(n + m), 空間 O(m) (ハッシュ集合)。
+;; 改善理由: 内側ループ「ts2 を線形探索」を、事前に作ったハッシュ集合への O(1) 問い合わせに置換。
+;;          内側 m 回 × 外側 n 回 = n*m が、前処理 m + 外側 n = n + m に落ちる。
+;; 説明ポイント: 出力順を ts1 順に揃えたいので「ts2 を集合化、ts1 を回す」と決める。逆も可。
+;;              filterv は遅延ではなくベクタを返すので、結果を即時消費する場面で扱いやすい。
+
+;; Q214: 契約リストから、:rent の合計が target になる 2契約のペア (1つで良い) を返す
+;;       関数 find-rent-pair-naive / find-rent-pair-fast を書け。
+;; signature: ([{:rent _ ...}], target) -> [contract contract] or nil
+(defn find-rent-pair-naive
+  [contracts target]
+  (let [v (vec contracts)
+        n (count v)]
+    (first
+      (for [i (range n)
+            j (range (inc i) n)
+            :let [c1 (v i) c2 (v j)]
+            :when (= target (+ (:rent c1) (:rent c2)))]
+        [c1 c2]))))
+;; 計算量: 時間 O(n^2), 空間 O(1)。全ペア (n*(n-1)/2) を走査。
+
+(defn find-rent-pair-fast
+  [contracts target]
+  (loop [[c & more] (seq contracts)
+         seen       {}]
+    (when c
+      (let [need (- target (:rent c))]
+        (if-let [c2 (seen need)]
+          [c2 c]
+          (recur more (assoc seen (:rent c) c)))))))
+;; 計算量: 時間 O(n), 空間 O(n) (seen マップ)。
+;; 改善理由: two-sum パターン。各 c に対し「(target - rent) を既に見たか」をハッシュで O(1) 問い合わせ。
+;;          全ペア n^2 を「各要素1回 + 1ルックアップ」に削減。
+;; 説明ポイント: 「過去に見た値を辞書に貯め、現在の値とマッチさせる」は二重ループ削減の最頻出パターン。
+;;              本番で「target を分解できないか?」を口に出すと、面接官に意図が伝わりやすい。
+
+;; Q215: 空室掲載 listings と buildings から、各掲載にビル名を付けた行を返す
+;;       関数 join-listings-with-building-naive / join-listings-with-building-fast を書け。
+;; signature: ([{:building-id _ ...}], [{:id _ :name _ ...}]) -> [{... :building-name _}]
+(defn join-listings-with-building-naive
+  [listings buildings]
+  (mapv (fn [l]
+          (let [b (some #(when (= (:id %) (:building-id l)) %) buildings)]
+            (assoc l :building-name (:name b))))
+        listings))
+;; 計算量: 時間 O(n * m), 空間 O(1) (出力除く)。listing ごとに buildings を線形探索。
+
+(defn join-listings-with-building-fast
+  [listings buildings]
+  (let [b-by-id (into {} (map (juxt :id :name)) buildings)]
+    (mapv (fn [l] (assoc l :building-name (b-by-id (:building-id l))))
+          listings)))
+;; 計算量: 時間 O(n + m), 空間 O(m)。
+;; 改善理由: building の :id → :name マップを 1度作るだけで、各 listing は O(1) で名前を引ける。
+;; 説明ポイント: SQL の JOIN を素直に書くと O(n*m)。「結合キーで辞書化」がいわゆる hash join。
+;;              clojure.set/index / clojure.set/join も同じ発想で実装されている。
+
+;; Q216: 同じ (building-id, floor) を持つ掲載を「重複」として検出し、重複に含まれる
+;;       :listing-id の集合を返す find-duplicate-listings-naive / find-duplicate-listings-fast を書け。
+;; signature: ([{:listing-id _ :building-id _ :floor _ ...}]) -> #{listing-id ...}
+(defn find-duplicate-listings-naive
+  [listings]
+  (set (for [l1 listings
+             l2 listings
+             :when (and (not= (:listing-id l1) (:listing-id l2))
+                        (= (:building-id l1) (:building-id l2))
+                        (= (:floor l1) (:floor l2)))]
+         (:listing-id l1))))
+;; 計算量: 時間 O(n^2), 空間 O(出力)。
+
+(defn find-duplicate-listings-fast
+  [listings]
+  (->> listings
+       (group-by (juxt :building-id :floor))
+       (filter (fn [[_ ls]] (> (count ls) 1)))
+       (mapcat (fn [[_ ls]] (map :listing-id ls)))
+       set))
+;; 計算量: 時間 O(n), 空間 O(n)。group-by は単一パス。
+;; 改善理由: 「自己結合で重複ペアを探す n^2」を、「複合キーでバケット分け n + バケット内集約」に削減。
+;; 説明ポイント: juxt は「複数キーを1つの複合キーにまとめる」常套手段。
+;;              SQL でいえば GROUP BY building_id, floor HAVING COUNT(*) > 1 に対応。
+
+;; Q217: テナントリストから、同一ビル内で連続階 (floor が隣接) のテナントペアを
+;;       (テナントID2つの集合の集合として) 返す adjacent-floor-pairs-naive / -fast を書け。
+;; signature: ([{:id _ :building-id _ :floor _ ...}]) -> #{#{id1 id2} ...}
+(defn adjacent-floor-pairs-naive
+  [tenants]
+  (set (for [t1 tenants
+             t2 tenants
+             :when (and (not= (:id t1) (:id t2))
+                        (= (:building-id t1) (:building-id t2))
+                        (= 1 (Math/abs (- (int (:floor t1)) (int (:floor t2))))))]
+         #{(:id t1) (:id t2)})))
+;; 計算量: 時間 O(n^2), 空間 O(出力)。
+
+(defn adjacent-floor-pairs-fast
+  [tenants]
+  (let [by-bf (reduce (fn [acc t]
+                        (update acc [(:building-id t) (:floor t)] (fnil conj []) (:id t)))
+                      {} tenants)]
+    (set (for [t tenants
+               other-id (by-bf [(:building-id t) (inc (:floor t))])]
+           #{(:id t) other-id}))))
+;; 計算量: 時間 O(n), 空間 O(n)。
+;; 改善理由: 「全ペアを試して隣接判定」を、「(building, floor+1) を直接 lookup」に置換。
+;;          同一フロアに複数テナントが居る場合も (fnil conj []) で id リストに溜める。
+;; 説明ポイント: 「キーを少しずらして辞書を引く (floor+1)」は座標系/隣接データの常套手段。
+;;              本番で「(b, f+1) を引けば隣接判定が定数時間になる」と一言述べられると強い。
+
+;; ============================================================
+;; 領域C: グラフ探索 (BFS / DFS)
+;; ============================================================
+;; この領域で口頭説明できるべきこと:
+;;   ・隣接リスト表現 {node [neighbors]} の選択理由 (辺追加 O(1)、隣接列挙 O(deg))、
+;;     vs 隣接行列 (V x V のメモリ, 疎グラフでは無駄)
+;;   ・DFS: 再帰版 vs スタック版 の同等性、深い再帰のスタックオーバーフローを避けるためのスタック版
+;;   ・BFS: キューを使う。「層ごとに展開」されるため最短距離 (辺重み無しの場合) が自然に得られる
+;;   ・visited セットの役割 (= 循環防止) と空間 O(V) のコスト
+;;   ・連結成分: 未訪問ノードからDFSを繰り返す
+;;   ・clojure.lang.PersistentQueue/EMPTY を BFS の永続FIFOとして使う書き方
+
+;; --- 領域Cで使うサンプルデータ ----------------------------------
+;; 「区画」グラフ。{1,2,3,4} の連結成分、{10,11} の連結成分、孤立点 20。
+(def sample-zone-graph
+  {1  [2 3]
+   2  [1 4]
+   3  [1]
+   4  [2]
+   10 [11]
+   11 [10]
+   20 []})
+
+;; Q218: 隣接マップ adj から、連結成分のリスト (各成分はノードIDの集合) を返す
+;;       関数 connected-components を書け。
+;; signature: {node [neighbor]} -> [#{node ...} ...]
+;; 方針: 未訪問ノードを起点に DFS (スタック版) を繰り返す。
+(defn connected-components
+  [adj]
+  (loop [unvisited  (set (keys adj))
+         components []]
+    (if (empty? unvisited)
+      components
+      (let [start (first unvisited)
+            component (loop [stack   [start]
+                             visited #{}]
+                        (if (empty? stack)
+                          visited
+                          (let [n          (peek stack)
+                                rest-stack (pop stack)]
+                            (if (visited n)
+                              (recur rest-stack visited)
+                              (recur (into rest-stack (remove visited (adj n)))
+                                     (conj visited n))))))]
+        (recur (reduce disj unvisited component)
+               (conj components component))))))
+;; 計算量: 時間 O(V + E), 空間 O(V) (visited セット + スタック)。
+;; 説明ポイント: スタック版 DFS は再帰版と等価だが、スタックオーバーフローを起こさない。
+;;              「未訪問集合から DFS を繰り返す」が連結成分の標準手法。
+;;              永続ベクタの peek/pop/conj は実質 O(1) なのでスタックとして使える。
+
+;; Q219: 隣接マップ adj と start, goal を引数に、start から goal への経路が存在するかを
+;;       返す述語 path-exists? を書け。(BFS版)
+;; signature: ({node [neighbor]}, node, node) -> boolean
+;; 方針: BFS でゴール到達なら true。visited で循環防止。
+(defn path-exists?
+  [adj start goal]
+  (if (= start goal)
+    true
+    (loop [queue   (conj clojure.lang.PersistentQueue/EMPTY start)
+           visited #{start}]
+      (if (empty? queue)
+        false
+        (let [n         (peek queue)
+              rest-q    (pop queue)
+              neighbors (remove visited (adj n))]
+          (if (some #(= goal %) neighbors)
+            true
+            (recur (into rest-q neighbors)
+                   (into visited neighbors))))))))
+;; 計算量: 時間 O(V + E), 空間 O(V)。
+;; 説明ポイント: 「経路の有無だけ」なら BFS/DFS どちらでも結果は同じ。
+;;              BFS を選ぶ理由: Q220 で最短距離が要るとき、同じコードを流用できる。
+;;              clojure.lang.PersistentQueue/EMPTY が標準提供の永続FIFO。peek/pop/conj が
+;;              いずれも実質 O(1)。
+
+;; Q220: 隣接マップ adj と start から、各ノードまでの最短距離 (辺数) のマップを返す
+;;       関数 zone-distances を書け。
+;; signature: ({node [neighbor]}, node) -> {node distance}
+;; 方針: BFS。最初に到達した時点の距離が最短になる (層が単調増加するから)。
+(defn zone-distances
+  [adj start]
+  (loop [queue (conj clojure.lang.PersistentQueue/EMPTY [start 0])
+         dist  {start 0}]
+    (if (empty? queue)
+      dist
+      (let [[n d]         (peek queue)
+            rest-q        (pop queue)
+            new-neighbors (remove dist (adj n))
+            updates       (map (fn [x] [x (inc d)]) new-neighbors)]
+        (recur (into rest-q updates)
+               (into dist updates))))))
+;; 計算量: 時間 O(V + E), 空間 O(V)。
+;; 説明ポイント: BFS が最短距離を与えるのは「キューが距離順に処理されるから」。
+;;              DFS では辺重み無しでも最短にはならない (深く潜ってから戻る)。
+;;              dist マップ自体が visited を兼ねる (一度入れたら更新しない)。
+
+;; ============================================================
+;; 領域D: 動的計画法 (DP) — ナイーブ再帰 → memoize → ボトムアップ
+;; ============================================================
+;; この領域で口頭説明できるべきこと:
+;;   ・「同じ部分問題が何度も呼ばれる」ことに気付くこと
+;;   ・状態の定義 (= 関数の引数) と状態空間の大きさ = DPテーブルのサイズ
+;;   ・memoize は「上から (top-down) のDP」、bottom-up は「下から表で埋める」の対比
+;;   ・memoize の落とし穴: 再帰の深さでスタック消費、グローバル寿命の clojure.core/memoize
+;;   ・ボトムアップは「状態遷移の順序」を明示する必要がある (どの状態が先に確定するか)
+
+;; --- 領域Dで使うサンプルデータ ----------------------------------
+(def sample-lots
+  [{:area 30 :value 500}
+   {:area 40 :value 700}
+   {:area 50 :value 900}
+   {:area 60 :value 1100}])
+
+(def sample-time-listings
+  [{:start 1 :end 4 :value 50}
+   {:start 3 :end 5 :value 20}
+   {:start 0 :end 6 :value 60}
+   {:start 5 :end 7 :value 30}
+   {:start 8 :end 9 :value 40}])
+
+;; Q221: 区画 lots = [{:area _ :value _} ...] と予算 budget が与えられる。area の合計が
+;;       budget 以下になるよう区画の部分集合を選び、value 合計を最大化せよ。
+;;       (1) ナイーブ再帰版 max-value-naive
+;;       (2) memoize 版    max-value-memo
+;;       (3) ボトムアップ版 max-value-dp
+;;       の3通りで書け。(0/1 ナップサック)
+;; signature: ([{:area _ :value _}], budget) -> total-value
+(defn max-value-naive
+  [lots budget]
+  (let [v (vec lots)
+        n (count v)]
+    (letfn [(go [i remaining]
+              (if (or (= i n) (zero? remaining))
+                0
+                (let [{:keys [area value]} (v i)]
+                  (if (> area remaining)
+                    (go (inc i) remaining)
+                    (max (go (inc i) remaining)
+                         (+ value (go (inc i) (- remaining area))))))))]
+      (go 0 budget))))
+;; 計算量: 時間 O(2^n) 最悪, 空間 O(n) (再帰スタック)。各区画を「使う/使わない」の2分岐で全探索。
+
+(defn max-value-memo
+  [lots budget]
+  (let [v     (vec lots)
+        n     (count v)
+        cache (atom {})]
+    (letfn [(go [i remaining]
+              (if (or (= i n) (zero? remaining))
+                0
+                (if-let [hit (@cache [i remaining])]
+                  hit
+                  (let [{:keys [area value]} (v i)
+                        result (if (> area remaining)
+                                 (go (inc i) remaining)
+                                 (max (go (inc i) remaining)
+                                      (+ value (go (inc i) (- remaining area)))))]
+                    (swap! cache assoc [i remaining] result)
+                    result))))]
+      (go 0 budget))))
+;; 計算量: 時間 O(n * budget), 空間 O(n * budget) (キャッシュ)。
+;; 改善理由: 状態 [i remaining] の異なる組合せは n * (budget+1) 通り。各状態は1度しか計算しない (memo hit)。
+;;          2^n が n*budget に落ちる。
+;; 説明ポイント: clojure.core/memoize は引数全体をキーにし、関数オブジェクトのライフサイクル中
+;;              ずっとキャッシュが残るため、毎呼出しごとに新規 atom を持つ「letfn 内クロージャ」形式が安全。
+
+(defn max-value-dp
+  [lots budget]
+  (let [v (vec lots)
+        n (count v)
+        final-dp
+        (reduce
+          (fn [dp i]
+            (let [{:keys [area value]} (v i)]
+              (vec
+                (for [b (range (inc budget))]
+                  (if (> area b)
+                    (dp b)
+                    (max (dp b) (+ value (dp (- b area)))))))))
+          (vec (repeat (inc budget) 0))
+          (range n))]
+    (final-dp budget)))
+;; 計算量: 時間 O(n * budget), 空間 O(budget) (1次元配列を i 軸方向で更新)。
+;; 説明ポイント: 「アイテム i = 0..n-1 を外側、予算 b = 0..budget を内側」の2重ループで
+;;              dp[b] = max(dp[b], dp[b-area] + value) を更新。再帰呼び出しオーバーヘッドが消える。
+;;              実行速度は memo 版より速いことが多い。bottom-up は「i+1 を確定してから i を解く」順序を
+;;              「外側ループの単調進行」で表現する。
+
+;; Q222: n × m のグリッドで、左上 (0,0) から右下 (n-1,m-1) へ「右」または「下」のみで到達する
+;;       経路数を、(1) ナイーブ再帰 (2) memoize (3) ボトムアップ DP の3通りで書け。
+;; signature: (n, m) -> path-count
+(defn grid-paths-naive
+  [n m]
+  (letfn [(go [i j]
+            (cond
+              (or (= i n) (= j m)) 0
+              (and (= i (dec n)) (= j (dec m))) 1
+              :else (+ (go (inc i) j) (go i (inc j)))))]
+    (go 0 0)))
+;; 計算量: 時間 O(2^(n+m)), 空間 O(n + m) (再帰スタック)。同じ (i,j) を何度も再計算。
+
+(defn grid-paths-memo
+  [n m]
+  (let [cache (atom {})]
+    (letfn [(go [i j]
+              (cond
+                (or (= i n) (= j m)) 0
+                (and (= i (dec n)) (= j (dec m))) 1
+                :else
+                (if-let [hit (@cache [i j])]
+                  hit
+                  (let [v (+ (go (inc i) j) (go i (inc j)))]
+                    (swap! cache assoc [i j] v)
+                    v))))]
+      (go 0 0))))
+;; 計算量: 時間 O(n*m), 空間 O(n*m)。
+;; 改善理由: 状態 [i j] は n*m 通り。指数 → 多項式。
+
+(defn grid-paths-dp
+  [n m]
+  (let [init (assoc-in (vec (repeat n (vec (repeat m 0))))
+                       [(dec n) (dec m)] 1)
+        result
+        (reduce
+          (fn [dp [i j]]
+            (if (and (= i (dec n)) (= j (dec m)))
+              dp
+              (assoc-in dp [i j]
+                        (+ (get-in dp [(inc i) j] 0)
+                           (get-in dp [i (inc j)] 0)))))
+          init
+          (for [i (reverse (range n))
+                j (reverse (range m))]
+            [i j]))]
+    (get-in result [0 0])))
+;; 計算量: 時間 O(n*m), 空間 O(n*m)。
+;; 説明ポイント: 漸化式 dp[i][j] = dp[i+1][j] + dp[i][j+1] を右下から左上に向かって埋める。
+;;              「右と下から自分を導く」順序を明示するのが bottom-up の本質。
+
+;; Q223: 区間リスト [{:start _ :end _ :value _} ...] から、互いに重ならない区間部分集合を選んで
+;;       value の合計を最大化せよ。(1) ナイーブ再帰、(2) memoize、(3) DP テーブル の3通りで書け。
+;;       (重ならない条件: 直前の区間の :end <= 次の区間の :start)
+;; signature: ([{:start _ :end _ :value _}]) -> total-value
+(defn- previous-compatible
+  "sorted-by-end な v に対し、i 番目の区間と重ならない、i より前で最大の index を返す。なければ -1。"
+  [v i]
+  (let [s (:start (v i))]
+    (loop [j (dec i)]
+      (cond
+        (< j 0) -1
+        (<= (:end (v j)) s) j
+        :else (recur (dec j))))))
+
+(defn max-listings-value-naive
+  [listings]
+  (let [v (vec (sort-by :end listings))
+        n (count v)]
+    (letfn [(go [i]
+              (if (< i 0)
+                0
+                (max (go (dec i))
+                     (+ (:value (v i)) (go (previous-compatible v i))))))]
+      (go (dec n)))))
+;; 計算量: 時間 O(2^n) 最悪 (重複部分問題が指数), 空間 O(n)。
+
+(defn max-listings-value-memo
+  [listings]
+  (let [v     (vec (sort-by :end listings))
+        n     (count v)
+        cache (atom {})]
+    (letfn [(go [i]
+              (cond
+                (< i 0) 0
+                (contains? @cache i) (@cache i)
+                :else
+                (let [r (max (go (dec i))
+                             (+ (:value (v i)) (go (previous-compatible v i))))]
+                  (swap! cache assoc i r)
+                  r)))]
+      (go (dec n)))))
+;; 計算量: 時間 O(n^2) (previous-compatible が線形), 空間 O(n)。
+;; 改善理由: 状態 i は n 個しかない。各 i を1回解けばよい。
+
+(defn max-listings-value-dp
+  [listings]
+  (let [v (vec (sort-by :end listings))
+        n (count v)]
+    (if (zero? n)
+      0
+      (let [dp (loop [i 0 dp []]
+                 (if (= i n)
+                   dp
+                   (let [pi   (previous-compatible v i)
+                         take (+ (:value (v i))
+                                 (if (= pi -1) 0 (dp pi)))
+                         skip (if (zero? i) 0 (dp (dec i)))]
+                     (recur (inc i) (conj dp (max take skip))))))]
+        (dp (dec n))))))
+;; 計算量: 時間 O(n^2) (previous-compatible が線形), 空間 O(n)。
+;; 説明ポイント: :end でソートし、i 番目を「採用するなら互換区間 + value、しないなら i-1 まで」の最大を取る。
+;;              previous-compatible を二分探索に置き換えれば全体 O(n log n) に出来る。本実装は基本形。
+
+
