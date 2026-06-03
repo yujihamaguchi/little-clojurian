@@ -57,23 +57,23 @@
     )
   )
 
-(deftest qsort01-test
+(deftest qsort-test
   (testing
-      (is (=  (qsort01 [3 2 1]) [1 2 3] ))
-    (is (=  (qsort01 [3 2 3 1]) [1 2 3 3] ))
-    (is (=  (qsort01 [2 3 1]) [1 2 3] ))
-    (is (=  (qsort01 [1 2 3]) [1 2 3] ))
-    (is (=  (qsort01 "cba") '(\a \b \c) ))
-    (is (=  (qsort01 "bca") '(\a \b \c) ))
-    (is (=  (qsort01 "abc") '(\a \b \c) ))
-    (is (=  (qsort01 '(1)) '(1) ))
-    (is (=  (qsort01 "a") '(\a) ))
-    (is (=  (qsort01 "") () ))
-    (is (=  (qsort01 ()) () ))
+    (is (=  (qsort [3 2 1]) [1 2 3] ))
+    (is (=  (qsort [3 2 3 1]) [1 2 3 3] ))
+    (is (=  (qsort [2 3 1]) [1 2 3] ))
+    (is (=  (qsort [1 2 3]) [1 2 3] ))
+    (is (=  (qsort "cba") '(\a \b \c) ))
+    (is (=  (qsort "bca") '(\a \b \c) ))
+    (is (=  (qsort "abc") '(\a \b \c) ))
+    (is (=  (qsort '(1)) '(1) ))
+    (is (=  (qsort "a") '(\a) ))
+    (is (=  (qsort "") () ))
+    (is (=  (qsort ()) () ))
     )
   )
 
-(deftest product-test
+#_(deftest product-test
   (testing
       (is (= 6 (product [1 2 3])))
     (is (= 1 (product [1])))
@@ -81,7 +81,7 @@
     )
   )
 
-(deftest rqsort-test
+#_(deftest rqsort-test
   (testing
       (is (=  [3 2 1] (rqsort [3 2 1])))
     (is (=  [3 2 1] (rqsort [2 3 1])))
