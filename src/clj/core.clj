@@ -335,18 +335,16 @@
 ;; Q036: ある要素を、整列されたリストに挿入する関数 my-insert を書け。
 (defn my-insert
   [x xs]
-  (if (or
-       (not (seq xs))
-       (<= x (first xs)))
-    (cons x xs)
-    (cons (first xs)
-          (my-insert x (rest xs)))))
+  (cond
+    (empty? xs) (list x)
+    (< x (first xs)) (cons x xs)
+    :else (cons (first xs) (my-insert x (rest xs)))))
 
-;; Q037: 関数 my-insert を用いてリストのソートを"挿入ソート"で行う関数　isort　を書け。
+;; Q037: 関数 my-insert を用いてリストのソートを"挿入ソート"で行う関数 isort を書け。
 (defn isort
   [xs]
-  (if-not (seq xs)
-    []
+  (if (empty? xs)
+    '()
     (my-insert (first xs)
                (isort (rest xs)))))
 
@@ -393,13 +391,13 @@
 ;; Q042: qsort を再帰を用いて書け。（直接の再帰を用いて良い）
 (defn qsort
   [xs]
-  (if-not (seq xs)
-    []
+  (if (empty? xs)
+    '()
     (let [x (first xs)
           xs' (rest xs)
-          lt (for [x' xs' :when (< x' x)] x')
-          ge (for [x' xs' :when (>= x' x)] x')]
-      (concat (qsort lt) [x] (qsort ge)))))
+          lt (filter (fn [x'] (<= x' x)) xs')
+          ge (filter (fn [x'] (> x' x)) xs')]
+      (concat (qsort lt) (list x) (qsort ge)))))
 
 ;; Q043: リストから偶数の位置の要素を取り出す関数 evens と、奇数の位置の要素を取り出す関数 odds を相互再帰を用いて書け。
 (declare evens odds)
