@@ -1,4 +1,5 @@
 (ns clj.core
+  (:refer-clojure :exclude [sorted?])
   (:require [clojure.core.match :refer [match]]
             [clojure.string :as str]
             [clojure.set :as set]
@@ -2653,12 +2654,12 @@
 
 (let [c (chan)]
   (thread (>!! c "hello"))
-  (println (class (<!! c)))
+  (<!! c)
   (close! c))
 
 (let [c (chan)]
   (go (>! c "hello"))
-  (println (class (<!! (go (<! c)))))
+  (<!! (go (<! c)))
   (close! c))
 
 #_(require '[clojure.core.async :as async :refer :all])
@@ -2835,24 +2836,44 @@
 ;; signature (1): (contract, tenants, buildings) -> building-name
 ;; signature (2): (contracts, tenants, buildings) -> [building-name ...]
 ;; 方針: 「複数契約をまとめて引く」ときに前処理コストがペイバックするか否かの境目を口頭で説明できること。
+
+;; 自分で書いたバージョン
 (defn building-name-for-contract-naive
   [contract tenants buildings]
-  (let [tenant   (some #(when (= (:id %) (:tenant-id contract)) %) tenants)
-        building (some #(when (= (:id %) (:building-id tenant)) %) buildings)]
+  (let [tenant (first (filter #(= (:id %) (:tenant-id contract)) tenants))
+        building (first (filter #(= (:id %) (:building-id tenant)) buildings))]
     (:name building)))
+
+#_(defn building-name-for-contract-naive
+    [contract tenants buildings]
+    (let [tenant   (some #(when (= (:id %) (:tenant-id contract)) %) tenants)
+          building (some #(when (= (:id %) (:building-id tenant)) %) buildings)]
+      (:name building)))
 ;; 計算量: 1契約あたり時間 O(T + B), 空間 O(1)。
 ;;        K契約をまとめて引くと O(K*(T+B))。線形検索が毎回走る。
 ;; 説明ポイント: K=1 のスポット参照ならこれで十分。マップを作る方が前処理コストでむしろ高くつく。
 
+;; 自分で書いたバージョン
 (defn building-names-for-contracts-fast
   [contracts tenants buildings]
-  (let [tenants-by-id   (into {} (map (juxt :id identity)) tenants)
-        buildings-by-id (into {} (map (juxt :id identity)) buildings)]
-    (mapv (fn [c]
-            (let [t (tenants-by-id   (:tenant-id c))
-                  b (buildings-by-id (:building-id t))]
-              (:name b)))
-          contracts)))
+  (let [tenants' (into {} (map (juxt :id identity) tenants))
+        buildings' (into {} (map (juxt :id identity)  buildings))]
+    (->> contracts
+         (map :tenant-id)
+         (map tenants')
+         (map :building-id)
+         (map buildings')
+         (map :name))))
+
+#_(defn building-names-for-contracts-fast
+    [contracts tenants buildings]
+    (let [tenants-by-id   (into {} (map (juxt :id identity)) tenants)
+          buildings-by-id (into {} (map (juxt :id identity)) buildings)]
+      (mapv (fn [c]
+              (let [t (tenants-by-id   (:tenant-id c))
+                    b (buildings-by-id (:building-id t))]
+                (:name b)))
+            contracts)))
 ;; 計算量: 前処理 O(T + B), 1契約 O(1), K契約合計 O(K + T + B)。空間 O(T + B)。
 ;; 改善理由: 線形検索 K*(T+B) を、id->entity マップの前処理で K + (T+B) に落とした。
 ;;          K が大きい (= 契約をまとめて引く) ほどペイバック。 K=1 では逆に遅くなる。

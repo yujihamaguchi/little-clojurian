@@ -1,4 +1,5 @@
 (ns clj.core-test
+  (:refer-clojure :exclude [sorted?])
   (:require [clojure.test :refer :all]
             [clj.core :refer :all])
   (:import [clj.core TenantRec BuildingRec OfficeContract RetailContract]))
