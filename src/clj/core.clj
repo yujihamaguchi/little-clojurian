@@ -3,6 +3,7 @@
   (:require [clojure.core.match :refer [match]]
             [clojure.string :as str]
             [clojure.set :as set]
+            [clojure.pprint :refer [pprint]]
             [clojure.core.async :as async :refer [chan >!! <!! close! thread go >! <! alts!! timeout alts!]]
             [defun.core :refer [defun]]))
 
@@ -2837,11 +2838,11 @@
 ;; signature (2): (contracts, tenants, buildings) -> [building-name ...]
 ;; 方針: 「複数契約をまとめて引く」ときに前処理コストがペイバックするか否かの境目を口頭で説明できること。
 
-;; 自分で書いたバージョン
+;; (1) 自分で書いたバージョン
 (defn building-name-for-contract-naive
   [contract tenants buildings]
-  (let [tenant (first (filter #(= (:id %) (:tenant-id contract)) tenants))
-        building (first (filter #(= (:id %) (:building-id tenant)) buildings))]
+  (let [tenant (first (filter #(= (:tenant-id contract) (:id %)) tenants))
+        building (first (filter #(= (:building-id tenant) (:id %)) buildings))]
     (:name building)))
 
 #_(defn building-name-for-contract-naive
@@ -2853,11 +2854,11 @@
 ;;        K契約をまとめて引くと O(K*(T+B))。線形検索が毎回走る。
 ;; 説明ポイント: K=1 のスポット参照ならこれで十分。マップを作る方が前処理コストでむしろ高くつく。
 
-;; 自分で書いたバージョン
+;; (2) 自分で書いたバージョン
 (defn building-names-for-contracts-fast
   [contracts tenants buildings]
   (let [tenants' (into {} (map (juxt :id identity) tenants))
-        buildings' (into {} (map (juxt :id identity)  buildings))]
+        buildings' (into {} (map (juxt :id identity) buildings))]
     (->> contracts
          (map :tenant-id)
          (map tenants')
@@ -2886,18 +2887,18 @@
 ;; 方針: 多段の for で「全ての (b, f, t) の組合せ」を生成。空フロアは自然に脱落する。
 (defn flatten-buildings
   [buildings]
-  (vec
-    (for [b buildings
-          f (:floors b)
-          t (:tenants f)]
-      {:building-id   (:building/id b)
-       :building-name (:name b)
-       :building-area (:area b)
-       :floor         (:floor f)
-       :tenant-id     (:tenant/id t)
-       :tenant-name   (:name t)
-       :tenant-area   (:area t)
-       :rent          (:rent t)})))
+  (for [b buildings
+        f (:floors b)
+        t (:tenants f)]
+    {:building-id   (:building/id b)
+     :building-name (:name b)
+     :building-area (:area b)
+     :floor         (:floor f)
+     :tenant-id     (:tenant/id t)
+     :tenant-name   (:name t)
+     :tenant-area   (:area t)
+     :rent          (:rent t)}))
+
 ;; 計算量: 時間 O(N) (出力長), 空間 O(N)。
 ;; 説明ポイント: for の多重生成器はネスト展開の素直な表現。
 ;;              「行 (relation tuple) としての操作」が欲しい時の定石変換。
