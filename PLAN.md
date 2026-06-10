@@ -9,7 +9,9 @@
   - 到達点: naive=二重ループ O(N²)、fast=マップ構築 O(T+B)+各引き O(1) の足し算で O(N)。「O(N²)→O(N)」を口頭で言える状態
 - 消化済み(新規): **Q208**（6/8）ネスト→フラット flatten-buildings（単一 for＋生成器3つ）
   - 到達点: 階層走査なので直積でなく **O(N)**（葉=テナント総数を1回ずつ）。「ネスト for でも内側が外の子なら掛け算でなく足し算」を口頭で
-- 学んだ周辺知識: namespaced keyword(:building/id)、some vs filter+first、find-first はコア無し→(first (filter…))、transducer/comp の向き、defrecord 再定義の instance? 問題、:refer-clojure :exclude
+- 消化済み(新規): **Q209**（6/10）フラット→ネスト nest-by-building（group-by 2段＋set/rename-keys）
+  - 到達点: flatten は「グループ展開＋リネーム(衝突回避)」、逆の nest は「グループ集約＋リネーム復元」。リネームは省けない本質。group-by O(N)、順序安定化に sort で O(N log N)
+- 学んだ周辺知識: namespaced keyword(:building/id)、some vs filter+first、find-first はコア無し→(first (filter…))、transducer/comp の向き、defrecord 再定義の instance? 問題、:refer-clojure :exclude、set/rename-keys、`->` に渡す値を続く呼び出しに書くと二重になる罠
 
 ### 6/7(日) 振り返り
 - 大ブロックだったが **Q207 のみ**消化（概念の深掘りに時間を使った）。Q208/Q209/Q214 は未着手 → 平日昼に繰り越し
@@ -79,8 +81,9 @@
 - [x] Q036 / [x] Q037 / [x] Q042
 - [x] **Q207**（naive+fast、O(N²)→O(N) 理解済み）
 - [x] **Q208**（単一 for、O(N) 理解済み）
-- [ ] Q214  ← ★6/9
-- [ ] Q209 / [ ] Q213（＋clojure.set Q067-072 思い出し）  ← ★6/10
+- [x] **Q209**（group-by 2段＋set/rename-keys、O(N)）
+- [ ] Q214  ← ★必須A 残り1問
+- [ ] Q213（＋clojure.set Q067-072 思い出し）  ← 6/10
 - [ ] Q205 / [ ] Q210 / [ ] Q215  ← 6/11
 - [ ] Q219(口頭) / [ ] Q220(口頭) / [ ] Q216  ← ★必須B 6/12
 - [ ] 最終確認（空書き4問＋グラフ口頭＋定型句）  ← 6/15

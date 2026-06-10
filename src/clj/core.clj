@@ -2903,7 +2903,6 @@
 ;; 説明ポイント: for の多重生成器はネスト展開の素直な表現。
 ;;              「行 (relation tuple) としての操作」が欲しい時の定石変換。
 ;;              以降は普通の集合操作 (group-by/filter/reduce) で扱える。
-
 ;; Q209: フラットな (Q208 形式の) 行のリストを、ビル→フロア→テナントのネスト構造に
 ;;       組み直す関数 nest-by-building を書け。
 ;; signature: [flat-rows] -> [{:building/id _ :name _ :area _ :floors [{:floor _ :tenants [...]}]}]
@@ -2911,25 +2910,49 @@
 ;; 注意: フラット化の時点で「空フロア」や :capacity など元情報の一部は失われる (ロスあり変換)。
 (defn nest-by-building
   [rows]
-  (->> (group-by :building-id rows)
-       (mapv (fn [[bid bid-rows]]
-               (let [first-row (first bid-rows)]
-                 {:building/id bid
-                  :name        (:building-name first-row)
-                  :area        (:building-area first-row)
-                  :floors      (->> (group-by :floor bid-rows)
-                                    (mapv (fn [[fl fl-rows]]
-                                            {:floor fl
-                                             :tenants (mapv (fn [r]
-                                                              {:tenant/id (:tenant-id r)
-                                                               :name      (:tenant-name r)
-                                                               :area      (:tenant-area r)
-                                                               :rent      (:rent r)})
-                                                            fl-rows)}))
-                                    (sort-by :floor)
-                                    vec)})))
-       (sort-by :building/id)
-       vec))
+  (->> rows
+       (group-by #(select-keys % [:building-id :building-name :building-area]))
+       (mapv
+        (fn [[kvs v]]
+          (-> kvs
+              (set/rename-keys {:building-id :building/id
+                                :building-name :name
+                                :building-area :area})
+              (assoc :floors (->> v
+                                  (group-by #(select-keys % [:floor]))
+                                  (mapv
+                                   (fn [[kvs v]]
+                                     (-> kvs
+                                         (assoc :tenants
+                                                (mapv
+                                                 #(select-keys % [:tenant-id :tenant-name :tenant-area :rent])
+                                                 v))))))))))))
+
+#_(pprint (let [flat   (flatten-buildings sample-buildings-nested)
+       nested (nest-by-building flat)]
+   nested))
+
+#_(defn nest-by-building
+    [rows]
+    (->> (group-by :building-id rows)
+         (mapv (fn [[bid bid-rows]]
+                 (let [first-row (first bid-rows)]
+                   {:building/id bid
+                    :name        (:building-name first-row)
+                    :area        (:building-area first-row)
+                    :floors      (->> (group-by :floor bid-rows)
+                                      (mapv (fn [[fl fl-rows]]
+                                              {:floor fl
+                                               :tenants (mapv (fn [r]
+                                                                {:tenant/id (:tenant-id r)
+                                                                 :name      (:tenant-name r)
+                                                                 :area      (:tenant-area r)
+                                                                 :rent      (:rent r)})
+                                                              fl-rows)}))
+                                      (sort-by :floor)
+                                      vec)})))
+         (sort-by :building/id)
+         vec))
 ;; 計算量: 時間 O(N log N) (sort のため; group-by 自体は O(N))、空間 O(N)。
 ;; 説明ポイント: 「フラット → ネスト」は group-by の階層的適用が定番。
 ;;              外側キー → 内側キーの順で適用。
