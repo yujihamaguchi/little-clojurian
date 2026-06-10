@@ -2908,10 +2908,13 @@
 ;; signature: [flat-rows] -> [{:building/id _ :name _ :area _ :floors [{:floor _ :tenants [...]}]}]
 ;; 方針: group-by を2段。ビルでまとめてから、フロアでまとめる。
 ;; 注意: フラット化の時点で「空フロア」や :capacity など元情報の一部は失われる (ロスあり変換)。
+;; 自分で書いたバージョン
 (defn nest-by-building
   [rows]
   (->> rows
-       (group-by #(select-keys % [:building-id :building-name :building-area]))
+       (group-by #(select-keys % [:building-id
+                                  :building-name
+                                  :building-area]))
        (mapv
         (fn [[kvs v]]
           (-> kvs
@@ -2923,14 +2926,18 @@
                                   (mapv
                                    (fn [[kvs v]]
                                      (-> kvs
-                                         (assoc :tenants
-                                                (mapv
-                                                 #(select-keys % [:tenant-id :tenant-name :tenant-area :rent])
-                                                 v))))))))))))
-
-#_(pprint (let [flat   (flatten-buildings sample-buildings-nested)
-       nested (nest-by-building flat)]
-   nested))
+                                         (assoc :tenants (-> (mapv
+                                                              (fn [r]
+                                                                (-> (select-keys r [:tenant-id
+                                                                                    :tenant-name
+                                                                                    :tenant-area
+                                                                                    :rent])
+                                                                    (set/rename-keys {:tenant-id :tenant/id
+                                                                                      :tenant-name :name
+                                                                                      :tenant-area :area
+                                                                                      })))
+                                                              v)
+                                                             ))))))))))))
 
 #_(defn nest-by-building
     [rows]
