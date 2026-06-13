@@ -3121,27 +3121,45 @@
 ;; Q214: 契約リストから、:rent の合計が target になる 2契約のペア (1つで良い) を返す
 ;;       関数 find-rent-pair-naive / find-rent-pair-fast を書け。
 ;; signature: ([{:rent _ ...}], target) -> [contract contract] or nil
+;; 自分で書いたバージョン
 (defn find-rent-pair-naive
   [contracts target]
-  (let [v (vec contracts)
-        n (count v)]
-    (first
-      (for [i (range n)
-            j (range (inc i) n)
-            :let [c1 (v i) c2 (v j)]
-            :when (= target (+ (:rent c1) (:rent c2)))]
-        [c1 c2]))))
-;; 計算量: 時間 O(n^2), 空間 O(1)。全ペア (n*(n-1)/2) を走査。
+  (-> (for [c1 contracts c2 contracts
+            :when (and (< (:tenant-id c1) (:tenant-id c2))
+                       (= target (+(:rent c1) (:rent c2))))]
+        [c1 c2])
+      first))
 
+#_(defn find-rent-pair-naive
+    [contracts target]
+    (let [v (vec contracts)
+          n (count v)]
+      (first
+       (for [i (range n)
+             j (range (inc i) n)
+             :let [c1 (v i) c2 (v j)]
+             :when (= target (+ (:rent c1) (:rent c2)))]
+         [c1 c2]))))
+;; 計算量: 時間 O(n^2), 空間 O(1)。全ペア (n*(n-1)/2) を走査。
+;; 自分で書いたバージョン
 (defn find-rent-pair-fast
   [contracts target]
-  (loop [[c & more] (seq contracts)
-         seen       {}]
-    (when c
-      (let [need (- target (:rent c))]
-        (if-let [c2 (seen need)]
-          [c2 c]
-          (recur more (assoc seen (:rent c) c)))))))
+  (loop [contracts contracts
+         seen {}]
+    (when-let [c (first contracts)]
+      (if-let [c2 (seen (- target (:rent c)))]
+        [c2 c]
+        (recur (rest contracts) (assoc seen (:rent c) c))))))
+
+#_(defn find-rent-pair-fast
+    [contracts target]
+    (loop [[c & more] (seq contracts)
+           seen       {}]
+      (when c
+        (let [need (- target (:rent c))]
+          (if-let [c2 (seen need)]
+            [c2 c]
+            (recur more (assoc seen (:rent c) c)))))))
 ;; 計算量: 時間 O(n), 空間 O(n) (seen マップ)。
 ;; 改善理由: two-sum パターン。各 c に対し「(target - rent) を既に見たか」をハッシュで O(1) 問い合わせ。
 ;;          全ペア n^2 を「各要素1回 + 1ルックアップ」に削減。
