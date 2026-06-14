@@ -2803,15 +2803,27 @@
 ;;       (空室面積 = floor の :capacity - そのフロアの全テナント :area の合計)
 ;; signature: [buildings-nested] -> {building-id -> vacant-area}
 ;; 方針: 2段の for / reduce でネストを舐める。素直版で十分。
+;; 自分で書いたバージョン
 (defn vacant-area-by-building
   [buildings]
-  (into {}
-        (map (fn [b]
-               [(:building/id b)
-                (reduce + (for [f (:floors b)]
-                            (- (:capacity f)
-                               (reduce + (map :area (:tenants f))))))]))
-        buildings))
+  (->> (for [b buildings
+             f (:floors b)]
+         [(:building/id b)
+          (- (:capacity f)
+             (reduce + (map :area (:tenants f))))])
+       (reduce (fn [acc [k v]]
+                 (update acc k (fnil + 0) v))
+               {})))
+
+#_(defn vacant-area-by-building
+    [buildings]
+    (into {}
+          (map (fn [b]
+                 [(:building/id b)
+                  (reduce + (for [f (:floors b)]
+                              (- (:capacity f)
+                                 (reduce + (map :area (:tenants f))))))]))
+          buildings))
 ;; 計算量: 時間 O(N) (N=テナント総数を1度ずつ舐める), 空間 O(B)。
 ;; 説明ポイント: フラットなマップなら 1段の reduce で済むが、ネストでは「外側で集約しつつ
 ;;              内側でさらに集約」の二段構えが必要。for 内包は多段ループを宣言的に書け、
@@ -2970,19 +2982,32 @@
 ;;       例: {"東京" {1 900000 2 350000} "大阪" {3 500000}}
 ;; 方針: ビル単位の rent 合計を作り、その上でエリアで group-by。多段集計の典型。
 (defn rent-totals-by-area-and-building
-  [buildings]
-  (->> buildings
-       (group-by :area)
-       (into {}
-             (map (fn [[area bs]]
-                    [area
-                     (into {}
-                           (map (fn [b]
-                                  [(:building/id b)
-                                   (reduce + (for [f (:floors b)
-                                                   t (:tenants f)]
-                                               (:rent t)))]))
-                           bs)])))))
+    [buildings]
+    (let [m (into {} (map (fn [b] [(:building/id b) (:area b)])buildings) )]
+      (->> (for [b buildings
+                 f (:floors b)]
+             [(:building/id b) (reduce + (map :rent (:tenants f)))])
+           (reduce (fn [acc [k v]]
+                     (update acc k (fnil + 0) v))
+                   {})
+           (group-by (fn [[k _]] (m k)))
+           (into {} (map (fn [[k vs]]
+                           [k (into {} vs)]))))))
+
+#_(defn rent-totals-by-area-and-building
+    [buildings]
+    (->> buildings
+         (group-by :area)
+         (into {}
+               (map (fn [[area bs]]
+                      [area
+                       (into {}
+                             (map (fn [b]
+                                    [(:building/id b)
+                                     (reduce + (for [f (:floors b)
+                                                     t (:tenants f)]
+                                                 (:rent t)))]))
+                             bs)])))))
 ;; 計算量: 時間 O(N), 空間 O(B)。group-by はハッシュテーブルでバケット分けする 1パス。
 ;; 説明ポイント: (group-by (juxt :area :building/id) ...) でも書けるが、キーがタプル
 ;;              {[area bid] -> ...} となり downstream で扱いづらい。ネストしたマップで返したい
@@ -2992,24 +3017,41 @@
 ;;       だけ引き上げた新しい構造を返す apply-rent-adjustment を書け。元の構造は破壊しないこと。
 ;; signature: (buildings-nested, building-id, floor-num, rate) -> buildings-nested
 ;; 方針: 構造マッピング版 (mapv で丸ごと辿る) と、index 検索 + update-in の経路特化版 を併記。
+;; 自分で書いたバージョン
 (defn apply-rent-adjustment
   [buildings building-id floor-num rate]
-  (mapv (fn [b]
-          (if-not (= (:building/id b) building-id)
-            b
-            (update b :floors
-                    (fn [floors]
-                      (mapv (fn [f]
-                              (if-not (= (:floor f) floor-num)
-                                f
-                                (update f :tenants
-                                        (fn [ts]
-                                          (mapv (fn [t]
-                                                  (update t :rent
-                                                          (fn [r] (long (* r (+ 1 rate))))))
-                                                ts)))))
-                            floors)))))
-        buildings))
+  (let [b-idx (->> buildings
+                   (keep-indexed (fn [i b] (when (= building-id (:building/id b)) i)))
+                   first)
+        f-idx (->> (get-in buildings [b-idx :floors])
+                   (keep-indexed (fn [i f] (when (= floor-num (:floor f)) i)))
+                   first)]
+    (update-in buildings [b-idx :floors f-idx :tenants]
+               (fn [ts]
+                 (mapv #(update % :rent (fn [r] (long (* r (+ 1 rate)))))
+                       ts)))))
+#_(get-in
+ (apply-rent-adjustment sample-buildings-nested 1 2 0.1)
+ [0 :floors 1 :tenants 0 :rent])
+
+#_(defn apply-rent-adjustment
+    [buildings building-id floor-num rate]
+    (mapv (fn [b]
+            (if-not (= (:building/id b) building-id)
+              b
+              (update b :floors
+                      (fn [floors]
+                        (mapv (fn [f]
+                                (if-not (= (:floor f) floor-num)
+                                  f
+                                  (update f :tenants
+                                          (fn [ts]
+                                            (mapv (fn [t]
+                                                    (update t :rent
+                                                            (fn [r] (long (* r (+ 1 rate))))))
+                                                  ts)))))
+                              floors)))))
+          buildings))
 ;; 計算量: 時間 O(N) (全構造を1度走査), 空間 O(N) — ただし不変データの構造的共有 (path copy) で
 ;;        変更されない枝はメモリ実体を元と共有するため、変更パス以外はコピー発生しない。
 ;; 説明ポイント: マップ/ベクタはともに変更パスのみ O(log32 N) の浅いトライをコピー。

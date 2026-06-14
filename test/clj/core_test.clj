@@ -1434,7 +1434,6 @@
 (deftest vacant-area-by-building-test
   (is (= {1 170 2 110 3 40}
          (vacant-area-by-building sample-buildings-nested))))
-
 (deftest tenant-count-by-building-test
   (is (= {1 3 2 1 3 1}
          (tenant-count-by-building sample-buildings-nested))))
