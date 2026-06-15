@@ -2853,9 +2853,9 @@
 ;; (1) 自分で書いたバージョン
 (defn building-name-for-contract-naive
   [contract tenants buildings]
-  (let [tenant (first (filter #(= (:tenant-id contract) (:id %)) tenants))
-        building (first (filter #(= (:building-id tenant) (:id %)) buildings))]
-    (:name building)))
+  (let [t (first (filter (fn [t] (= (:id t) (:tenant-id contract))) tenants))
+        b (first (filter (fn [b] (= (:id b) (:building-id t))) buildings))]
+   (:name b)))
 
 #_(defn building-name-for-contract-naive
     [contract tenants buildings]
@@ -2869,13 +2869,13 @@
 ;; (2) 自分で書いたバージョン
 (defn building-names-for-contracts-fast
   [contracts tenants buildings]
-  (let [tenants' (into {} (map (juxt :id identity) tenants))
-        buildings' (into {} (map (juxt :id identity) buildings))]
+  (let [t (into {} (map (juxt :id identity) tenants))
+        b (into {} (map (juxt :id identity) buildings))]
     (->> contracts
          (map :tenant-id)
-         (map tenants')
+         (map t)
          (map :building-id)
-         (map buildings')
+         (map b)
          (map :name))))
 
 #_(defn building-names-for-contracts-fast
@@ -2897,6 +2897,7 @@
 ;; signature: [buildings-nested] -> [{:building-id _ :building-name _ :building-area _
 ;;                                    :floor _ :tenant-id _ :tenant-name _ :tenant-area _ :rent _}]
 ;; 方針: 多段の for で「全ての (b, f, t) の組合せ」を生成。空フロアは自然に脱落する。
+;; 自分で書いたバージョン
 (defn flatten-buildings
   [buildings]
   (for [b buildings
@@ -2911,6 +2912,20 @@
      :tenant-area   (:area t)
      :rent          (:rent t)}))
 
+#_(defn flatten-buildings
+    [buildings]
+    (for [b buildings
+          f (:floors b)
+          t (:tenants f)]
+      {:building-id   (:building/id b)
+       :building-name (:name b)
+       :building-area (:area b)
+       :floor         (:floor f)
+       :tenant-id     (:tenant/id t)
+       :tenant-name   (:name t)
+       :tenant-area   (:area t)
+       :rent          (:rent t)}))
+
 ;; 計算量: 時間 O(N) (出力長), 空間 O(N)。
 ;; 説明ポイント: for の多重生成器はネスト展開の素直な表現。
 ;;              「行 (relation tuple) としての操作」が欲しい時の定石変換。
@@ -2920,36 +2935,52 @@
 ;; signature: [flat-rows] -> [{:building/id _ :name _ :area _ :floors [{:floor _ :tenants [...]}]}]
 ;; 方針: group-by を2段。ビルでまとめてから、フロアでまとめる。
 ;; 注意: フラット化の時点で「空フロア」や :capacity など元情報の一部は失われる (ロスあり変換)。
-;; 自分で書いたバージョン
-(defn nest-by-building
+;; 自分で書いたバージョン（rename 外した見やすい版）
+#_(defn nest-by-building
   [rows]
   (->> rows
        (group-by #(select-keys % [:building-id
                                   :building-name
                                   :building-area]))
-       (mapv
-        (fn [[kvs v]]
-          (-> kvs
-              (set/rename-keys {:building-id :building/id
-                                :building-name :name
-                                :building-area :area})
-              (assoc :floors (->> v
-                                  (group-by #(select-keys % [:floor]))
-                                  (mapv
-                                   (fn [[kvs v]]
-                                     (-> kvs
-                                         (assoc :tenants (-> (mapv
-                                                              (fn [r]
-                                                                (-> (select-keys r [:tenant-id
-                                                                                    :tenant-name
-                                                                                    :tenant-area
-                                                                                    :rent])
-                                                                    (set/rename-keys {:tenant-id :tenant/id
-                                                                                      :tenant-name :name
-                                                                                      :tenant-area :area
-                                                                                      })))
-                                                              v)
-                                                             ))))))))))))
+       (mapv (fn [[kvs vs]]
+               (assoc kvs :floors (->> vs
+                                       (group-by #(select-keys % [:floor]))
+                                       (mapv (fn [[kvs vs]]
+                                               (assoc kvs :tenants (->> vs
+                                                                        (mapv #(select-keys % [:tenant-id
+                                                                                               :tenant-name
+                                                                                               :tenant-area
+                                                                                               :rent]))))))))))))
+;; 自分で書いたバージョン
+(defn nest-by-building
+    [rows]
+    (->> rows
+         (group-by #(select-keys % [:building-id
+                                    :building-name
+                                    :building-area]))
+         (mapv
+          (fn [[kvs v]]
+            (-> kvs
+                (set/rename-keys {:building-id :building/id
+                                  :building-name :name
+                                  :building-area :area})
+                (assoc :floors (->> v
+                                    (group-by #(select-keys % [:floor]))
+                                    (mapv
+                                     (fn [[kvs v]]
+                                       (-> kvs
+                                           (assoc :tenants (-> (mapv
+                                                                (fn [r]
+                                                                  (-> (select-keys r [:tenant-id
+                                                                                      :tenant-name
+                                                                                      :tenant-area
+                                                                                      :rent])
+                                                                      (set/rename-keys {:tenant-id :tenant/id
+                                                                                        :tenant-name :name
+                                                                                        :tenant-area :area
+                                                                                        })))
+                                                                v)
+                                                               ))))))))))))
 
 #_(defn nest-by-building
     [rows]
@@ -2981,15 +3012,27 @@
 ;; signature: [buildings-nested] -> {area -> {building-id -> rent-sum}}
 ;;       例: {"東京" {1 900000 2 350000} "大阪" {3 500000}}
 ;; 方針: ビル単位の rent 合計を作り、その上でエリアで group-by。多段集計の典型。
+
+;; 自分で書いたバージョン
 (defn rent-totals-by-area-and-building
+  [buildings]
+  (reduce (fn [acc b]
+            (assoc-in acc
+                      [(:area b) (:building/id b)]
+                      (->> (:floors b)
+                           (mapcat :tenants)
+                           (map :rent)
+                           (reduce +))))
+          {}
+          buildings))
+
+#_(defn rent-totals-by-area-and-building
     [buildings]
     (let [m (into {} (map (fn [b] [(:building/id b) (:area b)])buildings) )]
       (->> (for [b buildings
                  f (:floors b)]
              [(:building/id b) (reduce + (map :rent (:tenants f)))])
-           (reduce (fn [acc [k v]]
-                     (update acc k (fnil + 0) v))
-                   {})
+           (reduce (fn [acc [k v]] (update acc k (fnil + 0) v)) {})
            (group-by (fn [[k _]] (m k)))
            (into {} (map (fn [[k vs]]
                            [k (into {} vs)]))))))
@@ -3030,9 +3073,6 @@
                (fn [ts]
                  (mapv #(update % :rent (fn [r] (long (* r (+ 1 rate)))))
                        ts)))))
-#_(get-in
- (apply-rent-adjustment sample-buildings-nested 1 2 0.1)
- [0 :floors 1 :tenants 0 :rent])
 
 #_(defn apply-rent-adjustment
     [buildings building-id floor-num rate]
@@ -3165,12 +3205,12 @@
 ;; signature: ([{:rent _ ...}], target) -> [contract contract] or nil
 ;; 自分で書いたバージョン
 (defn find-rent-pair-naive
-  [contracts target]
-  (-> (for [c1 contracts c2 contracts
-            :when (and (< (:tenant-id c1) (:tenant-id c2))
-                       (= target (+(:rent c1) (:rent c2))))]
-        [c1 c2])
-      first))
+    [contracts target]
+    (-> (for [c1 contracts c2 contracts
+              :when (and (< (:tenant-id c1) (:tenant-id c2))
+                         (= target (+(:rent c1) (:rent c2))))]
+          [c1 c2])
+        first))
 
 #_(defn find-rent-pair-naive
     [contracts target]
@@ -3186,12 +3226,13 @@
 ;; 自分で書いたバージョン
 (defn find-rent-pair-fast
   [contracts target]
-  (loop [contracts contracts
+  (loop [cs contracts
          seen {}]
-    (when-let [c (first contracts)]
+    (when-let [c (first cs)]
       (if-let [c2 (seen (- target (:rent c)))]
-        [c2 c]
-        (recur (rest contracts) (assoc seen (:rent c) c))))))
+        [c c2]
+        (recur (rest cs)
+               (assoc seen (:rent c) c))))))
 
 #_(defn find-rent-pair-fast
     [contracts target]
