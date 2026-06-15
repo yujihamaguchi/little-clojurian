@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(timeout 180 lein run -m clojure.main -e ' *)"
+    ]
+  }
+}
